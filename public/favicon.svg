@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Ícone "U!" da marca Uhuu (rosa #EE3680 sobre fundo transparente) -->
+  <g fill="#EE3680">
+    <rect x="42" y="297" width="44" height="44"/>
+    <rect x="340" y="43" width="43" height="254"/>
+    <rect x="340" y="340" width="43" height="43"/>
+    <rect x="425" y="297" width="44" height="44"/>
+  </g>
+  <path d="M148.5 256V383a64 64 0 0 0 128 0V128" fill="none" stroke="#EE3680" stroke-width="43"/>
+</svg>
