@@ -316,7 +316,8 @@ function SectorRow({ sector, session, open, onToggle, count }) {
         open ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-ink-4'
       } disabled:cursor-not-allowed disabled:bg-body-2 disabled:hover:border-line`}
     >
-      <Ico name={icon} className={`size-6 ${disabled ? 'text-ink-4' : 'text-ink'}`} />
+      {/* No celular o ícone fica oculto para sobrar espaço ao nome e ao preço (Figma 9986:126801) */}
+      <Ico name={icon} className={`hidden size-6 md:block ${disabled ? 'text-ink-4' : 'text-ink'}`} />
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2">
           <Badge tone={disabled ? 'muted' : 'brand'}>{sector.badge}</Badge>
@@ -363,15 +364,18 @@ function FreeBody({ sector, order, dispatch, session }) {
         const n = q[f.id] || 0
         return (
           <div key={f.id} className={`rounded-2xl border bg-white transition ${n > 0 ? 'border-brand' : 'border-line'}`}>
-            <div className="flex items-center gap-3 p-4">
-              <Ico name="ticket" className="size-6 text-ink" />
-              <div className="min-w-0 flex-1">
-                <p className="text-base font-semibold leading-5 text-ink">{f.name}</p>
-                <p className="font-ui text-xs text-ink-3">{f.desc}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-bold text-ink">{brl(f.price)}</p>
-                <Fee value={f.price} as="p" />
+            {/* Celular (Figma 9986:126783): tarifa e preço na mesma linha, quantidade abaixo à direita, sem ícone */}
+            <div className="flex flex-col items-end gap-3 p-4 md:flex-row md:items-center">
+              <Ico name="ticket" className="hidden size-6 text-ink md:block" />
+              <div className="flex w-full min-w-0 flex-1 items-start gap-3 md:items-center">
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <p className="text-sm font-bold leading-5 text-ink md:text-base md:font-semibold">{f.name}</p>
+                  <p className="text-xs leading-4 text-ink-2 md:font-ui md:text-ink-3">{f.desc}</p>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
+                  <p className="text-sm font-bold leading-5 text-ink">{brl(f.price)}</p>
+                  <Fee value={f.price} as="p" />
+                </div>
               </div>
               <Stepper label={f.name} value={n} canAdd={room > 0} onChange={(v) => dispatch({ type: 'qty', sector: sector.id, fare: f.id, n: v })} />
             </div>

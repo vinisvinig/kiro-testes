@@ -484,6 +484,7 @@ function AddressForm({ onSave, onCancel }) {
 /* ---------------- 05/06 · Pagamento ---------------- */
 function PaymentStep({ c, t, dispatch, onPix, onCard }) {
   const open = c.step === 'pagamento'
+  const [coinsInfo, setCoinsInfo] = useState(false)
   return (
     <StepShell
       id="pagamento"
@@ -500,9 +501,19 @@ function PaymentStep({ c, t, dispatch, onPix, onCard }) {
         </span>
         <span className="flex items-center gap-2 text-base font-semibold text-ink">
           Usar moedas Uhuu
-          <span title="Moedas acumuladas em compras anteriores. Valem como desconto no pedido." className="text-ink-3">
+          {/* Botão fora do efeito do <label>: abre a explicação sem ligar/desligar as moedas */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setCoinsInfo(true)
+            }}
+            aria-label="O que são as moedas Uhuu?"
+            className="-m-1.5 flex items-center justify-center rounded-full p-1.5 text-ink-3 hover:bg-body-3 hover:text-ink"
+          >
             <Ico name="help" className="size-[18px]" />
-          </span>
+          </button>
         </span>
         <span className="ml-auto font-ui text-sm text-ink-3">Saldo elegível para este pedido</span>
         <span className="text-base font-semibold text-ink">{brl(UHUU_COINS)}</span>
@@ -512,6 +523,22 @@ function PaymentStep({ c, t, dispatch, onPix, onCard }) {
           <span className="absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
         </span>
       </label>
+      {/* "Sobre a moeda Uhuu" (Figma 9968:42371) */}
+      <InfoDialog open={coinsInfo} onClose={() => setCoinsInfo(false)} title="O que são os créditos?">
+        <p className="font-sans text-base leading-6">
+          Crédito é a moeda Uhuu, criada para garantir que você consiga fazer uma compra utilizando o valor pago em pedidos com eventos cancelados.
+        </p>
+        <div className="rounded-2xl bg-body-2 p-4 font-sans text-sm leading-5 text-ink-2">
+          <p className="font-bold">Regras:</p>
+          <ul className="mt-2.5 flex list-disc flex-col gap-2.5 pl-5">
+            <li>Ao solicitar a troca por crédito, o seu pedido e ingressos serão cancelados</li>
+            <li>Os créditos só podem ser gastos em eventos da mesma produtora</li>
+            <li>Você não pode resgatar seus créditos, apenas gastar na plataforma em eventos da mesma produtora</li>
+            <li>Os créditos somente serão gerados na carteira do consumidor que realizou a compra</li>
+            <li>Você não pode utilizar seus créditos em pedidos contendo mais de um evento</li>
+          </ul>
+        </div>
+      </InfoDialog>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Forma de pagamento">
         {[
