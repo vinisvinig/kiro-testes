@@ -96,6 +96,8 @@ export const COMBOS = [
   combo('amigos-coberta', 'Combo Amigos', '5 lugares, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 4], ['cortesia', 1]]),
 ]
 export const comboPrice = (c, session) => c.price * (session?.mult ?? 1)
+/** Mesmo texto da lista de combos, sem o ponto final (ex.: "5 lugares, sendo 1 cortesia"). */
+export const comboDetail = (c) => c.desc.replace(/\.$/, '')
 /** "3 Inteira, 1 Meia-entrada e 1 Cortesia" */
 export const comboItemsLabel = (c) => {
   const parts = c.items.map(([f, n]) => `${n} ${COMBO_FARES[f]}`)

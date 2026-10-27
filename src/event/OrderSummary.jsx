@@ -1,7 +1,7 @@
 // Resumo do pedido (coluna direita, Figma 9401:52957) e barra fixa de compra no celular.
 import { useEffect, useId, useRef, useState } from 'react'
 import { useModalBehavior } from '../components/home/ui.jsx'
-import { SERVICE_FEE, comboItemsLabel, sessionTitle } from './eventData.js'
+import { SERVICE_FEE, comboDetail, sessionTitle } from './eventData.js'
 import { Card, Eyebrow, Ico, brl } from './parts.jsx'
 
 export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
@@ -93,7 +93,7 @@ function SummaryLine({ line: l, codeOk, onRemove }) {
   else if (!isCombo && !l.fare) pending = 'Tarifa pendente'
   else if (l.fare?.validator && !codeOk(l.fare.validator)) pending = 'Validação pendente'
 
-  const detail = isCombo ? `${l.qty}x ${l.combo.name} · ${comboItemsLabel(l.combo)}` : `${l.qty}x ${l.fare ? l.fare.name : 'tarifa a definir'}`
+  const detail = isCombo ? `${l.qty}x ${l.combo.name} · ${comboDetail(l.combo)}` : `${l.qty}x ${l.fare ? l.fare.name : 'tarifa a definir'}`
   const what = isCombo ? `${l.qty}x ${l.combo.name}` : `${l.qty}x ${l.fare?.name ?? 'sem tarifa'}`
 
   return (

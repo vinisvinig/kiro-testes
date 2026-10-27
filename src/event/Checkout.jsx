@@ -2,7 +2,7 @@
 // Etapas: Seguro → Clube Planeta → Entrega → Pagamento. Cada uma só abre quando a anterior é respondida;
 // as já respondidas viram um resumo com "Editar".
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { EVENT, comboItemsLabel, sessionTitle } from './eventData.js'
+import { EVENT, comboDetail, sessionTitle } from './eventData.js'
 import {
   DELIVERY,
   INSTALLMENTS,
@@ -138,7 +138,7 @@ function EventSummary({ order }) {
                   {l.kind === 'combo' ? `${l.qty}x ${l.combo.name}, ${l.sector.name}` : `${l.qty} ${l.qty === 1 ? 'ingresso' : 'ingressos'}, ${l.sector.name}`}
                 </span>
                 <span className="mt-1 block font-ui text-xs text-ink-3">
-                  {l.kind === 'combo' ? comboItemsLabel(l.combo) : `${l.qty}x ${l.fare.name}`}
+                  {l.kind === 'combo' ? comboDetail(l.combo) : `${l.qty}x ${l.fare.name}`}
                   {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
                 </span>
               </span>
