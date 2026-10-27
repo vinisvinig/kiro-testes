@@ -2,14 +2,13 @@
 
 Protótipo em React e Vite preparado para hospedagem gratuita no GitHub Pages e acesso por celular, tablet ou computador em redes diferentes.
 
-## Publicação
+## Link para os participantes
 
-1. Crie o repositório público `kiro-testes` na sua conta do GitHub e envie os arquivos desta pasta, incluindo `.github/workflows/deploy.yml`.
-2. Em **Settings → Pages → Build and deployment → Source**, selecione **GitHub Actions**.
-3. Na aba **Actions**, execute **Publicar protótipo no GitHub Pages**, se necessário.
-4. Após a publicação, compartilhe `https://vinisvinig.github.io/kiro-testes/`.
+[Abrir o protótipo](https://vinisvinig.github.io/kiro-testes/)
 
-Esse endereço é o previsto; só estará disponível depois que a publicação terminar. Cada atualização enviada para `main` publica uma nova versão automaticamente.
+O GitHub Pages está configurado para publicar pelo GitHub Actions. Cada atualização enviada para `main` publica uma nova versão automaticamente. Aguarde a execução mais recente de **Publicar protótipo no GitHub Pages** ficar verde na [aba Actions](https://github.com/vinisvinig/kiro-testes/actions) antes de iniciar uma sessão de teste.
+
+Para recriar a hospedagem em outro repositório, envie os arquivos, mantenha a branch `main` e selecione **Settings → Pages → Build and deployment → Source → GitHub Actions**. O workflow adapta o caminho de publicação ao nome do repositório.
 
 As rotas publicadas usam `/#/busca`, `/#/local/...` e `/#/evento/...`, permitindo abrir links diretamente e atualizar a página no GitHub Pages.
 
@@ -17,7 +16,7 @@ As rotas publicadas usam `/#/busca`, `/#/local/...` e `/#/evento/...`, permitind
 
 - Login, pedidos e pagamentos são simulados. Use dados fictícios, inclusive e-mail, senha, endereço e cartão. Não há cobrança nem emissão real de ingressos.
 - Cada navegador tem seu próprio estado; contas e pedidos não são compartilhados entre dispositivos. Use uma janela anônima para começar um teste sem o login anterior.
-- O site ficará acessível pelo link público. O GitHub Free exige repositório público para o GitHub Pages.
+- O site é acessível pelo link público. O GitHub Free exige repositório público para o GitHub Pages.
 - Fontes do Google, mapas e consulta de CEP dependem de serviços externos e de internet. A localização pode solicitar permissão no navegador.
 - Este projeto se destina a testes do protótipo, sem operação de vendas reais.
 
