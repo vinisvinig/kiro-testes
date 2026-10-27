@@ -244,7 +244,7 @@ function About() {
           <li key={k} className="rounded-xl border border-[#fbcfe8] bg-brand-0 p-3">
             <p className="font-ui text-[10px] font-medium uppercase text-brand">{k}</p>
             <p className="mt-1 text-sm font-semibold text-ink">{v}</p>
-            <p className="font-ui text-[11px] text-ink-3">{d}</p>
+            {d && <p className="font-ui text-[11px] text-ink-3">{d}</p>}
           </li>
         ))}
       </ul>

@@ -129,15 +129,16 @@ export const EVENT = {
     /** Texto revelado pelo "Ver mais". */
     more: [
       'A trilha sonora é executada ao vivo por uma orquestra de 40 músicos, com arranjos inéditos para os temas mais conhecidos do filme. O palco central de 360° permite que todos os setores acompanhem as cenas de perto, e telões de alta definição mostram os detalhes dos bonecos e figurinos.',
-      'A classificação indicativa é livre, mas menores de 16 anos devem estar acompanhados dos pais ou responsáveis. A duração aproximada é de 2h, com intervalo de 20 minutos. Não é permitida a entrada com alimentos, bebidas, câmeras profissionais ou guarda-chuvas.',
+      'Não é permitida a entrada com alimentos, bebidas, câmeras profissionais ou guarda-chuvas. Recomendamos chegar com antecedência para passar pela revista e encontrar seu setor com tranquilidade.',
     ],
+    /** Informações práticas do evento (Figma 9720:324216): [rótulo, valor, detalhe] */
     credits: [
-      ['Direção criativa', 'Ateliê Caminho de Luzes', 'Concepção da experiência ao vivo'],
-      ['Direção musical', 'Orquestra Halloween Town', 'Produção musical e arranjos'],
-      ['Direção de palco', 'Cia. Noite Estranha', 'Luz, lasers e efeitos cênicos'],
-      ['Produção & realização', 'Uhuu Live', 'Operação oficial da turnê'],
-      ['Acessibilidade', 'Áreas e rotas acessíveis', 'Atendimento mediante disponibilidade'],
-      ['Sustentabilidade', 'Pulseiras LED reutilizáveis', 'Devolução assistida após o show'],
+      ['Local', 'Estádio MorumBIS', 'Morumbi · São Paulo/SP'],
+      ['Data e horário', '14 a 27 de novembro às 20h30', 'Abertura dos portões às 18h'],
+      ['Estacionamento', 'Estacionamento no local', 'Pago à parte e sujeito à lotação'],
+      ['Classificação etária', '16 anos', 'Menores somente acompanhados dos responsáveis'],
+      ['Acessibilidade', 'Espaços e acessos adaptados', ''],
+      ['Duração', 'Aproximadamente 2 horas', 'Sem intervalo'],
     ],
   },
   /** Mensagem pós-compra (texto livre do produtor no AppADM). */
