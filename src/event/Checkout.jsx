@@ -154,7 +154,7 @@ function EventSummary({ order }) {
 /* ------------------------------------------------------------------ */
 /* Blocos de etapa: aberta, concluída, bloqueada                       */
 /* ------------------------------------------------------------------ */
-function StepShell({ id, state, icon, title, subtitle, summary, onEdit, lockedText = 'Disponível após a etapa anterior', children }) {
+function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, lockedText = 'Disponível após a etapa anterior', children }) {
   if (state === 'locked') {
     return (
       <section id={`etapa-${id}`} aria-disabled="true" className="scroll-mt-24 rounded-3xl border border-line bg-white px-6 py-5 opacity-80">
@@ -174,7 +174,8 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, lockedTe
     return (
       <section id={`etapa-${id}`} className="scroll-mt-24 rounded-3xl border border-line bg-white px-6 py-5">
         <div className="flex items-center gap-4">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#22c55e] text-white">
+          {/* Verde quando o adicional foi contratado; cinza (como etapa não preenchida) quando a pessoa continuou sem */}
+          <span className={`flex size-8 shrink-0 items-center justify-center rounded-full ${declined ? 'bg-body-3 text-ink-2' : 'bg-[#22c55e] text-white'}`}>
             <Ico name={icon} className="size-4" />
           </span>
           <div className="min-w-0 flex-1">
@@ -240,6 +241,7 @@ function InsuranceStep({ c, t, dispatch }) {
       subtitle="Seguro opcional"
       summary={c.insurance ? `Seguro MetLife contratado · ${brl(t.insuranceValue)}` : 'Sem seguro'}
       onEdit={() => dispatch({ type: 'edit', step: 'seguro' })}
+      declined={c.insurance === false}
     >
       <p className="text-base font-bold text-ink">Seguro MetLife</p>
       <p className="mt-2 font-ui text-sm leading-6 text-ink-2">Reembolso sujeito à análise da seguradora, às coberturas contratadas e às condições do seguro.</p>
@@ -283,6 +285,7 @@ function ClubStep({ c, t, order, dispatch }) {
       subtitle="Adesão opcional"
       summary={c.club ? `Clube Planeta adicionado · ${order.count} ${order.count === 1 ? 'ingresso' : 'ingressos'} · ${brl(t.clubValue)}` : 'Sem Clube Planeta'}
       onEdit={() => dispatch({ type: 'edit', step: 'clube' })}
+      declined={c.club === false}
     >
       <p className="font-ui text-sm leading-6 text-ink-2">Benefícios e descontos exclusivos em eventos participantes.</p>
       <ul className="mt-2 list-disc pl-5 font-ui text-xs leading-5 text-ink-2">
