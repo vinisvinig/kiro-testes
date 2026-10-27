@@ -68,12 +68,12 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
         </div>
 
         {order.sessionId && (
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
             <OrderSummary order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} />
           </aside>
         )}
       </div>
-      {order.sessionId && <MobileBuyBar derived={derived} onBuy={onBuy} />}
+      {order.sessionId && <MobileBuyBar order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} />}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 // Resumo do pedido (coluna direita, Figma 9401:52957) e barra fixa de compra no celular.
-import { useId } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { useModalBehavior } from '../components/home/ui.jsx'
 import { SERVICE_FEE, comboItemsLabel, sessionTitle } from './eventData.js'
 import { Card, Eyebrow, Ico, brl } from './parts.jsx'
 
@@ -7,20 +8,11 @@ export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${Str
 
 export const SUMMARY_ID = 'resumo-pedido'
 
-export function OrderSummary({ order, derived, dispatch, onFees, onBuy }) {
-  const d = derived
+/** Itens, valores, total e código validador: compartilhado entre o card (desktop) e a barra expandida (mobile). */
+function SummaryDetails({ order, derived: d, dispatch }) {
   const empty = d.count === 0
-
   return (
-    <Card as="div" id={SUMMARY_ID} className="flex scroll-mt-24 flex-col gap-5">
-      <div>
-        <Eyebrow>Resumo do pedido</Eyebrow>
-        <p className="mt-2 text-2xl font-bold leading-tight text-ink">
-          {empty ? 'Nenhum ingresso selecionado' : `${d.count} ${d.count === 1 ? 'ingresso' : 'ingressos'}`}
-        </p>
-        {d.sessions > 1 && <p className="mt-1 font-ui text-xs text-ink-3">Em {d.sessions} datas diferentes</p>}
-      </div>
-
+    <>
       <div className="border-t border-line pt-4">
         {empty ? (
           <p className="font-ui text-xs text-ink-3">Nenhum ingresso selecionado</p>
@@ -51,6 +43,26 @@ export function OrderSummary({ order, derived, dispatch, onFees, onBuy }) {
       {d.validators.map((v) => (
         <ValidatorBox key={v.id} validator={v} state={order.codes[v.id]} dispatch={dispatch} />
       ))}
+    </>
+  )
+}
+
+const countLabel = (n) => (n === 0 ? 'Nenhum ingresso selecionado' : `${n} ${n === 1 ? 'ingresso' : 'ingressos'}`)
+
+/** Card do resumo na coluna direita (a partir de 1024px; no celular vira a barra expansível). */
+export function OrderSummary({ order, derived, dispatch, onFees, onBuy }) {
+  const d = derived
+  const empty = d.count === 0
+
+  return (
+    <Card as="div" id={SUMMARY_ID} className="flex scroll-mt-24 flex-col gap-5">
+      <div>
+        <Eyebrow>Resumo do pedido</Eyebrow>
+        <p className="mt-2 text-2xl font-bold leading-tight text-ink">{countLabel(d.count)}</p>
+        {d.sessions > 1 && <p className="mt-1 font-ui text-xs text-ink-3">Em {d.sessions} datas diferentes</p>}
+      </div>
+
+      <SummaryDetails order={order} derived={d} dispatch={dispatch} />
 
       <div className="flex flex-col gap-2">
         <button
@@ -185,31 +197,82 @@ function Row({ label, value, className = '' }) {
   )
 }
 
-/** Barra fixa no rodapé do celular com total e Comprar. O aviso leva até o resumo (ex.: código validador). */
-export function MobileBuyBar({ derived, onBuy }) {
-  if (!derived.count) return null
-  const toSummary = () => document.getElementById(SUMMARY_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+/**
+ * Resumo do pedido no celular (Figma 9977:125080): barra fixa com seta, quantidade, total e Comprar.
+ * A seta expande o resumo completo (itens, valores e código validador) acima da barra.
+ */
+export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
+  const [open, setOpen] = useState(false)
+  const panelId = useId()
+  const panel = useRef(null)
+  useModalBehavior(open, () => setOpen(false))
+  useEffect(() => {
+    if (open) panel.current?.focus()
+  }, [open])
+
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
-      <div className="min-w-0 flex-1">
-        <p className="font-ui text-[11px] text-ink-3">
-          {derived.count} {derived.count === 1 ? 'ingresso' : 'ingressos'} · total à vista
-        </p>
-        <p className="text-xl font-bold leading-tight text-ink">{brl(derived.total)}</p>
-        {!derived.canBuy && (
-          <button type="button" onClick={toSummary} className="block max-w-full truncate text-left font-ui text-[11px] text-orange underline">
-            {derived.blocker}
+    <div className="lg:hidden">
+      {open && <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setOpen(false)} aria-hidden />}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col border-t border-line bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+        {open && (
+          <div
+            ref={panel}
+            id={panelId}
+            role="region"
+            aria-label="Resumo do pedido"
+            tabIndex={-1}
+            className="flex min-h-0 flex-col gap-5 overflow-y-auto px-4 pb-2 pt-5 outline-none"
+          >
+            <div>
+              <Eyebrow>Resumo do pedido</Eyebrow>
+              <p className="mt-2 text-2xl font-bold leading-tight text-ink">{countLabel(d.count)}</p>
+              {d.sessions > 1 && <p className="mt-1 font-ui text-xs text-ink-3">Em {d.sessions} datas diferentes</p>}
+            </div>
+            <SummaryDetails order={order} derived={d} dispatch={dispatch} />
+            <button type="button" onClick={onFees} className="flex items-center gap-1.5 self-start font-ui text-sm font-semibold text-brand underline hover:no-underline">
+              <Ico name="info" className="size-4" /> Entenda as taxas
+            </button>
+          </div>
+        )}
+
+        <div className={`flex items-center gap-6 p-4 ${open ? 'border-t border-line' : ''}`}>
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-controls={panelId}
+            aria-label={open ? 'Recolher resumo do pedido' : 'Ver resumo do pedido'}
+            className="-m-1 flex shrink-0 items-center gap-6 rounded-lg p-1 text-left"
+          >
+            <Ico name="expand" className={`size-8 text-ink transition-transform ${open ? '' : 'rotate-180'}`} />
+            <span className="flex flex-col gap-1 whitespace-nowrap">
+              <span className="text-xs font-light leading-4 text-ink-3">
+                {d.count} {d.count === 1 ? 'ingresso' : 'ingressos'} • total à vista
+              </span>
+              <span className="text-xl font-semibold leading-none text-black">{brl(d.total)}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onBuy}
+            disabled={!d.canBuy}
+            className="min-w-0 flex-1 rounded-full bg-brand px-6 py-[14px] font-ui text-[15px] font-semibold leading-[18px] text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-brand/30"
+          >
+            Comprar
+          </button>
+        </div>
+        {/* Pendência (ex.: código validador): toca e abre o resumo para resolver */}
+        {!d.canBuy && d.count > 0 && !open && (
+          <button type="button" onClick={() => setOpen(true)} className="-mt-2 block truncate px-4 pb-3 text-left font-ui text-[11px] text-orange underline">
+            {d.blocker}
           </button>
         )}
+        {!d.canBuy && d.count > 0 && open && (
+          <p className="px-4 pb-3 text-center font-ui text-xs text-orange" aria-live="polite">
+            {d.blocker}
+          </p>
+        )}
       </div>
-      <button
-        type="button"
-        onClick={onBuy}
-        disabled={!derived.canBuy}
-        className="rounded-full bg-brand px-8 py-[14px] font-ui text-[15px] font-semibold text-white disabled:bg-brand/30"
-      >
-        Comprar
-      </button>
     </div>
   )
 }
