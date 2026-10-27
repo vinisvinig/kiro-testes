@@ -485,6 +485,7 @@ function AddressForm({ onSave, onCancel }) {
 function PaymentStep({ c, t, dispatch, onPix, onCard }) {
   const open = c.step === 'pagamento'
   const [coinsInfo, setCoinsInfo] = useState(false)
+  const coinsId = useId()
   return (
     <StepShell
       id="pagamento"
@@ -495,7 +496,9 @@ function PaymentStep({ c, t, dispatch, onPix, onCard }) {
       lockedText="Disponível após escolher a entrega"
     >
       {/* Moedas: faixa discreta; Pix e cartão logo abaixo ganham mais destaque (Figma 9807:159890) */}
-      <label className="flex cursor-pointer flex-wrap items-center gap-3 rounded-[14px] border border-line bg-body px-4 py-3">
+      {/* htmlFor explícito: sem ele o navegador liga o <label> ao 1º controle de dentro (o botão de ajuda),
+          e tocar em qualquer ponto da faixa abria o pop-up em vez de aplicar as moedas. */}
+      <label htmlFor={coinsId} className="flex cursor-pointer flex-wrap items-center gap-3 rounded-[14px] border border-line bg-body px-4 py-3">
         <span className="flex size-6 items-center justify-center rounded-full bg-brand text-white">
           <Ico name="coin" className="size-4" />
         </span>
@@ -518,7 +521,7 @@ function PaymentStep({ c, t, dispatch, onPix, onCard }) {
         <span className="ml-auto font-ui text-sm text-ink-3">Saldo elegível para este pedido</span>
         <span className="text-base font-semibold text-ink">{brl(UHUU_COINS)}</span>
         <span className="relative inline-flex">
-          <input type="checkbox" role="switch" checked={c.coins} onChange={() => dispatch({ type: 'coins' })} className="peer sr-only" aria-label="Usar moedas Uhuu" />
+          <input id={coinsId} type="checkbox" role="switch" checked={c.coins} onChange={() => dispatch({ type: 'coins' })} className="peer sr-only" aria-label="Usar moedas Uhuu" />
           <span className="h-6 w-11 rounded-full bg-body-3 transition peer-checked:bg-brand peer-focus-visible:ring-2 peer-focus-visible:ring-brand peer-focus-visible:ring-offset-2" />
           <span className="absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
         </span>
