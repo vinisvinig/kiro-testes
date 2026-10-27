@@ -269,17 +269,30 @@ export function useMediaQuery(query) {
 
 export const useIsDesktop = () => useMediaQuery('(min-width: 768px)')
 
+/*
+ * Trava de scroll com contador: vários modais podem abrir/fechar fora de ordem (ex.: resumo
+ * mobile aberto → login → navegação para o pagamento). Guardar o "valor anterior" de cada um
+ * deixava o body preso em overflow:hidden; com o contador, o scroll volta quando o último fecha.
+ */
+let scrollLocks = 0
+const lockScroll = () => {
+  if (scrollLocks++ === 0) document.body.style.overflow = 'hidden'
+}
+const unlockScroll = () => {
+  scrollLocks = Math.max(0, scrollLocks - 1)
+  if (scrollLocks === 0) document.body.style.overflow = ''
+}
+
 /** Fecha com Esc e trava o scroll do body enquanto aberto. */
 export function useModalBehavior(open, onClose) {
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    lockScroll()
     return () => {
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
+      unlockScroll()
     }
   }, [open, onClose])
 }
