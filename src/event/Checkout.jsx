@@ -263,10 +263,21 @@ function InsuranceStep({ c, t, dispatch }) {
         </PrimaryButton>
       </div>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o seguro MetLife">
-        <p>A solicitação de reembolso é feita diretamente à MetLife e depende de análise.</p>
-        <p>Pode cobrir doenças graves, internação hospitalar, morte acidental, fratura óssea e desemprego involuntário.</p>
-        <p>Não cobre simples desistência, conflito de agenda ou insatisfação com o evento. Aplicam-se carências, limites e exclusões.</p>
-        <p>Consulte as condições contratuais antes da contratação.</p>
+        {/* Texto do Figma 9640:241163 */}
+        <div className="flex flex-col gap-6 font-sans text-base leading-6">
+          <p>
+            O Ingresso Protegido pode reembolsar o valor do ingresso e da taxa de serviço em situações cobertas pelo seguro. A solicitação é realizada diretamente com a MetLife e depende de análise e aprovação.
+          </p>
+          <p>Pode cobrir doenças graves, internação hospitalar, morte acidental, fratura óssea e desemprego involuntário, conforme as condições da apólice.</p>
+          <p>Não cobre simples desistência, conflito de agenda ou insatisfação com o evento. Aplicam-se carências, limites e exclusões.</p>
+          <p>
+            Consulte as{' '}
+            <a href="https://uhuu.com.br/ingresso-seguro" target="_blank" rel="noopener noreferrer" className="text-brand underline hover:no-underline">
+              condições do seguro
+            </a>{' '}
+            antes da contratação.
+          </p>
+        </div>
       </InfoDialog>
     </StepShell>
   )
