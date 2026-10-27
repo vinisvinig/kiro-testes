@@ -57,7 +57,7 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
               {order.modality === 'combo' ? (
                 <Combos order={order} dispatch={dispatch} session={session} onMap={toMap} />
               ) : (
-                <Sectors order={order} dispatch={dispatch} session={session} />
+                <Sectors order={order} dispatch={dispatch} session={session} onMap={toMap} />
               )}
             </div>
           )}
@@ -247,21 +247,29 @@ function ModalityPicker({ session, selected, onPick }) {
   )
 }
 
+/** "Ver mapa completo": rola até o Mapa referencial do evento (estático) no fim da página. */
+const MapButton = ({ onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:bg-brand-0"
+  >
+    Ver mapa completo <Ico name="pin" className="size-[14px]" />
+  </button>
+)
+
 /* ------------------------------------------------------------------ */
 /* Setores (ingresso individual): "Escolha onde você quer ficar"       */
 /* ------------------------------------------------------------------ */
-function Sectors({ order, dispatch, session }) {
-  const available = SECTORS.filter((s) => !s.soldOut).length
+function Sectors({ order, dispatch, session, onMap }) {
   return (
     <Card>
-      <div className="flex flex-wrap items-end justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <Eyebrow>Setores</Eyebrow>
           <CardTitle className="mt-2">Escolha onde você quer ficar</CardTitle>
         </div>
-        <span className="rounded-full bg-brand px-2 py-1 font-ui text-[11px] font-medium text-white">
-          {available} {available === 1 ? 'setor disponível' : 'setores disponíveis'}
-        </span>
+        <MapButton onClick={onMap} />
       </div>
 
       <ul className="mt-6 flex flex-col gap-4">
@@ -643,13 +651,7 @@ function Combos({ order, dispatch, session, onMap }) {
           <Eyebrow>Combo</Eyebrow>
           <CardTitle className="mt-1">Combos disponíveis</CardTitle>
         </div>
-        <button
-          type="button"
-          onClick={onMap}
-          className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:bg-brand-0"
-        >
-          Ver mapa completo <Ico name="pin" className="size-[14px]" />
-        </button>
+        <MapButton onClick={onMap} />
       </div>
 
       <ul className="mt-6 flex flex-col gap-4">
