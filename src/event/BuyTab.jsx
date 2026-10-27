@@ -23,6 +23,11 @@ import { Badge, Card, CardTitle, Eyebrow, Ico, InfoBanner, Note, Stepper, VenueM
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
 
+/** Taxa de serviço sempre com valor (exigência do decreto), em 12px. */
+const Fee = ({ value, as: Tag = 'span', className = '' }) => (
+  <Tag className={`font-ui text-xs leading-4 ${className || 'text-ink-3'}`}>+ taxa {brl(value * SERVICE_FEE)}</Tag>
+)
+
 const MAP_ID = 'mapa-evento'
 
 export default function BuyTab({ order, dispatch, derived, session, onFees, onBuy }) {
@@ -237,7 +242,7 @@ function ModalityPicker({ session, selected, onPick }) {
               <span className={`flex flex-col items-end ${on ? 'text-white' : ''}`}>
                 <span className={`font-ui text-[10px] font-medium leading-4 ${on ? '' : 'text-ink-3'}`}>A partir de</span>
                 <span className="text-sm font-semibold leading-5">{brl(o.from)}</span>
-                <span className={`font-ui text-[8px] leading-4 ${on ? '' : 'text-ink-3'}`}>+taxa {brl(o.from * SERVICE_FEE)}</span>
+                <Fee value={o.from} className={on ? 'text-white' : ''} />
               </span>
             </button>
           )
@@ -327,7 +332,7 @@ function SectorRow({ sector, session, open, onToggle, count }) {
           <span className="flex flex-col items-end text-right">
             <span className="font-ui text-[11px] text-ink-3">a partir de</span>
             <span className="text-lg font-bold leading-6 text-brand">{brl(minFare(sector, session))}</span>
-            <span className="font-ui text-[9px] text-ink-3">+taxa</span>
+            <Fee value={minFare(sector, session)} />
           </span>
           <span className="flex size-9 items-center justify-center rounded-full bg-body-3 text-ink">
             <Ico name="expand" className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -366,7 +371,7 @@ function FreeBody({ sector, order, dispatch, session }) {
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-ink">{brl(f.price)}</p>
-                <p className="font-ui text-[11px] text-ink-3">+ taxa</p>
+                <Fee value={f.price} as="p" />
               </div>
               <Stepper label={f.name} value={n} canAdd={room > 0} onChange={(v) => dispatch({ type: 'qty', sector: sector.id, fare: f.id, n: v })} />
             </div>
@@ -534,7 +539,10 @@ function FarePopover({ sector, seat, current, fares, style, onPick, onRemove, on
               <span className="block text-sm font-semibold leading-tight text-ink">{f.name}</span>
               {f.validator && <span className="mt-0.5 block font-ui text-[10px] text-ink-3">Pede código validador</span>}
             </span>
-            <span className="shrink-0 text-sm font-bold text-ink">{brl(f.price)}</span>
+            <span className="flex shrink-0 flex-col items-end">
+              <span className="text-sm font-bold text-ink">{brl(f.price)}</span>
+              <Fee value={f.price} />
+            </span>
           </button>
         ))}
       </div>
@@ -616,7 +624,7 @@ function SeatBody({ sector, order, dispatch, session }) {
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-ink">{f?.name}</span>
                       <span className="block font-ui text-xs text-ink-3">
-                        Linha {s.id[0]} · Assento {s.id.slice(1)} · {f ? `${brl(f.price)} + taxa` : ''}
+                        Linha {s.id[0]} · Assento {s.id.slice(1)} · {f ? `${brl(f.price)} + taxa ${brl(f.price * SERVICE_FEE)}` : ''}
                       </span>
                     </span>
                     <button
@@ -706,7 +714,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
         </span>
         <span className="flex items-baseline gap-2 md:flex-col md:items-end md:gap-0">
           <span className="text-sm font-semibold leading-5 text-ink">{brl(price)}</span>
-          <span className="font-ui text-[10px] leading-4 text-ink-3 md:text-[8px]">+taxa {brl(price * SERVICE_FEE)}</span>
+          <Fee value={price} />
         </span>
         {selected && (
           <span className="flex flex-wrap gap-2 md:col-span-3">
