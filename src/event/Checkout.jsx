@@ -26,6 +26,23 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   const t = useMemo(() => deriveCheckout(c, order), [c, order])
   const [pix, setPix] = useState(null) // null | 'generating' | { code, deadline }
   const [status, setStatus] = useState(null) // null | 'processing' | 'failed'
+  // Dados do cartão ficam aqui para o "Comprar" da barra do celular saber se está tudo preenchido.
+  const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
+  const [cardTouched, setCardTouched] = useState({})
+  const [alertStep, setAlertStep] = useState(null) // etapa obrigatória sinalizada em vermelho
+  const cardValid = Object.keys(cardErrors(card)).length === 0
+  const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
+  // Respondeu a etapa sinalizada (ou mudou o que faltava): tira o vermelho.
+  useEffect(() => setAlertStep(null), [c.step, c.method, cardValid])
+
+  /** Comprar (barra do celular): finaliza se estiver tudo pronto; senão sinaliza e rola até a pendência. */
+  const buyMobile = () => {
+    if (ready) return c.method === 'pix' ? genPix() : pay('cartao', card)
+    const step = c.step || 'pagamento'
+    if (step === 'pagamento' && c.method === 'cartao') setCardTouched({ number: true, name: true, expiry: true, cvv: true })
+    setAlertStep(step)
+    scrollToId(`etapa-${step}`)
+  }
 
   // Ao mudar de etapa, leva o usuário até ela.
   const first = useRef(true)
@@ -86,10 +103,18 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
           <div className="flex min-w-0 flex-col gap-6">
             <EventSummary order={order} />
-            <InsuranceStep c={c} t={t} dispatch={dispatch} />
-            <ClubStep c={c} t={t} order={order} dispatch={dispatch} />
-            <DeliveryStep c={c} dispatch={dispatch} />
-            <PaymentStep c={c} t={t} dispatch={dispatch} onPix={genPix} onCard={(card) => pay('cartao', card)} />
+            <InsuranceStep c={c} t={t} dispatch={dispatch} alert={alertStep === 'seguro'} />
+            <ClubStep c={c} t={t} order={order} dispatch={dispatch} alert={alertStep === 'clube'} />
+            <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} />
+            <PaymentStep
+              c={c}
+              t={t}
+              dispatch={dispatch}
+              alert={alertStep === 'pagamento'}
+              onPix={genPix}
+              card={{ value: card, set: setCard, touched: cardTouched, setTouched: setCardTouched }}
+              onCard={() => pay('cartao', card)}
+            />
           </div>
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
@@ -99,7 +124,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         </div>
       </div>
 
-      <MobileTotal total={t.total} remaining={remaining} />
+      <MobileTotal total={t.total} remaining={remaining} ready={ready} onBuy={buyMobile} />
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
     </div>
@@ -154,7 +179,7 @@ function EventSummary({ order }) {
 /* ------------------------------------------------------------------ */
 /* Blocos de etapa: aberta, concluída, bloqueada                       */
 /* ------------------------------------------------------------------ */
-function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, lockedText = 'Disponível após a etapa anterior', children }) {
+function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, alert = false, lockedText = 'Disponível após a etapa anterior', children }) {
   if (state === 'locked') {
     return (
       <section id={`etapa-${id}`} aria-disabled="true" className="scroll-mt-24 rounded-3xl border border-line bg-white px-6 py-5 opacity-80">
@@ -190,7 +215,16 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
     )
   }
   return (
-    <section id={`etapa-${id}`} aria-labelledby={`etapa-${id}-t`} className="scroll-mt-24 rounded-3xl border border-line bg-white p-5 md:p-6">
+    <section
+      id={`etapa-${id}`}
+      aria-labelledby={`etapa-${id}-t`}
+      className={`scroll-mt-24 rounded-3xl border bg-white p-5 transition-colors md:p-6 ${alert ? 'border-danger ring-1 ring-danger' : 'border-line'}`}
+    >
+      {alert && (
+        <p role="alert" className="mb-4 flex items-center gap-2 rounded-xl bg-[#fef2f2] px-3 py-2 font-ui text-xs font-semibold text-danger">
+          <Ico name="error" className="size-4" /> {id === 'pagamento' ? 'Escolha a forma de pagamento e preencha os dados para comprar.' : 'Responda esta etapa para continuar.'}
+        </p>
+      )}
       <div className="flex items-start gap-4">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <Ico name={icon} className="size-4" />
@@ -230,11 +264,12 @@ const PrimaryButton = ({ className = '', ...rest }) => (
 )
 
 /* ---------------- 02 · Seguro ---------------- */
-function InsuranceStep({ c, t, dispatch }) {
+function InsuranceStep({ c, t, dispatch, alert }) {
   const [info, setInfo] = useState(false)
   return (
     <StepShell
       id="seguro"
+      alert={alert}
       state={stateOf(c, 'seguro', c.insurance !== null)}
       icon="shield"
       title={c.step === 'seguro' ? 'Quer proteger seus ingressos?' : 'Seguro'}
@@ -284,12 +319,13 @@ function InsuranceStep({ c, t, dispatch }) {
 }
 
 /* ---------------- 03 · Clube Planeta ---------------- */
-function ClubStep({ c, t, order, dispatch }) {
+function ClubStep({ c, t, order, dispatch, alert }) {
   const [info, setInfo] = useState(false)
   const per = t.clubValue / Math.max(1, order.count)
   return (
     <StepShell
       id="clube"
+      alert={alert}
       state={stateOf(c, 'clube', c.club !== null)}
       icon="club"
       title={c.step === 'clube' ? 'Quer adicionar o Clube Planeta?' : 'Clube Planeta'}
@@ -331,7 +367,7 @@ function ClubStep({ c, t, order, dispatch }) {
 }
 
 /* ---------------- 04 · Entrega ---------------- */
-function DeliveryStep({ c, dispatch }) {
+function DeliveryStep({ c, dispatch, alert }) {
   const [adding, setAdding] = useState(false)
   const chosen = DELIVERY.find((d) => d.id === c.delivery)
   const express = c.delivery === 'expressa'
@@ -346,6 +382,7 @@ function DeliveryStep({ c, dispatch }) {
   return (
     <StepShell
       id="entrega"
+      alert={alert}
       state={stateOf(c, 'entrega', c.deliveryDone)}
       icon="truck"
       title={c.step === 'entrega' ? (express ? 'Para onde enviamos?' : 'Escolha a modalidade de entrega') : 'Entrega'}
@@ -496,13 +533,14 @@ function AddressForm({ onSave, onCancel }) {
 }
 
 /* ---------------- 05/06 · Pagamento ---------------- */
-function PaymentStep({ c, t, dispatch, onPix, onCard }) {
+function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert }) {
   const open = c.step === 'pagamento'
   const [coinsInfo, setCoinsInfo] = useState(false)
   const coinsId = useId()
   return (
     <StepShell
       id="pagamento"
+      alert={alert}
       state={open ? 'open' : 'locked'}
       icon="card"
       title="Escolha como pagar"
@@ -592,16 +630,15 @@ function PaymentStep({ c, t, dispatch, onPix, onCard }) {
           </div>
         </div>
       )}
-      {c.method === 'cartao' && <CardForm c={c} t={t} dispatch={dispatch} onSubmit={onCard} />}
+      {c.method === 'cartao' && <CardForm c={c} t={t} dispatch={dispatch} card={card} onSubmit={onCard} />}
       {!c.method && <p className="mt-4 font-ui text-xs text-ink-3">Escolha Pix ou Cartão de crédito para continuar.</p>}
     </StepShell>
   )
 }
 
-function CardForm({ c, t, dispatch, onSubmit }) {
+function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
   const id = useId()
-  const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
-  const [touched, setTouched] = useState({})
+  const { value: card, set: setCard, touched, setTouched } = cs
   const errors = cardErrors(card)
   const valid = Object.keys(errors).length === 0
   const set = (k, fmt = (v) => v) => (e) => setCard((x) => ({ ...x, [k]: fmt(e.target.value) }))
@@ -637,7 +674,7 @@ function CardForm({ c, t, dispatch, onSubmit }) {
       className="mt-5 grid grid-cols-2 gap-4"
       onSubmit={(e) => {
         e.preventDefault()
-        if (valid) onSubmit(card)
+        if (valid) onSubmit()
         else setTouched({ number: true, name: true, expiry: true, cvv: true })
       }}
       noValidate
@@ -794,7 +831,11 @@ function Coupons({ c, t, order, dispatch }) {
 }
 
 /** Barra fixa no celular com o total; leva até o resumo. */
-function MobileTotal({ total, remaining }) {
+/**
+ * Barra fixa no celular: total + Comprar. O botão fica em contorno enquanto falta algo obrigatório
+ * (ao tocar, sinaliza a etapa pendente em vermelho e rola até ela) e preenchido quando está tudo pronto.
+ */
+function MobileTotal({ total, remaining, ready, onBuy }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
       <div className="min-w-0 flex-1">
@@ -803,9 +844,21 @@ function MobileTotal({ total, remaining }) {
         </p>
         <p className="text-xl font-bold leading-tight text-ink">{brl(total)}</p>
       </div>
-      <button type="button" onClick={() => scrollToId(SUMMARY_ID)} className="rounded-full border border-brand px-5 py-[11px] font-ui text-sm font-semibold text-brand">
-        Ver resumo e cupons
+      <button
+        type="button"
+        onClick={onBuy}
+        aria-describedby={ready ? undefined : 'comprar-pendente'}
+        className={`min-w-[140px] rounded-full border px-8 py-[13px] font-ui text-[15px] font-semibold leading-[18px] transition ${
+          ready ? 'border-brand bg-brand text-white hover:brightness-110' : 'border-brand bg-white text-brand'
+        }`}
+      >
+        Comprar
       </button>
+      {!ready && (
+        <span id="comprar-pendente" className="sr-only">
+          Ainda há etapas obrigatórias pendentes
+        </span>
+      )}
     </div>
   )
 }
