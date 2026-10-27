@@ -83,7 +83,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         </button>
         <h1 className="sr-only">Finalizar compra</h1>
 
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
           <div className="flex min-w-0 flex-col gap-6">
             <EventSummary order={order} />
             <InsuranceStep c={c} t={t} dispatch={dispatch} />
@@ -846,8 +846,9 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
           <Ico name="arrowLeft" className="size-4" /> Trocar forma de pagamento
         </button>
         <h1 className="mt-4 text-[28px] font-bold leading-tight text-ink md:text-[32px]">Finalizar compra</h1>
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
-          <Card className="md:!p-8">
+        {/* grid-cols-1 + min-w-0: sem isso o código Pix (uma linha longa) alargava o card além da tela no celular */}
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+          <Card className="min-w-0 md:!p-8">
             {!ready ? (
               <div className="flex flex-col items-center gap-4 py-16 text-center" role="status">
                 <Spinner />
