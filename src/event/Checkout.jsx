@@ -26,7 +26,6 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   const t = useMemo(() => deriveCheckout(c, order), [c, order])
   const [pix, setPix] = useState(null) // null | 'generating' | { code, deadline }
   const [status, setStatus] = useState(null) // null | 'processing' | 'failed'
-  const sessions = new Set(order.lines.map((l) => l.session.id)).size
 
   // Ao mudar de etapa, leva o usuário até ela.
   const first = useRef(true)
@@ -86,7 +85,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
 
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
           <div className="flex min-w-0 flex-col gap-6">
-            <EventSummary order={order} sessions={sessions} />
+            <EventSummary order={order} />
             <InsuranceStep c={c} t={t} dispatch={dispatch} />
             <ClubStep c={c} t={t} order={order} dispatch={dispatch} />
             <DeliveryStep c={c} dispatch={dispatch} />
@@ -113,7 +112,7 @@ const pixCode = (total) =>
 /* ------------------------------------------------------------------ */
 /* Evento e ingressos (cabeçalho com lista recolhível)                 */
 /* ------------------------------------------------------------------ */
-function EventSummary({ order, sessions }) {
+function EventSummary({ order }) {
   const [open, setOpen] = useState(true)
   const id = useId()
   return (
@@ -122,9 +121,6 @@ function EventSummary({ order, sessions }) {
         <span className="min-w-0 flex-1">
           <span className="block font-ui text-[10px] font-semibold uppercase tracking-wide text-ink-2">Espetáculo</span>
           <span className="mt-2 block text-2xl font-bold leading-tight text-ink md:text-[28px]">{EVENT.title}</span>
-          <span className="mt-2 block font-ui text-sm text-ink-2">
-            {sessions} {sessions === 1 ? 'sessão selecionada' : 'sessões selecionadas'}
-          </span>
           <span className="mt-1 block font-ui text-xs text-ink-3">{EVENT.venue.name}, São Paulo</span>
         </span>
         <Ico name="expand" className={`mt-2 size-6 text-ink transition-transform ${open ? 'rotate-180' : ''}`} />
