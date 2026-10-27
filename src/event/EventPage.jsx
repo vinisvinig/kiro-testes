@@ -372,19 +372,27 @@ function BuyCard({ onBuy, onFees }) {
 }
 
 /* ---------------- Diálogos ---------------- */
+/** "Tempo esgotado!" (Figma 9376:110185). Fechar ou tentar novamente libera a seleção. */
 function ExpiredDialog({ open, onRestart }) {
   return (
-    <Dialog open={open} onClose={onRestart} labelledBy="expired-title" className="max-w-[344px] text-center">
-      <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#fef2f2] text-danger">
-        <Ico name="timer" className="size-6" />
-      </span>
-      <h2 id="expired-title" className="mt-4 text-2xl font-bold text-ink">
-        Tempo esgotado
-      </h2>
-      <p className="mt-2 font-ui text-sm leading-5 text-ink-2">O tempo da sua reserva acabou e os ingressos foram liberados. Você pode escolher novamente.</p>
-      <button type="button" onClick={onRestart} className="mt-6 w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
-        Escolher novamente
-      </button>
+    <Dialog open={open} onClose={onRestart} labelledBy="expired-title" className="max-w-[390px] !rounded-lg !px-6 !pb-10 !pt-6">
+      <div className="flex justify-end">
+        <button type="button" onClick={onRestart} aria-label="Fechar" className="flex size-8 items-center justify-center rounded-full text-ink hover:bg-body-2">
+          <Ico name="close" className="size-6" />
+        </button>
+      </div>
+      <div className="mt-2 flex flex-col items-center gap-8 text-center">
+        <Ico name="alarmOff" className="size-16 text-ink" />
+        <div>
+          <h2 id="expired-title" className="font-ui text-2xl font-bold leading-tight text-ink">
+            Tempo esgotado!
+          </h2>
+          <p className="mt-2 font-ui text-sm leading-5 text-ink-2">Infelizmente seu tempo se esgotou, por favor atualize a página e tente novamente.</p>
+        </div>
+        <button type="button" onClick={onRestart} className="w-full rounded-full bg-brand py-[10px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
+          Tentar novamente
+        </button>
+      </div>
     </Dialog>
   )
 }
