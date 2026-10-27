@@ -36,4 +36,16 @@ VITE_BASE_PATH=/kiro-testes/ VITE_ROUTER_MODE=hash npm run build
 npm run preview
 ```
 
-Esta cópia foi preparada a partir da pasta Kiro. Alterações feitas na pasta original precisam ser trazidas para esta cópia antes de enviar uma nova versão ao GitHub. Não envie `node_modules`, `dist`, `.env` ou credenciais.
+## Publicação a partir do Mac
+
+A pasta `Documents/Kiro` está ligada diretamente a este repositório por SSH (`git@github.com:vinisvinig/kiro-testes.git`). Para publicar uma nova versão:
+
+```sh
+git add -A
+git commit -m "Descreva a mudança"
+git push
+```
+
+O GitHub Actions publica automaticamente em cerca de 2 minutos. Não envie `node_modules`, `dist`, `.env` ou credenciais (já estão no `.gitignore`).
+
+✅ Integração verificada: este trecho foi enviado pelo Kiro direto do Mac.
