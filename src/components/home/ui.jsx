@@ -177,9 +177,13 @@ export function SectionHeader({ icon, title, light = false, mobileActions = fals
   )
 }
 
-/** Barra de progresso do trilho no mobile (Figma "Barra de Rolagem" 242px). */
-export function ScrollProgress({ railRef }) {
+/**
+ * Barra de rolagem do trilho (Figma "Barra de Rolagem"): 242px no celular, largura do conteúdo no desktop.
+ * No desktop dá para arrastar a barra ou clicar no trilho para rolar.
+ */
+export function ScrollProgress({ railRef, className = 'w-[242px]', interactive = false }) {
   const [state, setState] = useState({ w: 0.5, x: 0 })
+  const track = useRef(null)
   useEffect(() => {
     const el = railRef.current
     if (!el) return
@@ -196,13 +200,81 @@ export function ScrollProgress({ railRef }) {
       window.removeEventListener('resize', on)
     }
   }, [railRef])
+
+  // Posição do ponteiro no trilho (0–1) → scrollLeft
+  const scrollTo = (clientX, grab = 0.5) => {
+    const el = railRef.current
+    const r = track.current.getBoundingClientRect()
+    const free = 1 - state.w
+    if (!el || free <= 0) return
+    const x = (clientX - r.left) / r.width - state.w * grab
+    el.style.scrollSnapType = 'none'
+    el.style.scrollBehavior = 'auto'
+    el.scrollLeft = Math.max(0, Math.min(1, x / free)) * (el.scrollWidth - el.clientWidth)
+  }
+  const onDown = (e) => {
+    if (!interactive || e.button !== 0) return
+    e.preventDefault()
+    const r = track.current.getBoundingClientRect()
+    const pos = (e.clientX - r.left) / r.width
+    // Agarrou a barra: mantém o ponto agarrado; clicou fora: centraliza a barra no clique
+    const grab = pos >= state.x && pos <= state.x + state.w ? (pos - state.x) / state.w : 0.5
+    scrollTo(e.clientX, grab)
+    const move = (ev) => scrollTo(ev.clientX, grab)
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      const el = railRef.current
+      if (el) {
+        el.style.scrollSnapType = ''
+        el.style.scrollBehavior = ''
+      }
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
+
   return (
-    <div className="h-[14px] w-[242px] rounded-full bg-body p-1" aria-hidden>
-      <div className="relative h-full overflow-hidden rounded-full">
+    <div className={`h-[14px] rounded-full bg-body p-1 ${interactive ? 'cursor-pointer' : ''} ${className}`} aria-hidden onPointerDown={onDown}>
+      <div ref={track} className="relative h-full overflow-hidden rounded-full">
         <span className="absolute inset-y-0 rounded-full bg-line" style={{ width: `${state.w * 100}%`, left: `${state.x * 100}%` }} />
       </div>
     </div>
   )
+}
+
+/**
+ * Desktop: estende o trilho até as duas bordas da janela, com padding/scroll-padding iguais à margem,
+ * para o 1º e o último card pararem alinhados ao conteúdo e os demais aparecerem até a borda.
+ * Medido em px (o % do scroll-padding é relativo ao próprio trilho e não serviria).
+ */
+function useFullBleed(railRef) {
+  useEffect(() => {
+    const el = railRef.current
+    const box = el?.parentElement
+    if (!el || !box) return
+    const apply = () => {
+      if (!window.matchMedia('(min-width: 768px)').matches) {
+        Object.assign(el.style, { marginLeft: '', marginRight: '', paddingLeft: '', paddingRight: '', scrollPaddingLeft: '', scrollPaddingRight: '' })
+        return
+      }
+      const r = box.getBoundingClientRect()
+      const left = Math.max(0, r.left)
+      const right = Math.max(0, document.documentElement.clientWidth - r.right)
+      Object.assign(el.style, {
+        marginLeft: `${-left}px`,
+        marginRight: `${-right}px`,
+        paddingLeft: `${left}px`,
+        paddingRight: `${right}px`,
+        scrollPaddingLeft: `${left}px`,
+        scrollPaddingRight: `${right}px`,
+      })
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(document.documentElement)
+    return () => ro.disconnect()
+  }, [railRef])
 }
 
 /**
@@ -211,16 +283,19 @@ export function ScrollProgress({ railRef }) {
  * e opcionalmente um botão "Ver tudo" de largura total.
  */
 export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', seeAllHref, seeAllLight = false, children }) {
+  useFullBleed(railRef)
   return (
     <div className="flex flex-col gap-5 md:gap-0">
-      {/* Desktop: o trilho começa alinhado ao conteúdo e vai até a borda direita da tela (Figma 6384:38271).
-          O padding à direita deixa o último card parar alinhado ao fim do conteúdo. */}
+      {/* Desktop: o trilho ocupa a tela toda (os cards passam das margens dos dois lados, como no Figma 6384:38271).
+          O padding e o scroll-padding iguais à margem fazem o 1º e o último card pararem alinhados ao conteúdo.
+          A barra nativa ficaria da largura da tela, então ela é escondida e a barra própria fica abaixo, na largura do conteúdo. */}
       <div
         ref={railRef}
-        className={`max-md:no-scrollbar md:uhuu-scroll -mx-4 flex snap-x overflow-x-auto px-4 md:ml-0 md:mr-[calc(50%-50vw)] md:pl-0 md:pr-[calc(50vw-50%)] md:pb-4 ${gap}`}
+        className={`no-scrollbar -mx-4 flex snap-x overflow-x-auto px-4 ${gap}`}
       >
         {children}
       </div>
+      <ScrollProgress railRef={railRef} interactive className="mt-4 hidden w-full md:block" />
       <div className="flex items-center justify-between md:hidden">
         <ScrollProgress railRef={railRef} />
         <CarouselNav onScroll={onScroll} />
