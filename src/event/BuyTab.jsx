@@ -348,7 +348,7 @@ function SectorRow({ sector, session, open, onToggle, count }) {
 const ValidatorHint = () => (
   <p className="flex items-center gap-1.5 rounded-xl bg-[#fffbeb] px-3 py-2 font-ui text-xs text-ink-2">
     <Ico name="info" className="size-4 text-alert" />
-    Esta tarifa pede um código validador. Informe no resumo do pedido, acima do botão Comprar.
+    Este tipo de ingresso pede um código validador. Informe no resumo do pedido, acima do botão Comprar.
   </p>
 )
 
