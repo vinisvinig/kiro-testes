@@ -161,7 +161,7 @@ function Highlights({ events }) {
           <SectionTitle icon="ic-sparkle.svg">Destaques</SectionTitle>
           <div
             ref={rail}
-            className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 md:-mx-10 md:px-10 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-[29px] lg:overflow-visible lg:px-0"
+            className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 md:-mx-margem md:px-margem lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-[29px] lg:overflow-visible lg:px-0"
           >
             {events.map((e) => (
               <EventCard key={e.id} {...e} grid widthClass="w-[172px] lg:w-full" />

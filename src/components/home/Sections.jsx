@@ -19,15 +19,15 @@ const PRODUCER_URL = 'https://sobre.uhuu.com/Venda-Na-Uhuu'
 export function Categories() {
   const [ref, scroll] = useScroller()
   return (
-    <section className="bg-body py-6 md:px-10 md:py-8">
-      <div className="mx-auto flex max-w-[1360px] flex-col gap-4 overflow-hidden md:gap-6 md:rounded-2xl md:border md:border-line md:bg-black/[.03] md:px-12 md:py-8">
+    <section className="bg-body py-6 md:px-caixa md:py-8">
+      <div className="mx-auto flex flex-col gap-4 overflow-hidden md:gap-6 md:rounded-2xl md:border md:border-line md:bg-black/[.03] md:px-caixa-in md:py-8">
         <div className="px-5 md:px-0">
           <SectionHeader title="Categorias" mobileActions>
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
         </div>
         {/* Desktop: os itens vão até a borda da caixa (Figma 6384:38280); o 1º fica alinhado ao título */}
-        <div ref={ref} className="no-scrollbar flex gap-3 overflow-x-auto pl-5 pr-3 md:-mx-12 md:gap-4 md:pl-12 md:pr-4">
+        <div ref={ref} className="no-scrollbar flex gap-3 overflow-x-auto pl-5 pr-3 md:-mx-caixa-in md:gap-4 md:pl-caixa-in md:pr-4">
           {categories.map((c) => (
             <Link
               key={c.label}

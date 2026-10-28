@@ -9,7 +9,7 @@ export default function SearchHero() {
   return (
     <section className="flex flex-col bg-body md:gap-6 md:pb-6 md:pt-10">
       {/* z-30: o dropdown do autocomplete precisa ficar acima do banner */}
-      <div className="relative z-30 md:px-10">
+      <div className="relative z-30 md:px-caixa">
         <SearchBox variant="home" />
       </div>
       <div className="hidden md:block">

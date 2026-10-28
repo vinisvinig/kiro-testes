@@ -16,9 +16,9 @@ body {
 }
 
 @layer components {
-  /* Container padrão do Figma: 1440 de largura, 88px de margem lateral (1264 de conteúdo) */
+  /* Container padrão: margem lateral proporcional (Figma: 88px em 1440 = 6,111vw), sem largura máxima */
   .page-x {
-    @apply mx-auto w-full max-w-page px-4 md:px-10 xl:px-22;
+    @apply mx-auto w-full px-4 md:px-margem;
   }
 
   /* Barra de rolagem horizontal dos carrosséis (Figma: trilho 14px, barra 6px #d4d4d4) */

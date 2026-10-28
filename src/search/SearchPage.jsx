@@ -120,7 +120,7 @@ function SearchSkeleton() {
   return (
     <>
       <section className="bg-body md:pt-10">
-        <div className="mx-auto flex max-w-page flex-col gap-4 p-4 md:px-20">
+        <div className="mx-auto flex flex-col gap-4 p-4 md:px-margem">
           <Skel className="h-[46px] w-full" />
           <div className="grid gap-4 md:flex">
             {Array.from({ length: 4 }, (_, i) => (

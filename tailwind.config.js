@@ -31,8 +31,9 @@ export default {
         ui: ['Barlow', 'system-ui', 'sans-serif'],
       },
       letterSpacing: { ui: '0.005em' },
-      maxWidth: { page: '1440px', content: '1264px' },
-      spacing: { 22: '88px', 28: '112px' },
+      // Margens proporcionais ao Figma (1440 de largura): 88px = 6,111vw; caixas cinza: 40px de recuo + 48px de padding
+      maxWidth: { page: 'none', content: 'none' },
+      spacing: { 22: '88px', 28: '112px', margem: '6.111vw', caixa: '2.778vw', 'caixa-in': '3.333vw' },
     },
   },
   plugins: [],

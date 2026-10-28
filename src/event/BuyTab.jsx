@@ -51,7 +51,7 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
 
   return (
     <div className="page-x py-6 md:py-8">
-      <div className={`mx-auto grid max-w-content gap-6 ${order.sessionId ? 'lg:grid-cols-[minmax(0,1fr)_360px]' : 'max-w-[744px]'}`}>
+      <div className={`mx-auto grid gap-6 ${order.sessionId ? 'lg:grid-cols-[minmax(0,1fr)_360px]' : 'max-w-[744px]'}`}>
         <div className="flex min-w-0 flex-col gap-6">
           <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
