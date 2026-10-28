@@ -279,8 +279,12 @@ function InsuranceStep({ c, t, dispatch, alert }) {
       declined={c.insurance === false}
     >
       <p className="text-base font-bold text-ink">Seguro MetLife</p>
-      <p className="mt-2 font-ui text-sm leading-6 text-ink-2">Reembolso sujeito à análise da seguradora, às coberturas contratadas e às condições do seguro.</p>
-      <p className="mt-1 font-ui text-sm leading-6 text-ink-2">Pode cobrir doenças graves e internação hospitalar. Não cobre simples desistência ou mudança de planos.</p>
+      {/* Textos do Figma 9564:40662 */}
+      <div className="mt-2 flex flex-col gap-2 text-base leading-6 text-ink-2">
+        <p>Reembolso sujeito à análise da seguradora, às coberturas contratadas e às condições do seguro.</p>
+        <p>Cobertura em caso de imprevistos, como problemas de saúde.</p>
+        <p>Não cobre simples desistência ou mudança de planos.</p>
+      </div>
       <button type="button" onClick={() => setInfo(true)} className="mt-2 font-ui text-xs text-brand underline hover:no-underline">
         Ver condições e como solicitar reembolso
       </button>
@@ -334,10 +338,11 @@ function ClubStep({ c, t, order, dispatch, alert }) {
       onEdit={() => dispatch({ type: 'edit', step: 'clube' })}
       declined={c.club === false}
     >
-      <p className="font-ui text-sm leading-6 text-ink-2">Benefícios e descontos exclusivos em eventos participantes.</p>
-      <ul className="mt-2 list-disc pl-5 font-ui text-xs leading-5 text-ink-2">
-        <li>Descontos em ingressos parceiros</li>
-        <li>Prioridade em eventos selecionados</li>
+      {/* Textos do Figma 9564:40694 */}
+      <p className="text-base font-bold leading-6 text-ink">Benefícios e descontos exclusivos em eventos participantes.</p>
+      <ul className="mt-2 list-disc pl-6 text-base leading-6 text-ink-2">
+        <li>Descontos exclusivos em ingressos parceiros</li>
+        <li>Prioridade na compra de eventos selecionados</li>
         <li>Vantagens administradas pela Uhuu</li>
       </ul>
       <button type="button" onClick={() => setInfo(true)} className="mt-2 font-ui text-xs text-brand underline hover:no-underline">
@@ -348,11 +353,11 @@ function ClubStep({ c, t, order, dispatch, alert }) {
           checked={c.clubDraft}
           onChange={(v) => dispatch({ type: 'draft', key: 'clubDraft', value: v })}
           title="Quero adicionar o Clube Planeta"
-          detail={`${brl(per)} por ingresso · + ${brl(t.clubValue)} no pedido`}
+          detail={`${brl(per)} por ingresso + ${brl(t.clubValue)} no pedido`}
         />
       </div>
       <div className="mt-5 flex justify-end">
-        <PrimaryButton onClick={() => dispatch({ type: 'answer', key: 'club', value: c.clubDraft })}>{c.clubDraft ? 'Continuar' : 'Continuar sem o Clube'}</PrimaryButton>
+        <PrimaryButton onClick={() => dispatch({ type: 'answer', key: 'club', value: c.clubDraft })}>{c.clubDraft ? 'Continuar' : 'Continuar sem clube'}</PrimaryButton>
       </div>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o Clube Planeta">
         <p>Benefícios e descontos exclusivos em eventos e ingressos participantes.</p>
