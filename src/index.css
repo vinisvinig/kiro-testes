@@ -21,6 +21,19 @@ body {
     @apply mx-auto w-full px-4 md:px-margem;
   }
 
+  /* Página do evento e finalização (Figma em 1440: 152 de margem, blocos de 744 + 32 de espaço + resumo de 360).
+     No desktop tudo é proporcional à tela: caixa de 1136/1440 = 78,889vw, colunas na razão 744:360 e espaço
+     de 32/1440 = 2,222vw. O resumo não fica menor que 320px, para caber o conteúdo em telas de 1024. */
+  .evento-box {
+    @apply mx-auto w-full lg:max-w-[78.889vw];
+  }
+  .evento-grid {
+    @apply grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,744fr)_minmax(320px,360fr)] lg:gap-[2.222vw];
+  }
+  /* Coluna única (Comprar antes de escolher a data): mesma largura do bloco do meio, 744 em 1440 = 51,667vw */
+  .evento-coluna {
+    @apply mx-auto w-full max-w-[max(744px,51.667vw)];
+  }
   /* Barra de rolagem horizontal dos carrosséis (Figma: trilho 14px, barra 6px #d4d4d4) */
   .uhuu-scroll {
     scrollbar-width: thin;

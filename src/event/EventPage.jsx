@@ -181,7 +181,7 @@ function Tabs({ tab, onTab }) {
   return (
     <div id="abas-evento" className="scroll-mt-20 border-b border-line bg-body">
       <div className="page-x">
-        <div role="tablist" aria-label="Seções do evento" className="no-scrollbar mx-auto flex max-w-content gap-2 overflow-x-auto md:gap-6">
+        <div role="tablist" aria-label="Seções do evento" className="no-scrollbar evento-box flex gap-2 overflow-x-auto md:gap-6">
           {item('info', 'info', 'Informações do evento')}
           {item('buy', 'ticket', 'Comprar ingressos')}
         </div>
@@ -194,7 +194,7 @@ function Tabs({ tab, onTab }) {
 function InfoTab({ onBuy, onFees }) {
   return (
     <div className="page-x py-6 md:py-8">
-      <div className="mx-auto grid max-w-content gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
           <About />
           <GalleryCard />

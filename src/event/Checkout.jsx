@@ -94,13 +94,13 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
 
   return (
     <div className="page-x pb-28 pt-6 md:pt-8 lg:pb-16">
-      <div className="mx-auto max-w-content">
+      <div className="evento-box">
         <button type="button" onClick={onBack} className="flex items-center gap-1.5 font-ui text-sm text-ink-2 hover:text-brand">
           <Ico name="arrowLeft" className="size-4" /> Voltar à seleção
         </button>
         <h1 className="sr-only">Finalizar compra</h1>
 
-        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+        <div className="mt-4 evento-grid">
           <div className="flex min-w-0 flex-col gap-6">
             <EventSummary order={order} />
             <InsuranceStep c={c} t={t} dispatch={dispatch} alert={alertStep === 'seguro'} />
@@ -933,13 +933,13 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
 
   return (
     <div className="page-x pb-16 pt-6 md:pt-10">
-      <div className="mx-auto max-w-content">
+      <div className="evento-box">
         <button type="button" onClick={onBack} className="flex items-center gap-1.5 font-ui text-sm text-ink-2 hover:text-brand">
           <Ico name="arrowLeft" className="size-4" /> Trocar forma de pagamento
         </button>
         <h1 className="mt-4 text-[28px] font-bold leading-tight text-ink md:text-[32px]">Finalizar compra</h1>
         {/* grid-cols-1 + min-w-0: sem isso o código Pix (uma linha longa) alargava o card além da tela no celular */}
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+        <div className="mt-6 evento-grid">
           <Card className="min-w-0 md:!p-8">
             {!ready ? (
               <div className="flex flex-col items-center gap-4 py-16 text-center" role="status">
