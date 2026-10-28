@@ -35,32 +35,12 @@ export function useDragScroll(ref) {
     }
     const onUp = () => {
       if (!drag) return
-      const { moved, id, left: drag0 } = drag
+      const { moved, id } = drag
       drag = null
       if (!moved) return
       if (el.hasPointerCapture?.(id)) el.releasePointerCapture(id)
-      // Os cards são largos (402px): se o snap fosse religado aqui, um arrasto menor que meio
-      // card voltaria para o card inicial. Então avança até o próximo card na direção do arrasto
-      // e só religa o snap quando a rolagem termina.
-      const pos = el.scrollLeft
-      const forward = pos > drag0
-      const box = el.getBoundingClientRect()
-      const pad = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0
-      const starts = [...el.children].map((c) => c.getBoundingClientRect().left - box.left + pos - pad)
-      const max = el.scrollWidth - el.clientWidth
-      let target = forward ? starts.find((s) => s > pos + 1) ?? max : [...starts].reverse().find((s) => s < pos - 1) ?? 0
-      target = Math.max(0, Math.min(max, target))
-      el.style.cursor = ''
-      el.style.userSelect = ''
-      el.style.scrollBehavior = ''
-      el.scrollTo({ left: target, behavior: 'smooth' })
-      const restore = () => {
-        el.removeEventListener('scrollend', restore)
-        clearTimeout(timer)
-        el.style.scrollSnapType = ''
-      }
-      const timer = setTimeout(restore, 700)
-      el.addEventListener('scrollend', restore)
+      // Para exatamente onde o usuário soltou (sem "ajeitar" até um card)
+      Object.assign(el.style, { scrollSnapType: '', scrollBehavior: '', cursor: '', userSelect: '' })
       const cancel = (ev) => {
         ev.preventDefault()
         ev.stopPropagation()
@@ -254,8 +234,10 @@ function useFullBleed(railRef) {
     const box = el?.parentElement
     if (!el || !box) return
     const apply = () => {
+      // No fim do trilho, o espaço à direita do último card é igual ao espaço entre os cards
+      const gap = parseFloat(getComputedStyle(el).columnGap) || 0
       if (!window.matchMedia('(min-width: 768px)').matches) {
-        Object.assign(el.style, { marginLeft: '', marginRight: '', paddingLeft: '', paddingRight: '', scrollPaddingLeft: '', scrollPaddingRight: '' })
+        Object.assign(el.style, { marginLeft: '', marginRight: '', paddingLeft: '', paddingRight: `${gap}px`, scrollPaddingLeft: '', scrollPaddingRight: '' })
         return
       }
       const r = box.getBoundingClientRect()
@@ -265,9 +247,9 @@ function useFullBleed(railRef) {
         marginLeft: `${-left}px`,
         marginRight: `${-right}px`,
         paddingLeft: `${left}px`,
-        paddingRight: `${right}px`,
+        paddingRight: `${gap}px`,
         scrollPaddingLeft: `${left}px`,
-        scrollPaddingRight: `${right}px`,
+        scrollPaddingRight: `${gap}px`,
       })
     }
     apply()
@@ -291,7 +273,7 @@ export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', seeAllHref
           A barra nativa ficaria da largura da tela, então ela é escondida e a barra própria fica abaixo, na largura do conteúdo. */}
       <div
         ref={railRef}
-        className={`no-scrollbar -mx-4 flex snap-x overflow-x-auto px-4 ${gap}`}
+        className={`no-scrollbar -mx-4 flex overflow-x-auto px-4 ${gap}`}
       >
         {children}
       </div>

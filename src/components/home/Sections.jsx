@@ -27,7 +27,7 @@ export function Categories() {
           </SectionHeader>
         </div>
         {/* Desktop: os itens vão até a borda da caixa (Figma 6384:38280); o 1º fica alinhado ao título */}
-        <div ref={ref} className="no-scrollbar flex snap-x scroll-px-5 gap-3 overflow-x-auto px-5 md:-mx-12 md:scroll-px-12 md:gap-4 md:px-12">
+        <div ref={ref} className="no-scrollbar flex gap-3 overflow-x-auto pl-5 pr-3 md:-mx-12 md:gap-4 md:pl-12 md:pr-4">
           {categories.map((c) => (
             <Link
               key={c.label}
