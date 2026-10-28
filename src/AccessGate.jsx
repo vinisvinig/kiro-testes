@@ -90,44 +90,54 @@ function Gate({ onOk }) {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-body-3 px-4 py-10">
-      <form onSubmit={submit} noValidate className="flex w-full max-w-[640px] flex-col gap-8 rounded-lg bg-body px-5 pb-16 pt-10 sm:px-10">
-        <div className="flex flex-col items-center gap-6">
-          <img src={`${import.meta.env.BASE_URL}figma/logo.svg`} alt="Uhuu.com" className="h-8" />
-          <h1 id="gate-title" className="text-center font-ui text-2xl font-bold leading-tight text-ink">
-            Para acessar o site informe a senha
-          </h1>
-          <div className="flex w-full justify-between gap-1.5 sm:gap-2" role="group" aria-labelledby="gate-title">
-            {chars.map((ch, i) => (
-              <input
-                key={i}
-                ref={(el) => (refs.current[i] = el)}
-                value={ch}
-                type="text"
-                maxLength={1}
-                inputMode="text"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                spellCheck={false}
-                aria-label={`Caractere ${i + 1} de ${LEN}`}
-                aria-invalid={!!error}
-                onChange={(e) => fill(i, e.target.value.slice(-1))}
-                onKeyDown={(e) => onKeyDown(i, e)}
-                onPaste={(e) => {
-                  e.preventDefault()
-                  fill(i, e.clipboardData.getData('text'))
-                }}
-                onFocus={(e) => e.target.select()}
-                placeholder="⚬"
-                className={`aspect-square w-full min-w-0 max-w-[60px] rounded-lg border bg-white text-center font-ui text-lg font-semibold text-ink outline-none placeholder:text-ink-3 focus:border-brand focus:ring-1 focus:ring-brand ${
-                  error ? 'border-danger' : 'border-line'
-                }`}
-              />
-            ))}
+      <form onSubmit={submit} noValidate className="flex w-full max-w-[560px] flex-col gap-8 rounded-lg bg-body px-5 pb-16 pt-10 sm:px-10">
+        {/* Figma 10047:214591 (atualizado): logo, "Nova Experiência", boas-vindas e a palavra secreta */}
+        <div className="flex flex-col gap-8">
+          <img src={`${import.meta.env.BASE_URL}figma/logo.svg`} alt="Uhuu.com" className="h-8 w-[102.9px]" />
+          <div className="flex flex-col gap-4 text-ink">
+            <p className="text-[30px] leading-none">Nova Experiência</p>
+            <h1 id="gate-title" className="font-ui text-2xl font-bold leading-tight">
+              Bem-vindo ao teste de usuário
+            </h1>
           </div>
-          <p aria-live="polite" className="min-h-4 font-ui text-sm text-danger">
-            {error}
-          </p>
+          <div className="flex flex-col gap-3">
+            <label htmlFor="gate-0" className="text-xs leading-4 text-ink">
+              Informe a palavra secreta para acessar
+            </label>
+            <div className="flex w-full justify-between gap-1.5" role="group" aria-label="Palavra secreta">
+              {chars.map((ch, i) => (
+                <input
+                  key={i}
+                  id={`gate-${i}`}
+                  ref={(el) => (refs.current[i] = el)}
+                  value={ch}
+                  type="text"
+                  maxLength={1}
+                  inputMode="text"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  aria-label={`Letra ${i + 1} de ${LEN}`}
+                  aria-invalid={!!error}
+                  onChange={(e) => fill(i, e.target.value.slice(-1))}
+                  onKeyDown={(e) => onKeyDown(i, e)}
+                  onPaste={(e) => {
+                    e.preventDefault()
+                    fill(i, e.clipboardData.getData('text'))
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  placeholder="⚬"
+                  className={`h-[62px] w-full min-w-0 max-w-[48px] rounded-lg border bg-white text-center font-ui text-lg font-semibold text-ink outline-none placeholder:text-[15px] placeholder:font-medium placeholder:text-ink-3 focus:border-brand focus:ring-1 focus:ring-brand ${
+                    error ? 'border-danger' : 'border-line'
+                  }`}
+                />
+              ))}
+            </div>
+            <p aria-live="polite" className="min-h-4 font-ui text-sm text-danger">
+              {error}
+            </p>
+          </div>
         </div>
         <button
           type="submit"
