@@ -1,10 +1,17 @@
 import { useState } from 'react'
-import { asset, useScroller, CarouselNav, SectionHeader, SeeAll, Pill, Carousel } from './ui.jsx'
+import { asset, useScroller, CarouselNav, SectionHeader, SeeAll, Pill, Carousel, ScrollProgress } from './ui.jsx'
 import EventCard from './EventCard.jsx'
-import { categories, trending, agenda, explore, collections, posts } from './data.js'
+import { categories, trending as trendingBase, agenda as agendaBase, explore as exploreBase, collections as collectionsBase, posts } from './data.js'
 import { Link } from '../../router.jsx'
 import { searchUrl, venueUrl } from '../../search/search.js'
 import { EVENTS, VENUES } from '../../search/catalog.js'
+
+/** Protótipo: +3 cards repetidos em cada carrossel para ter mais conteúdo para rolar. */
+const plus3 = (list) => [...list, ...list.slice(0, 3)]
+const trending = plus3(trendingBase)
+const agenda = plus3(agendaBase)
+const explore = plus3(exploreBase)
+const collections = plus3(collectionsBase)
 
 const PRODUCER_URL = 'https://sobre.uhuu.com/Venda-Na-Uhuu'
 
@@ -19,7 +26,8 @@ export function Categories() {
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
         </div>
-        <div ref={ref} className="max-md:no-scrollbar md:uhuu-scroll flex snap-x gap-3 overflow-x-auto px-5 md:gap-4 md:px-0 md:pb-4">
+        {/* Desktop: os itens vão até a borda da caixa (Figma 6384:38280); o 1º fica alinhado ao título */}
+        <div ref={ref} className="no-scrollbar flex snap-x scroll-px-5 gap-3 overflow-x-auto px-5 md:-mx-12 md:scroll-px-12 md:gap-4 md:px-12">
           {categories.map((c) => (
             <Link
               key={c.label}
@@ -31,6 +39,7 @@ export function Categories() {
             </Link>
           ))}
         </div>
+        <ScrollProgress railRef={ref} interactive className="hidden w-full md:block" />
       </div>
     </section>
   )
@@ -161,9 +170,9 @@ export function Collections() {
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
           <Carousel railRef={ref} onScroll={scroll}>
-            {collections.map((c) => (
+            {collections.map((c, i) => (
               <a
-                key={c.label}
+                key={`${c.label}-${i}`}
                 href="#"
                 aria-label={c.label}
                 className="block h-[300px] w-[172px] shrink-0 snap-start overflow-hidden rounded-[20px] md:h-[700px] md:w-[402px] md:rounded-[40px]"
@@ -243,7 +252,7 @@ export function Newsletter() {
 }
 
 /* ---------- Conheça as casas (desktop 7915:105354, mobile 8260:110555) ---------- */
-const HOME_VENUES = [
+const HOME_VENUES_BASE = [
   'teatro-de-camara-tulio-piva',
   'teatro-bradesco',
   'auditorio-araujo-vianna',
@@ -254,6 +263,7 @@ const HOME_VENUES = [
   const n = EVENTS.filter((e) => e.venueSlug === slug).length
   return { ...v, count: `${n} ${n === 1 ? 'evento' : 'eventos'}` }
 })
+const HOME_VENUES = plus3(HOME_VENUES_BASE)
 
 export function Venues() {
   const [ref, scroll] = useScroller()
@@ -265,9 +275,9 @@ export function Venues() {
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
           <Carousel railRef={ref} onScroll={scroll} gap="gap-2 md:gap-6">
-            {HOME_VENUES.map((v) => (
+            {HOME_VENUES.map((v, i) => (
               <Link
-                key={v.slug}
+                key={`${v.slug}-${i}`}
                 to={venueUrl(v.slug)}
                 className="relative flex h-[114px] w-[172px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-line md:h-[267px] md:w-[402px]"
               >

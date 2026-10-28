@@ -75,17 +75,28 @@ function BannerCarousel({ slides }) {
     <div className="page-x">
       {/* Mesma largura do conteúdo (1264), alinhado ao logo e às seções; as setas ficam por cima/para fora */}
       <div className="relative mx-auto max-w-content">
-        <div className="overflow-hidden rounded-2xl">
+        {/* Sem overflow-hidden: os banners vizinhos aparecem nas margens, à esquerda e à direita (Figma 6384:38279).
+            Uma cópia do último antes e do primeiro depois garante vizinhos nas pontas. */}
+        <div className="rounded-2xl">
           <div
             className="flex gap-10 transition-transform duration-700 ease-out"
-            style={{ transform: `translateX(calc(${-index} * (100% + 40px)))` }}
+            style={{ transform: `translateX(calc(${-(index + 1)} * (100% + 40px)))` }}
           >
-            {slides.map((s, i) => (
+            {[slides.at(-1), ...slides, slides[0]].map((s, k) => {
+              const i = k - 1
+              return (
               <Link
-                key={s.title}
+                key={k}
                 to={s.href}
                 aria-hidden={i !== index}
                 tabIndex={i === index ? 0 : -1}
+                onClick={(e) => {
+                  // Clicar num vizinho traz ele para o centro em vez de abrir o evento
+                  if (i !== index) {
+                    e.preventDefault()
+                    setIndex((i + slides.length) % slides.length)
+                  }
+                }}
                 className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:h-[420px]"
               >
                 <img src={s.image} alt="" className="absolute inset-0 size-full object-cover" />
@@ -99,7 +110,8 @@ function BannerCarousel({ slides }) {
                   <div className="h-[10px]" />
                 </div>
               </Link>
-            ))}
+              )
+            })}
           </div>
         </div>
 
