@@ -47,7 +47,10 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
         e.preventDefault()
         submit()
       }}
-      className={`mx-auto flex max-w-content gap-4 bg-black/5 p-4 md:rounded-2xl md:px-8 ${
+      className={`mx-auto flex gap-4 bg-black/5 p-4 md:rounded-2xl ${
+        // Home: mesma caixa da seção Categorias (1360 de largura, 48px de recuo), com o campo alinhado ao logo
+        isFilters ? 'max-w-content md:px-8' : 'max-w-[1360px] md:px-12'
+      } ${
         isFilters ? 'flex-col' : 'flex-col md:flex-row md:items-center'
       }`}
     >
