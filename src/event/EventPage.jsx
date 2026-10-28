@@ -241,10 +241,11 @@ function About() {
       </div>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
         {a.credits.map(([k, v, d]) => (
-          <li key={k} className="rounded-xl border border-[#fbcfe8] bg-brand-0 p-3">
-            <p className="font-ui text-[10px] font-medium uppercase text-brand">{k}</p>
-            <p className="mt-1 text-sm font-semibold text-ink">{v}</p>
-            {d && <p className="font-ui text-[11px] text-ink-3">{d}</p>}
+          // Figma 9720:324216: fundo claro com borda rosa
+          <li key={k} className="flex flex-col gap-[5px] rounded-lg border border-brand bg-body p-[14px]">
+            <p className="text-xs font-semibold uppercase leading-4 text-[#ed2a78]">{k}</p>
+            <p className="text-[13px] font-semibold leading-tight text-ink">{v}</p>
+            {d && <p className="text-xs leading-4 text-ink-2">{d}</p>}
           </li>
         ))}
       </ul>
