@@ -213,7 +213,12 @@ export function ScrollProgress({ railRef }) {
 export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', seeAllHref, seeAllLight = false, children }) {
   return (
     <div className="flex flex-col gap-5 md:gap-0">
-      <div ref={railRef} className={`max-md:no-scrollbar md:uhuu-scroll -mx-4 flex snap-x overflow-x-auto px-4 md:mx-0 md:px-0 md:pb-4 ${gap}`}>
+      {/* Desktop: o trilho começa alinhado ao conteúdo e vai até a borda direita da tela (Figma 6384:38271).
+          O padding à direita deixa o último card parar alinhado ao fim do conteúdo. */}
+      <div
+        ref={railRef}
+        className={`max-md:no-scrollbar md:uhuu-scroll -mx-4 flex snap-x overflow-x-auto px-4 md:ml-0 md:mr-[calc(50%-50vw)] md:pl-0 md:pr-[calc(50vw-50%)] md:pb-4 ${gap}`}
+      >
         {children}
       </div>
       <div className="flex items-center justify-between md:hidden">

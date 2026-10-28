@@ -73,7 +73,8 @@ function BannerCarousel({ slides }) {
 
   return (
     <div className="page-x">
-      <div className="relative mx-auto max-w-content md:px-[42px]">
+      {/* Mesma largura do conteúdo (1264), alinhado ao logo e às seções; as setas ficam por cima/para fora */}
+      <div className="relative mx-auto max-w-content">
         <div className="overflow-hidden rounded-2xl">
           <div
             className="flex gap-10 transition-transform duration-700 ease-out"

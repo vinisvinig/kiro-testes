@@ -68,7 +68,7 @@ export default function App() {
   else if (eventSlug) page = <EventPage key={eventSlug} slug={eventSlug} search={search} />
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-clip">
       <Header />
       <main className="flex-1">{page}</main>
       <Footer />
