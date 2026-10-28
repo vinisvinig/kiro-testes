@@ -268,8 +268,10 @@ const INSURANCE_TERMS =
   'https://s3.us-east-1.amazonaws.com/portal.uhuu.com.br/ingresso-seguro/UHUU+Ingresso+Protegido-+Condi%C3%A7%C3%B5es+Contratuais+VF.pdf'
 const INSURANCE_PRIVACY =
   'https://s3.us-east-1.amazonaws.com/portal.uhuu.com.br/ingresso-seguro/Privacidade+de+dados+e+Demais+Disposi%C3%A7%C3%B5es+do+Seguro_VF.pdf'
-// Central de políticas e termos da Uhuu (mesmo link do rodapé) até existirem páginas separadas
+// Links do Figma 9569:41706
 const UHUU_TERMS = 'https://uhuu.com/termos'
+const UHUU_PRIVACY = 'https://uhuu.com/privacidade'
+const UHUU_CANCEL = 'https://uhuu.com/cancelamento'
 
 const TermLink = ({ href, children }) => (
   <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand underline hover:no-underline">
@@ -281,7 +283,7 @@ const TermLink = ({ href, children }) => (
 const PurchaseTerms = ({ action }) => (
   <p className="mt-4 rounded-lg border border-line bg-white px-3 py-2.5 text-base leading-6 text-ink">
     Ao clicar em {action} eu declaro que li e tenho conhecimento e concordo com os <TermLink href={UHUU_TERMS}>Termos de Uso</TermLink>,{' '}
-    <TermLink href={UHUU_TERMS}>Políticas de Privacidade</TermLink> e <TermLink href={UHUU_TERMS}>Política de Cancelamento</TermLink>.
+    <TermLink href={UHUU_PRIVACY}>Políticas de Privacidade</TermLink> e <TermLink href={UHUU_CANCEL}>Política de Cancelamento</TermLink>.
   </p>
 )
 
@@ -311,8 +313,8 @@ function InsuranceStep({ c, t, dispatch, alert }) {
         Ver condições e como solicitar reembolso
       </button>
       {/* Aceite dos termos do seguro (Figma 9652:43944) */}
-      <p className="mt-6 text-base leading-6 text-ink-2">
-        Ao selecionar Seguro Ingresso Protegido, eu declaro que li e tenho conhecimento e concordo com os{' '}
+      <p className="mt-6 rounded-xl border border-line bg-body px-3 py-2.5 text-base leading-6 text-ink-2">
+        Ao selecionar Quero contratar o seguro, eu declaro que li e tenho conhecimento e concordo com os{' '}
         <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink> do seguro, e dos{' '}
         <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e Demais Disposições do Seguro</TermLink>.
       </p>
@@ -658,7 +660,7 @@ function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert }) {
             Ao gerar o Pix, você terá <strong className="text-ink">10 minutos</strong> para pagar <strong className="text-ink">{brl(t.total)}</strong> pelo app do seu banco. A
             confirmação costuma ser imediata.
           </div>
-          <PurchaseTerms action="gerar Pix" />
+          <PurchaseTerms action="Gerar Pix" />
           <div className="mt-5 flex justify-end">
             <PrimaryButton onClick={onPix}>Gerar Pix</PrimaryButton>
           </div>
@@ -741,7 +743,7 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
         {valid ? `Total no cartão: ${brl(t.cardTotal)}.` : 'Preencha os dados do cartão para finalizar a compra.'}
       </p>
       <div className="col-span-2">
-        <PurchaseTerms action="finalizar compra" />
+        <PurchaseTerms action="Finalizar compra" />
       </div>
       <div className="col-span-2 flex justify-end">
         <PrimaryButton type="submit" disabled={!valid}>
