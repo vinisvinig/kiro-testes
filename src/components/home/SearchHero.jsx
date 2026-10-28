@@ -107,7 +107,7 @@ function useAutoplay(go, paused, deps) {
 }
 
 /** Trilho com 3 cópias da lista, compartilhado entre desktop e mobile. */
-function LoopTrack({ slides, c, sw, gapPx, className, renderSlide }) {
+function LoopTrack({ slides, c, sw, gap, className, renderSlide }) {
   const list = [...slides, ...slides, ...slides]
   return (
     <div
@@ -115,7 +115,7 @@ function LoopTrack({ slides, c, sw, gapPx, className, renderSlide }) {
       onDragStart={(e) => e.preventDefault()}
       onTransitionEnd={c.onTransitionEnd}
       className={`flex touch-pan-y select-none ${sw.dx ? 'cursor-grabbing' : `cursor-grab ${c.animate ? 'transition-transform duration-700 ease-out' : ''}`} ${className}`}
-      style={{ transform: `translateX(calc(${-c.pos} * (100% + ${gapPx}px) + ${sw.dx}px))` }}
+      style={{ transform: `translateX(calc(${-c.pos} * (100% + ${gap}) + ${sw.dx}px))` }}
     >
       {list.map((s, k) => {
         const i = k % slides.length
@@ -148,7 +148,7 @@ function MobileBanner({ slides }) {
         slides={slides}
         c={c}
         sw={sw}
-        gapPx={8}
+        gap="8px"
         className="gap-2"
         renderSlide={(s, k, { active, onClick }) => (
           <Link
@@ -192,15 +192,15 @@ function BannerCarousel({ slides }) {
 
   return (
     <div className="page-x">
-      {/* Mesma largura do conteúdo (1264), alinhado ao logo e às seções; as setas ficam por cima/para fora.
+      {/* Mesma largura do conteúdo; altura na proporção do Figma (1264×420) e espaço entre banners de 40px em 1440 (2,778vw), alinhado ao logo e às seções; as setas ficam por cima/para fora.
           Sem overflow-hidden: os banners vizinhos aparecem nas margens (Figma 6384:38279). */}
       <div className="relative mx-auto max-w-content">
         <LoopTrack
           slides={slides}
           c={c}
           sw={sw}
-          gapPx={40}
-          className="gap-10"
+          gap="2.778vw"
+          className="gap-[2.778vw]"
           renderSlide={(s, k, { active, onClick }) => (
             <Link
               key={k}
@@ -209,13 +209,13 @@ function BannerCarousel({ slides }) {
               tabIndex={active ? 0 : -1}
               draggable={false}
               onClick={onClick}
-              className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:h-[420px]"
+              className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:aspect-[1264/420] md:h-auto md:min-h-[300px]"
             >
               <img src={s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
               <div className="relative flex w-full flex-col items-center gap-5 bg-black/[.56] px-4 py-5">
                 <div className="flex flex-col items-center gap-3 pt-[10px]">
                   <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white">{s.period}</span>
-                  <p className="text-center text-3xl font-bold leading-none text-white md:text-5xl">{s.title}</p>
+                  <p className="text-center text-3xl font-bold leading-none text-white md:text-4xl lg:text-5xl">{s.title}</p>
                 </div>
                 <div className="h-[10px]" />
               </div>
