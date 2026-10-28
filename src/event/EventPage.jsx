@@ -413,11 +413,13 @@ function ExtraTimeDialog({ open, onClose }) {
             Seu tempo está acabando
           </h2>
           <p className="mt-2 font-ui text-sm leading-5 text-ink-2" role="status">
-            Você ganhou <strong className="text-ink">+5 minutos</strong> para finalizar a compra.
+            Você ganhou mais <strong className="text-ink">5 minutos</strong> para finalizar
+            <br />
+            seu pedido.
           </p>
         </div>
         <button type="button" onClick={onClose} className="w-full rounded-full bg-brand py-[10px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
-          Fechar
+          Entendi
         </button>
       </div>
     </Dialog>
