@@ -308,7 +308,8 @@ const BLOG_URL = 'https://sobre.uhuu.com/blog'
 
 export function Blog() {
   return (
-    <section className="bg-body-2">
+    // Desktop: transparente e acima do Produtor, para o roxo dele aparecer atrás da curva (Figma 9185:172171)
+    <section className="relative z-10 bg-body-2 md:bg-transparent">
       <div className="bg-night py-12 md:rounded-bl-[112px] md:pb-28 md:pt-22">
         <div className="page-x">
           <div className="mx-auto flex max-w-content flex-col gap-6">
@@ -402,20 +403,34 @@ export function Producer() {
         </div>
       </section>
 
-      {/* Desktop */}
-      <section className="hidden bg-body-2 py-28 md:block">
-        <div className="page-x">
-          <div className="mx-auto flex max-w-content flex-col gap-8">
-            <div className="flex flex-col gap-6">
-              <h2 className="text-4xl font-normal leading-none text-brand">Produtor, seu evento merece chegar mais longe!</h2>
-              <p className="text-sm font-medium leading-5 text-ink-2">
-                Venda ingressos, divulgue seu evento e conte com tecnologia, operação, marketing e inteligência de dados para
-                transformar cada etapa em uma experiência mais simples e eficiente.
-              </p>
+      {/* Desktop (Figma 9093:102618): foto com gradiente roxo; sobe 105px para ficar atrás da curva do Blog */}
+      <section className="relative hidden overflow-hidden bg-[#661a68] md:-mt-[105px] md:block">
+        <img src={asset('produtor-gradiente.png')} alt="" aria-hidden className="pointer-events-none absolute left-0 top-[-16%] h-[116%] w-full object-cover" />
+        <div className="relative pb-22 pt-[185px]">
+          <div className="page-x">
+            <div className="mx-auto flex max-w-content flex-col gap-8 lg:pl-[108px]">
+              <div className="flex flex-col gap-2">
+                <p className="flex items-center gap-2 text-[30px] font-bold leading-none text-white">
+                  <img src={asset('ic-campaign.svg')} alt="" className="size-6" />
+                  Produtor
+                </p>
+                <h2 className="text-2xl font-semibold leading-tight text-brand">Plataforma completa de gestão de eventos</h2>
+                <p className="text-base leading-6 text-white">Uma plataforma completa para venda, gestão e operação do seu evento</p>
+              </div>
+              <ul className="flex flex-col gap-3">
+                {BENEFITS.map((b) => (
+                  <li key={b} className="flex items-center gap-3 text-base font-semibold leading-6 text-white">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand">
+                      <img src={asset('ic-check.svg')} alt="" className="size-[18px]" />
+                    </span>
+                    {b}
+                  </li>
+                ))}
+              </ul>
+              <Pill as="a" href={PRODUCER_URL} size="sm" className="self-start">
+                Traga seu evento para Uhuu
+              </Pill>
             </div>
-            <Pill as="a" href={PRODUCER_URL} size="sm" className="self-start">
-              Leve seu evento para a Uhuu
-            </Pill>
           </div>
         </div>
       </section>
