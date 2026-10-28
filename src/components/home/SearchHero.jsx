@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { asset } from './ui.jsx'
+import { asset, useDragScroll } from './ui.jsx'
 import { heroSlides } from './data.js'
 import { Link } from '../../router.jsx'
 import SearchBox from '../../search/SearchBox.jsx'
@@ -24,6 +24,7 @@ export default function SearchHero() {
 function MobileBanner({ slides }) {
   const [i, setI] = useState(0)
   const ref = useRef(null)
+  useDragScroll(ref)
   const onScroll = () => {
     const el = ref.current
     if (el) setI(Math.round(el.scrollLeft / (el.firstChild?.offsetWidth + 8 || 1)))
@@ -64,12 +65,42 @@ function MobileBanner({ slides }) {
 
 function BannerCarousel({ slides }) {
   const [index, setIndex] = useState(1) // o Figma mostra o 2º slide ativo
+  const [dx, setDx] = useState(0) // deslocamento enquanto arrasta com o mouse
+  const drag = useRef(null)
+  const moved = useRef(false)
   const go = (dir) => setIndex((i) => (i + dir + slides.length) % slides.length)
 
   useEffect(() => {
+    if (dx) return // pausa o avanço automático durante o arrasto
     const id = setInterval(() => go(1), 6000)
     return () => clearInterval(id)
-  }, [index])
+  }, [index, dx])
+
+  // Arrastar com o mouse: o banner acompanha o ponteiro; ao soltar, passa para o vizinho
+  // se o arrasto foi maior que 60px (ou 1/6 da largura), senão volta ao lugar.
+  const onPointerDown = (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return
+    e.preventDefault()
+    drag.current = { x: e.clientX, w: e.currentTarget.offsetWidth }
+    moved.current = false
+    const move = (ev) => {
+      const d = ev.clientX - drag.current.x
+      if (Math.abs(d) > 5) moved.current = true
+      setDx(d)
+    }
+    const up = (ev) => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      const d = ev.clientX - drag.current.x
+      const limit = Math.min(60, drag.current.w / 6)
+      if (d <= -limit) go(1)
+      else if (d >= limit) go(-1)
+      drag.current = null
+      setDx(0)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
 
   return (
     <div className="page-x">
@@ -79,8 +110,10 @@ function BannerCarousel({ slides }) {
             Uma cópia do último antes e do primeiro depois garante vizinhos nas pontas. */}
         <div className="rounded-2xl">
           <div
-            className="flex gap-10 transition-transform duration-700 ease-out"
-            style={{ transform: `translateX(calc(${-(index + 1)} * (100% + 40px)))` }}
+            onPointerDown={onPointerDown}
+            onDragStart={(e) => e.preventDefault()}
+            className={`flex select-none gap-10 ${dx ? 'cursor-grabbing' : 'cursor-grab transition-transform duration-700 ease-out'}`}
+            style={{ transform: `translateX(calc(${-(index + 1)} * (100% + 40px) + ${dx}px))` }}
           >
             {[slides.at(-1), ...slides, slides[0]].map((s, k) => {
               const i = k - 1
@@ -90,7 +123,14 @@ function BannerCarousel({ slides }) {
                 to={s.href}
                 aria-hidden={i !== index}
                 tabIndex={i === index ? 0 : -1}
+                draggable={false}
                 onClick={(e) => {
+                  // Depois de arrastar, o clique não abre o evento
+                  if (moved.current) {
+                    e.preventDefault()
+                    moved.current = false
+                    return
+                  }
                   // Clicar num vizinho traz ele para o centro em vez de abrir o evento
                   if (i !== index) {
                     e.preventDefault()
@@ -99,7 +139,7 @@ function BannerCarousel({ slides }) {
                 }}
                 className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:h-[420px]"
               >
-                <img src={s.image} alt="" className="absolute inset-0 size-full object-cover" />
+                <img src={s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
                 <div className="relative flex w-full flex-col items-center gap-5 bg-black/[.56] px-4 py-5">
                   <div className="flex flex-col items-center gap-3 pt-[10px]">
                     <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white">
