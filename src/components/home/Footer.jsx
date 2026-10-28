@@ -31,7 +31,9 @@ export default function Footer() {
   return (
     <footer className="flex flex-col gap-14 bg-[#fafafa] pt-14">
       <div className="page-x">
-        <div className="mx-auto flex max-w-content flex-col gap-8 md:flex-row md:flex-wrap">
+        {/* A partir de 1280: as 4 colunas numa linha com espaço automático entre elas (justify-between), então os selos
+            ficam alinhados à direita. O gap-8 é o espaço mínimo: em 1440 dá 32px, como no Figma; em telas maiores ele cresce e, entre 1280 e 1440, as 3 primeiras colunas encolhem. */}
+        <div className="mx-auto flex flex-col gap-8 md:flex-row md:flex-wrap xl:flex-nowrap xl:justify-between">
           <div className="flex flex-col gap-4 md:w-[271px]">
             <div className="flex h-10 items-center">
               <img src={asset('logo.svg')} alt="Uhuu.com" className="h-8 w-[102.9px]" />
@@ -79,7 +81,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex w-[355px] max-w-full flex-col gap-4">
+          <div className="flex w-[355px] max-w-full shrink-0 flex-col gap-4">
             <ColTitle>Selos Reclame Aqui</ColTitle>
             <ReclameAquiSeals />
           </div>
