@@ -215,7 +215,7 @@ export function ScrollProgress({ railRef, className = 'w-[242px]', interactive =
   }
 
   return (
-    <div className={`h-[14px] rounded-full bg-body p-1 ${interactive ? 'cursor-pointer' : ''} ${className}`} aria-hidden onPointerDown={onDown}>
+    <div className={`h-[14px] rounded-full bg-black/5 p-1 ${interactive ? 'cursor-pointer' : ''} ${className}`} aria-hidden onPointerDown={onDown}>
       <div ref={track} className="relative h-full overflow-hidden rounded-full">
         <span className="absolute inset-y-0 rounded-full bg-line" style={{ width: `${state.w * 100}%`, left: `${state.x * 100}%` }} />
       </div>
