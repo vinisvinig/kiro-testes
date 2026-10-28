@@ -61,7 +61,7 @@ export default function EventCard({
     <Link
       to={href}
       draggable={false}
-      className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-line bg-white px-px transition hover:shadow-lg ${b.card} ${widthClass}`}
+      className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-line bg-white transition hover:shadow-lg ${b.card} ${widthClass}`}
     >
       <div className={`h-[114px] w-full overflow-hidden rounded-br-[20px] ${b.media}`}>
         <img src={image} alt="" loading="lazy" draggable={false} className={`size-full object-cover ${imageClass}`} />
