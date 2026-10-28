@@ -102,8 +102,10 @@ function Gate({ onOk }) {
                 key={i}
                 ref={(el) => (refs.current[i] = el)}
                 value={ch}
-                type="password"
+                type="text"
                 maxLength={1}
+                inputMode="text"
+                autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
                 spellCheck={false}
