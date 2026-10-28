@@ -39,14 +39,15 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
     requestAnimationFrame(() => listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
   const showList = session && order.modality
-  const openFromMap = (sectorId) => {
-    if (!showList) return
-    // No combo, abre o primeiro combo do setor clicado; no individual, o próprio setor.
-    const target = order.modality === 'combo' ? COMBOS.find((c) => c.sector === sectorId)?.id : sectorId
-    if (!target) return
-    if (order.open !== target) dispatch({ type: 'open', id: target })
-    requestAnimationFrame(() => document.getElementById(`item-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
-  }
+  // Mapa referencial agora é estático (só para o usuário se localizar). Interação desativada, mantida para reuso:
+  // const openFromMap = (sectorId) => {
+  //   if (!showList) return
+  //   // No combo, abre o primeiro combo do setor clicado; no individual, o próprio setor.
+  //   const target = order.modality === 'combo' ? COMBOS.find((c) => c.sector === sectorId)?.id : sectorId
+  //   if (!target) return
+  //   if (order.open !== target) dispatch({ type: 'open', id: target })
+  //   requestAnimationFrame(() => document.getElementById(`item-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  // }
   const toMap = () => document.getElementById(MAP_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
@@ -68,7 +69,9 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
           )}
 
           <div id={MAP_ID} className="scroll-mt-24">
-            <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} />
+            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
+                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
+            <VenueMap />
           </div>
         </div>
 

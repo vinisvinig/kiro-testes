@@ -154,34 +154,34 @@ const MAP_BLOCKS = [
   { label: 'Cadeira coberta B', sector: 'cadeira-coberta', cls: 'bg-[#f0abfc]' },
 ]
 
-export function VenueMap({ onPick, active }) {
+/**
+ * Mapa estático, exibido como imagem: serve só para o usuário se localizar e já chegar na compra
+ * sabendo qual setor quer. A versão interativa (clicar no setor abre a lista; setor aberto em destaque)
+ * ficou comentada abaixo; para reativar, volte a aceitar { onPick, active } e use os trechos comentados.
+ */
+export function VenueMap() {
   return (
     <Card>
       <CardTitle>Mapa referencial do evento</CardTitle>
       <p className="mt-4 text-sm font-medium text-ink md:mt-6">Visão geral do local</p>
       <div className="mt-4 rounded-2xl border border-line bg-body-2 px-3 pb-4 pt-6 md:px-6 md:pt-8">
-        <div className="relative mx-auto max-w-[460px] rounded-[50%] bg-[#b8b0bf] p-2 md:p-3">
-          <div className="flex flex-col items-center gap-2 rounded-[50%] bg-[#ddd6e1] px-3 py-5 md:px-4 md:py-6">
+        <div
+          role="img"
+          aria-label={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
+          className="pointer-events-none relative mx-auto max-w-[460px] select-none rounded-[50%] bg-[#b8b0bf] p-2 md:p-3"
+        >
+          <div aria-hidden="true" className="flex flex-col items-center gap-2 rounded-[50%] bg-[#ddd6e1] px-3 py-5 md:px-4 md:py-6">
             <span className="w-1/3 rounded bg-ink-dark py-1.5 text-center font-ui text-[10px] font-semibold text-white md:text-xs">Palco</span>
             <div className="grid w-full grid-cols-3 gap-1.5 md:gap-2">
               {MAP_BLOCKS.map((b) => {
-                const isActive = active && active === b.sector
-                const content = (
-                  <>
+                // const isActive = active && active === b.sector
+                const cls = `rounded-md px-1 py-3 text-center font-ui text-[10px] font-semibold leading-tight text-ink md:py-4 md:text-xs ${b.cls}`
+                // Interativo: ${isActive ? 'ring-2 ring-brand ring-offset-2' : ''} na classe e, com onPick,
+                // <button type="button" onClick={() => onPick(b.sector)} className={`${cls} transition hover:brightness-95`}>
+                return (
+                  <span key={b.label} className={cls}>
                     {b.star && <Ico name="star" className="mr-0.5 inline size-3 align-[-2px]" />}
                     {b.label}
-                  </>
-                )
-                const cls = `rounded-md px-1 py-3 text-center font-ui text-[10px] font-semibold leading-tight text-ink md:py-4 md:text-xs ${b.cls} ${
-                  isActive ? 'ring-2 ring-brand ring-offset-2' : ''
-                }`
-                return onPick ? (
-                  <button key={b.label} type="button" onClick={() => onPick(b.sector)} className={`${cls} transition hover:brightness-95`}>
-                    {content}
-                  </button>
-                ) : (
-                  <span key={b.label} className={cls}>
-                    {content}
                   </span>
                 )
               })}
@@ -189,7 +189,8 @@ export function VenueMap({ onPick, active }) {
           </div>
         </div>
         <Note className="mt-6">
-          Este mapa apresenta somente a localização dos setores. {onPick ? 'Selecione um setor acima para ver ingressos ou assentos disponíveis.' : 'Escolha a sessão em “Comprar ingressos” para ver os setores disponíveis.'}
+          Este mapa apresenta somente a localização dos setores.
+          {/* Interativo: {onPick ? 'Selecione um setor acima para ver ingressos ou assentos disponíveis.' : 'Escolha a sessão em “Comprar ingressos” para ver os setores disponíveis.'} */}
         </Note>
       </div>
     </Card>
