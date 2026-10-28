@@ -21,31 +21,27 @@ export default function SearchHero() {
 }
 
 /**
- * Carrossel em loop infinito (desktop e mobile): o 1º banner começa no centro, o último aparece à
- * esquerda e o 2º à direita. Há uma cópia do último antes do 1º e do 1º depois do último; ao parar
- * numa cópia, o trilho pula sem animação para o banner real, então 3 → 1 → 2 segue sempre no mesmo sentido.
+ * Carrossel em loop infinito (desktop e mobile), começando no 2º banner (1º à esquerda, 3º à direita).
+ * O trilho tem 3 cópias completas da lista e fica sempre na cópia do meio: ao sair dela, pula sem
+ * animação para a posição equivalente no meio. Como as cópias são iguais, o pulo é invisível e sempre
+ * há banners dos dois lados, então 3 → 1 → 2 segue fluido no mesmo sentido.
  */
-function useLoopCarousel(count) {
-  const [pos, setPos] = useState(1) // posição no trilho com cópias: 0 = cópia do último, count+1 = cópia do 1º
+function useLoopCarousel(count, start = 1) {
+  const [pos, setPos] = useState(count + start) // posição no trilho de 3 cópias
   const [animate, setAnimate] = useState(true)
-  const busy = useRef(false)
-  const index = (pos - 1 + count) % count
+  const index = pos % count
 
-  const move = (to) => {
-    if (busy.current) return
-    busy.current = true
+  const go = (dir) => {
     setAnimate(true)
-    setPos(to)
+    setPos((p) => p + dir)
   }
-  const go = (dir) => move(pos + dir)
-  const goTo = (i) => i !== index && move(i + 1)
+  const goTo = (i) => i !== index && go(i - index)
 
   const onTransitionEnd = (e) => {
     if (e.target !== e.currentTarget || e.propertyName !== 'transform') return
-    busy.current = false
-    if (pos === 0 || pos === count + 1) {
+    if (pos < count || pos >= 2 * count) {
       setAnimate(false)
-      setPos(pos === 0 ? count : 1)
+      setPos(count + (pos % count))
     }
   }
   // Religa a animação depois do pulo sem animação
@@ -110,9 +106,9 @@ function useAutoplay(go, paused, deps) {
   }, [paused, ...deps])
 }
 
-/** Trilho com as cópias nas pontas, compartilhado entre desktop e mobile. */
+/** Trilho com 3 cópias da lista, compartilhado entre desktop e mobile. */
 function LoopTrack({ slides, c, sw, gapPx, className, renderSlide }) {
-  const list = [slides.at(-1), ...slides, slides[0]]
+  const list = [...slides, ...slides, ...slides]
   return (
     <div
       onPointerDown={sw.onPointerDown}
@@ -122,7 +118,7 @@ function LoopTrack({ slides, c, sw, gapPx, className, renderSlide }) {
       style={{ transform: `translateX(calc(${-c.pos} * (100% + ${gapPx}px) + ${sw.dx}px))` }}
     >
       {list.map((s, k) => {
-        const i = (k - 1 + slides.length) % slides.length
+        const i = k % slides.length
         const active = k === c.pos
         return renderSlide(s, k, {
           active,
