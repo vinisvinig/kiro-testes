@@ -20,7 +20,7 @@ export function Categories() {
   const [ref, scroll] = useScroller()
   return (
     <section className="bg-body py-6 md:px-caixa md:py-8">
-      <div className="mx-auto flex flex-col gap-4 overflow-hidden md:gap-6 md:rounded-2xl md:border md:border-line md:bg-black/[.03] md:px-caixa-in md:py-8">
+      <div className="mx-auto flex flex-col gap-4 overflow-hidden border border-line bg-black/[.03] py-6 md:gap-6 md:rounded-2xl md:px-caixa-in md:py-8">
         <div className="px-5 md:px-0">
           <SectionHeader title="Categorias" mobileActions>
             <CarouselNav onScroll={scroll} />
