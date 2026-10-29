@@ -174,12 +174,16 @@ function ValidatorBox({ validator: v, state = { value: '', status: 'idle' }, dis
           className={`h-11 min-w-0 flex-1 rounded-xl border-2 bg-white px-3 font-ui text-sm tracking-widest text-ink outline-none focus:border-brand ${error ? 'border-danger' : 'border-line'}`}
         />
         {applied ? (
+          // Figma 10116:205422: pílula cinza "Aplicado" com check. Tocar libera o campo para trocar o código.
           <button
             type="button"
             onClick={() => dispatch({ type: 'codeInput', validator: v.id, value: '' })}
-            className="h-11 shrink-0 rounded-full border border-brand px-4 font-ui text-sm font-semibold text-brand hover:border-brand-700 hover:text-brand-700"
+            aria-label="Código aplicado. Toque para alterar o código"
+            title="Alterar código"
+            className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-[#6b7280] px-4 font-ui text-[15px] font-semibold leading-none text-white transition hover:brightness-110"
           >
-            Alterar
+            Aplicado
+            <Ico name="checkCircle" className="size-[14px]" />
           </button>
         ) : (
           <button type="submit" disabled={!value} className="h-11 shrink-0 rounded-full bg-brand px-5 font-ui text-sm font-semibold text-white hover:brightness-110 disabled:bg-brand/40">
