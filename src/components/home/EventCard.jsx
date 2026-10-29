@@ -41,6 +41,9 @@ const BP = {
  * Mobile (Figma 7930:119358): 172px, raio 20, imagem 114, data em chip "10 / JUL - qui".
  * `grid`: uso em grade (ver BP.lg) — o card ocupa a largura da coluna.
  */
+/** No máximo 2 tags por card; as demais (em ordem de prioridade no dado) ficam ocultas. */
+const MAX_TAGS = 2
+
 export default function EventCard({
   image,
   imageClass = '',
@@ -57,6 +60,7 @@ export default function EventCard({
 }) {
   const d = dates[0]
   const b = BP[grid ? 'lg' : 'md']
+  const shown = tags.slice(0, MAX_TAGS)
   return (
     <Link
       to={href}
@@ -68,9 +72,9 @@ export default function EventCard({
       </div>
 
       <div className={`flex flex-1 flex-col gap-2 px-2 py-3 ${b.body}`}>
-        {tags.length > 0 && (
+        {shown.length > 0 && (
           <div className={`flex flex-wrap items-center gap-1 ${b.tags}`}>
-            {tags.map((t) => (
+            {shown.map((t) => (
               <span key={t.label} className={`inline-flex items-center gap-0.5 rounded-full border-[1.2px] bg-white px-[6px] py-1 ${b.tag} ${t.color}`}>
                 <img src={t.icon} alt="" draggable={false} className={`size-2 ${b.tagIcon}`} />
                 <span className={`font-ui text-[8px] font-semibold leading-none text-ink ${b.tagText}`}>{t.label}</span>
