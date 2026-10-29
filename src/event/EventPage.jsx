@@ -343,19 +343,16 @@ function BuyCard({ onBuy, onFees }) {
   const from = Math.min(...SECTORS.filter((s) => !s.soldOut).map((s) => minFare(s)))
   const fee = from * 0.15
   const total = from + fee
-  const dates = SESSIONS.filter((s) => s.kind === 'data').length
   return (
     <Card as="div">
       <Eyebrow>Ingressos disponíveis</Eyebrow>
       <p className="mt-2 text-xl font-bold text-ink">Escolha a melhor sessão</p>
-      <button type="button" onClick={onBuy} className="mt-4 flex w-full items-center gap-3 rounded-xl border border-line bg-body-2 p-3 text-left hover:border-brand">
+      {/* Sessão (Figma 9150:191560): ícone + período, sem fundo nem borda. Continua levando à compra. */}
+      <button type="button" onClick={onBuy} className="mt-6 flex items-center gap-3 text-left text-sm font-semibold leading-5 text-brand hover:underline" aria-label={`${EVENT.rangeLabel}: ver datas e comprar`}>
         <Ico name="calendar" className="size-6 text-ink" />
-        <span>
-          <span className="block text-sm font-semibold text-brand">{EVENT.rangeLabel}</span>
-          <span className="block font-ui text-xs text-ink-3">{dates} datas e passaporte</span>
-        </span>
+        {EVENT.rangeLabel}
       </button>
-      <div className="mt-5 border-t border-line pt-5">
+      <div className="mt-6 border-t border-line pt-6">
         <p className="font-ui text-xs text-ink-3">Ingressos a partir de</p>
         <p className="text-2xl font-bold text-ink">{brl(from)}</p>
         <p className="font-ui text-xs text-ink-3">+ {brl(fee)} taxa de serviço</p>
