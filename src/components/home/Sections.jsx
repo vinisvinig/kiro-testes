@@ -79,7 +79,7 @@ export function Categories() {
 }
 
 /* ---------- Seções de eventos (Em alta, Agenda, Explore) ---------- */
-function EventSection({ bg, padding, header, top, events, seeAll, mobileNav, empty }) {
+function EventSection({ bg, padding, header, top, events, seeAll, empty }) {
   const [ref, scroll] = useScroller()
   return (
     <section className={`${bg} ${padding}`}>
@@ -90,7 +90,7 @@ function EventSection({ bg, padding, header, top, events, seeAll, mobileNav, emp
           {events.length === 0 && empty ? (
             empty
           ) : (
-            <Carousel railRef={ref} onScroll={scroll} seeAllHref={seeAll} mobileNav={mobileNav}>
+            <Carousel railRef={ref} onScroll={scroll} seeAllHref={seeAll}>
               {events.map((e, i) => (
                 <EventCard key={e.id ?? i} {...e} />
               ))}
@@ -108,7 +108,6 @@ export function Trending() {
       bg="bg-body-2"
       padding="py-22 md:pb-28"
       events={trending}
-      mobileNav="split"
       seeAll={searchUrl({})}
       top={
         <Pill variant="soft" icon={asset('ic-gps.svg')} className="w-full md:hidden">
@@ -212,7 +211,8 @@ function MenuButton({ label, value, options, onChange, menuWidth, menuAlign = 'l
     </div>
   )
 }
-const CITY_OPTIONS = CITIES.map((c) => ({ value: c.name, label: c.name }))
+// Só as cidades que têm eventos a partir de hoje
+const CITY_OPTIONS = CITIES.filter((c) => EVENTS.some((e) => e.cityName === c.name && e.date >= TODAY)).map((c) => ({ value: c.name, label: c.name }))
 export function Agenda() {
   const [city, setCity] = useState('Porto Alegre')
   const [period, setPeriod] = useState('hoje')
@@ -226,7 +226,6 @@ export function Agenda() {
       bg="bg-body"
       padding="py-16 md:py-22"
       events={events}
-      mobileNav="split"
       empty={
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-line bg-white p-6">
           <p className="text-lg font-semibold leading-6 text-ink">
@@ -417,7 +416,7 @@ export function Venues() {
           <SectionHeader icon={asset('ic-stadium.svg')} title="Conheça as casas">
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
-          <Carousel railRef={ref} onScroll={scroll} gap="gap-2 md:gap-6" mobileNav="below">
+          <Carousel railRef={ref} onScroll={scroll} gap="gap-2 md:gap-6">
             {HOME_VENUES.map((v, i) => (
               <Link
                 key={`${v.slug}-${i}`}
