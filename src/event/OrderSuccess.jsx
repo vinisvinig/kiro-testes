@@ -117,7 +117,7 @@ export default function OrderSuccess({ result, onHome }) {
             </Card>
           )}
 
-          <button type="button" onClick={onHome} className="self-center rounded-full border border-brand px-6 py-[11px] font-ui text-sm font-semibold text-brand hover:bg-brand-0">
+          <button type="button" onClick={onHome} className="self-center rounded-full border border-brand px-6 py-[11px] font-ui text-sm font-semibold text-brand hover:border-brand-700 hover:text-brand-700">
             Voltar para a home
           </button>
         </div>

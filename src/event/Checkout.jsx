@@ -404,6 +404,7 @@ function ClubStep({ c, t, order, dispatch, alert }) {
 /* ---------------- 04 · Entrega ---------------- */
 function DeliveryStep({ c, dispatch, alert }) {
   const [adding, setAdding] = useState(false)
+  const [duplicate, setDuplicate] = useState(false) // pop-up "Endereço já cadastrado"
   const chosen = DELIVERY.find((d) => d.id === c.delivery)
   const express = c.delivery === 'expressa'
   const addr = c.addresses.find((a) => a.id === c.address)
@@ -470,9 +471,17 @@ function DeliveryStep({ c, dispatch, alert }) {
               })}
             </div>
             {adding ? (
-              <AddressForm onCancel={() => setAdding(false)} onSave={(address) => (dispatch({ type: 'addAddress', address }), setAdding(false))} />
+              <AddressForm
+                onCancel={() => setAdding(false)}
+                onSave={(address) => {
+                  // Não permite cadastrar o mesmo endereço duas vezes (Figma 10080:39933); o formulário fica aberto para corrigir
+                  if (c.addresses.some((a) => addressKey(a) === addressKey(address))) return setDuplicate(true)
+                  dispatch({ type: 'addAddress', address })
+                  setAdding(false)
+                }}
+              />
             ) : (
-              <button type="button" onClick={() => setAdding(true)} className="mt-4 rounded-full border border-brand px-4 py-[10px] font-ui text-sm font-semibold text-brand hover:bg-brand-0">
+              <button type="button" onClick={() => setAdding(true)} className="mt-4 rounded-full border border-brand px-4 py-[10px] font-ui text-sm font-semibold text-brand hover:border-brand-700 hover:text-brand-700">
                 Adicionar novo endereço
               </button>
             )}
@@ -482,9 +491,42 @@ function DeliveryStep({ c, dispatch, alert }) {
               Confirmar endereço
             </PrimaryButton>
           </div>
+          <DuplicateAddressDialog open={duplicate} onClose={() => setDuplicate(false)} />
         </>
       )}
     </StepShell>
+  )
+}
+
+/** Chave para comparar endereços: rua e número, CEP e complemento, sem diferenciar maiúsculas, acentos e espaços. */
+const norm = (t = '') => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+function addressKey(a) {
+  const parts = a.detail.split(' · ')
+  const i = parts.findIndex((x) => x.startsWith('CEP '))
+  const cep = onlyDigits(parts[i] || '')
+  const extra = i >= 0 ? parts.slice(i + 1).join(' ') : ''
+  return `${norm(a.street)}|${cep}|${norm(extra)}`
+}
+
+/** "Endereço já cadastrado" (Figma 10080:39933) */
+function DuplicateAddressDialog({ open, onClose }) {
+  return (
+    <Dialog open={open} onClose={onClose} labelledBy="dup-address-title" className="max-w-[344px] !rounded-lg !px-6 !pb-10 !pt-6">
+      <div className="flex justify-end">
+        <button type="button" onClick={onClose} aria-label="Fechar" className="flex size-8 items-center justify-center rounded-full text-ink hover:bg-body-2">
+          <Ico name="close" className="size-6" />
+        </button>
+      </div>
+      <div className="mt-2 flex flex-col items-center gap-8 text-center">
+        <Ico name="warning" className="size-16 text-ink" />
+        <h2 id="dup-address-title" className="text-2xl font-bold leading-tight text-ink">
+          Endereço já cadastrado
+        </h2>
+        <button type="button" onClick={onClose} className="w-full rounded-full bg-brand py-[10px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
+          Entendi
+        </button>
+      </div>
+    </Dialog>
   )
 }
 
@@ -861,7 +903,7 @@ function Coupons({ c, t, order, dispatch }) {
         <p id={`${id}-s`} aria-live="polite" className={`font-ui text-xs ${error ? 'text-danger' : 'text-ink-3'}`}>
           {error || (busy ? 'Validando cupom…' : 'Simulação: DESCONTO10 (10%, até 2 ingressos) ou UHUU20 (R$ 20, 1 ingresso).')}
         </p>
-        <button type="submit" disabled={busy} className="rounded-full border border-brand py-[13px] font-ui text-[15px] font-semibold text-brand hover:bg-brand-0 disabled:opacity-60">
+        <button type="submit" disabled={busy} className="rounded-full border border-brand py-[13px] font-ui text-[15px] font-semibold text-brand hover:border-brand-700 hover:text-brand-700 disabled:opacity-60">
           {busy ? 'Validando…' : 'Aplicar cupom'}
         </button>
       </form>
@@ -888,7 +930,7 @@ function MobileTotal({ total, remaining, ready, onBuy }) {
         onClick={onBuy}
         aria-describedby={ready ? undefined : 'comprar-pendente'}
         className={`min-w-[140px] rounded-full border px-8 py-[13px] font-ui text-[15px] font-semibold leading-[18px] transition ${
-          ready ? 'border-brand bg-brand text-white hover:brightness-110' : 'border-brand bg-white text-brand'
+          ready ? 'border-brand bg-brand text-white hover:brightness-110' : 'border-brand bg-white text-brand hover:border-brand-700 hover:text-brand-700'
         }`}
       >
         Comprar
@@ -984,7 +1026,7 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
                 <button
                   type="button"
                   onClick={onPaid}
-                  className="mt-6 w-full rounded-full border border-brand py-[13px] font-ui text-[15px] font-semibold text-brand hover:bg-brand-0"
+                  className="mt-6 w-full rounded-full border border-brand py-[13px] font-ui text-[15px] font-semibold text-brand hover:border-brand-700 hover:text-brand-700"
                 >
                   Já paguei
                 </button>

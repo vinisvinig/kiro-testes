@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: '#ee3680', 0: '#fde8f1' },
+        brand: { DEFAULT: '#ee3680', 0: '#fde8f1', 700: '#c51159' }, // 700: hover do botão outline (DS 4126:4916)
         ink: {
           DEFAULT: '#171717', // Texto/Primário
           2: '#404040', // Texto/Secundário

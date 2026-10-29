@@ -260,7 +260,7 @@ const MapButton = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:bg-brand-0"
+    className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:border-brand-700 hover:text-brand-700"
   >
     Ver mapa completo <Ico name="pin" className="size-[14px]" />
   </button>

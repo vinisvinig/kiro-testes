@@ -84,7 +84,7 @@ const VARIANTS = {
   ghostLight: 'text-white hover:bg-white/10',
   outline: 'border border-ink text-brand hover:bg-brand-0',
   outlineNeutral: 'border border-line text-ink hover:bg-body-2',
-  outlineBrand: 'border border-brand text-brand hover:bg-brand-0',
+  outlineBrand: 'border border-brand text-brand hover:border-brand-700 hover:text-brand-700',
   outlineLight: 'border border-white text-white hover:bg-white/10',
 }
 

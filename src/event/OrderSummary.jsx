@@ -169,7 +169,7 @@ function ValidatorBox({ validator: v, state = { value: '', status: 'idle' }, dis
           <button
             type="button"
             onClick={() => dispatch({ type: 'codeInput', validator: v.id, value: '' })}
-            className="h-11 shrink-0 rounded-full border border-brand px-4 font-ui text-sm font-semibold text-brand hover:bg-brand-0"
+            className="h-11 shrink-0 rounded-full border border-brand px-4 font-ui text-sm font-semibold text-brand hover:border-brand-700 hover:text-brand-700"
           >
             Alterar
           </button>
