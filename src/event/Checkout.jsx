@@ -404,7 +404,7 @@ function ClubStep({ c, t, order, dispatch, alert }) {
           checked={c.clubDraft}
           onChange={(v) => dispatch({ type: 'draft', key: 'clubDraft', value: v })}
           title="Quero adicionar o Clube Planeta"
-          detail={`${brl(per)} por ingresso + ${brl(t.clubValue)} no pedido`}
+          detail={`${brl(per)} por ingresso. Total: + ${brl(t.clubValue)} no pedido`}
         />
       </div>
       <div className="mt-5 flex justify-end">

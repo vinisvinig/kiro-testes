@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# Baixa os assets da home Uhuu (Figma MCP) para public/figma/.
+# As URLs do Figma expiram em ~7 dias; rode novamente com URLs novas se precisar.
+set -euo pipefail
+OUT="$(cd "$(dirname "$0")/.." && pwd)/public/figma"
+mkdir -p "$OUT"
+
+F="https://www.figma.com/api/mcp/asset"
+while read -r name url; do
+  [ -z "$name" ] && continue
+  curl -sfL -o "$OUT/$name" "$url" || echo "FALHOU: $name"
+done <<EOF
+logo.svg $F/d964987d-4fc1-4641-ad92-ecceecf26a2a/28700.svg
+ic-place.svg $F/d964987d-4fc1-4641-ad92-ecceecf26a2a/92e9f.svg
+ic-cart.svg $F/d964987d-4fc1-4641-ad92-ecceecf26a2a/03dc4.svg
+hero-1.png $F/a3827227-4171-4d46-8a89-087ad62e963d/5e72d.png
+hero-2.png $F/a3827227-4171-4d46-8a89-087ad62e963d/a5d9f.png
+hero-3.png $F/a3827227-4171-4d46-8a89-087ad62e963d/08238.png
+ic-search.svg $F/a3827227-4171-4d46-8a89-087ad62e963d/527a6.svg
+ic-calendar.svg $F/a3827227-4171-4d46-8a89-087ad62e963d/6bdbe.svg
+ic-hero-left.svg $F/a3827227-4171-4d46-8a89-087ad62e963d/fa64d.svg
+ic-hero-right.svg $F/a3827227-4171-4d46-8a89-087ad62e963d/8fb1c.svg
+ic-chevron-left.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/c9299.svg
+ic-chevron-right.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/dbebc.svg
+cat-show.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/202ab.svg
+cat-familia.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/3c138.svg
+cat-espetaculo.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/5980d.svg
+cat-musical.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/7bebe.svg
+cat-comedia.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/f7040.svg
+cat-estacionamento.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/f16c0.svg
+cat-palestra.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/d9fae.svg
+cat-circo.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/5c3fb.svg
+cat-exposicao.svg $F/0b2fa0fe-8fe5-4124-9d5c-944323fb6877/de8be.svg
+ic-whatshot.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/6457d.svg
+ic-star-amber.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/60adb.svg
+ic-star-indigo.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/e52a2.svg
+ic-star-blue.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/fa946.svg
+ic-run.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/880ff.svg
+ic-fire.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/66d57.svg
+ic-gps.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/91c09.svg
+ic-date-arrow.svg $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/415cb.svg
+ev-1.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/53d1d.png
+ev-2.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/5cb86.png
+ev-3.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/28f07.png
+ev-4.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/04385.png
+ev-5.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/3856a.png
+ev-6.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/55e14.png
+ev-7.png $F/58676d27-d8e1-4db0-ae22-9ffc5503ba60/0e4ea.png
+ic-chevron-down.svg $F/917f1552-b99c-44f6-ae21-084be2aa970d/07b96.svg
+ad.png $F/ddc76522-01fb-4c0f-bfcd-f7555edd559d/c7ac2.png
+ad-tool.svg $F/ddc76522-01fb-4c0f-bfcd-f7555edd559d/58bc8.svg
+ad-info.svg $F/ddc76522-01fb-4c0f-bfcd-f7555edd559d/d2d4f.svg
+col-namorados.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/ee355.png
+col-pais.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/24c48.png
+col-maes.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/015ad.png
+col-carnaval.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/97eb7.png
+col-reveillon.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/c654f.png
+col-saojoao.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/1f43c.png
+col-halloween.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/3fce7.png
+col-criancas.png $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/06ed7.png
+ic-favorite.svg $F/5634b54a-5c22-4cbe-9c14-2f604eec956e/39ad1.svg
+casa-1.png $F/5987abfb-f9c6-4591-b6c6-786370dd05bd/538fe.png
+casa-2.png $F/5987abfb-f9c6-4591-b6c6-786370dd05bd/bdd48.png
+ic-stadium.svg $F/5987abfb-f9c6-4591-b6c6-786370dd05bd/02876.svg
+blog-1.png $F/2ef4eb50-fc2e-47a2-aa06-a1d1a9f7e83f/f8e94.png
+blog-2.png $F/2ef4eb50-fc2e-47a2-aa06-a1d1a9f7e83f/8829c.png
+ic-article.svg $F/2ef4eb50-fc2e-47a2-aa06-a1d1a9f7e83f/e7f25.svg
+ic-today.svg $F/2ef4eb50-fc2e-47a2-aa06-a1d1a9f7e83f/14a8a.svg
+ic-chevron-pink.svg $F/2ef4eb50-fc2e-47a2-aa06-a1d1a9f7e83f/a1528.svg
+pay-pix.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/6bdb3.svg
+pay-diners.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/9038f.svg
+pay-amex.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/84c14.svg
+pay-hipercard.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/7d69c.svg
+pay-elo.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/40d7a.svg
+pay-mastercard.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/76af6.svg
+pay-visa.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/117cf.svg
+ra-selo-bandeira.png $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/eee6f.png
+ra-premio.png $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/fdd96.png
+soc-branco.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/46c29.svg
+soc-instagram.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/46c14.svg
+soc-facebook.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/576bc.svg
+soc-tiktok.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/8e542.svg
+soc-linkedin.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/6ca1a.svg
+soc-spotify.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/5622b.svg
+soc-blog.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/4154a.svg
+ra-v0.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/0d69c.svg
+ra-v1.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/ce508.svg
+ra-v2.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/b5497.svg
+ra-v3.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/dfc4f.svg
+ra-v4.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/84a9a.svg
+ra-v5.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/dfbc1.svg
+ra-xml.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/8a777.svg
+ra-g92.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/b4ffc.svg
+ra-1000.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/1aebb.svg
+ra-mask.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/60634.svg
+ra-group.svg $F/c40c94c2-ca6f-4e81-9a48-01fa87e6eefd/d6edc.svg
+ic-feed.svg $F/18cd9c6d-8c9a-46d5-8de2-17e47d4be531/82cba.svg
+ic-close.svg $F/dd5aad00-4b29-4c3e-b962-7d6764d55b8a/14440.svg
+ic-expand.svg $F/dd5aad00-4b29-4c3e-b962-7d6764d55b8a/029cb.svg
+sug-event.svg $F/5dbc4684-edb2-49e1-b48f-a1ad935d3363/3e265.svg
+sug-arrow.svg $F/5dbc4684-edb2-49e1-b48f-a1ad935d3363/25d7f.svg
+sug-place.svg $F/5dbc4684-edb2-49e1-b48f-a1ad935d3363/a74cb.svg
+sug-city.svg $F/5dbc4684-edb2-49e1-b48f-a1ad935d3363/4e70b.svg
+pg-left.svg $F/f12b8de3-b173-40f9-9677-5cb92655b8bb/884e7.svg
+pg-right.svg $F/f12b8de3-b173-40f9-9677-5cb92655b8bb/83179.svg
+loc-hero-1.png $F/1299ebfe-beea-48ed-ba61-72e13fd4ae6d/30937.png
+ic-share.svg $F/1299ebfe-beea-48ed-ba61-72e13fd4ae6d/d410a.svg
+ic-place-white.svg $F/1299ebfe-beea-48ed-ba61-72e13fd4ae6d/eef07.svg
+loc-g1.png $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/98c3b.png
+loc-g2.png $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/3266e.png
+loc-g3.png $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/c60ca.png
+loc-g4.png $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/a07fd.png
+loc-g5.png $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/91329.png
+ic-gallery.svg $F/ed8ba92b-50f4-43ae-9e75-19bdd6b30a0d/1827d.svg
+ic-home.svg $F/49d113d8-2096-46e0-8bda-0fec515d133a/99eb3.svg
+ic-slash.svg $F/49d113d8-2096-46e0-8bda-0fec515d133a/26b51.svg
+res-place.svg $F/a7ef8340-497d-42ce-89db-2b7c857f5b3d/25bfe.svg
+res-seat.svg $F/a7ef8340-497d-42ce-89db-2b7c857f5b3d/0c8eb.svg
+res-info.svg $F/a7ef8340-497d-42ce-89db-2b7c857f5b3d/517b0.svg
+ic-dbl-down.svg $F/a7ef8340-497d-42ce-89db-2b7c857f5b3d/5a808.svg
+res-access.svg $F/f97229d6-1fc2-4037-b7ce-8777303e3a30/008f2.svg
+res-car.svg $F/f97229d6-1fc2-4037-b7ce-8777303e3a30/65c59.svg
+res-today.svg $F/f97229d6-1fc2-4037-b7ce-8777303e3a30/c5480.svg
+ic-lock.svg $F/6ca88913-1c96-438a-a70f-b02f44bd7975/abf5b.svg
+ic-faq-expand.svg $F/1215c50a-604a-4a6a-8ae7-12c455abcb79/6a71a.svg
+ic-map.svg $F/656db7d0-4104-4307-94f3-9d1167ac3735/18c53.svg
+ic-pin.svg $F/656db7d0-4104-4307-94f3-9d1167ac3735/e1c89.svg
+ic-sparkle.svg $F/0502f816-b767-4b97-8701-32e6b04945c3/aa643.svg
+ic-timer.svg $F/7fc716d9-35fc-4884-a9db-a679bd6abf2d/8cb45.svg
+ic-x.svg $F/dd1b578c-c8d2-42ae-bf75-66f6a817d7bc/b9f47.svg
+ic-menu.svg $F/730dd9d0-49eb-406d-bfec-7dc0a1beca9c/7a68f.svg
+ic-today-sm.svg $F/e6e6a76e-27b1-4e17-992a-0a3da00f309d/d1d38.svg
+ic-campaign.svg $F/e0afba6e-d3bc-431a-8c4c-77cf7bbe6331/a4b3d.svg
+ic-check.svg $F/e0afba6e-d3bc-431a-8c4c-77cf7bbe6331/45f59.svg
+EOF
+echo "OK: $(ls "$OUT" | wc -l | tr -d ' ') arquivos em $OUT"

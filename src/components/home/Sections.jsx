@@ -162,7 +162,7 @@ function MenuButton({ label, value, options, onChange, menuWidth, menuAlign = 'l
     const i = items.indexOf(document.activeElement)
     items[Math.max(0, Math.min(items.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))]?.focus()
   }
-  // No celular a lista da cidade fica centralizada sob o botão e a do período à esquerda, como no Figma
+  // No celular a lista da cidade fica centralizada sob o botão e a do período à esquerda, conforme prototipo no Figma
   const align = menuAlign === 'center' ? 'left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0' : 'left-0'
   return (
     <div ref={wrap} className={`relative max-md:w-full ${open ? 'z-20' : ''}`}>
