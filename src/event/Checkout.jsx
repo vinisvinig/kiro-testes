@@ -32,6 +32,8 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   const [alertStep, setAlertStep] = useState(null) // etapa obrigatória sinalizada em vermelho
   const cardValid = Object.keys(cardErrors(card)).length === 0
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
+  // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
+  const showBar = c.step === 'pagamento' && !!c.method
   // Respondeu a etapa sinalizada (ou mudou o que faltava): tira o vermelho.
   useEffect(() => setAlertStep(null), [c.step, c.method, cardValid])
 
@@ -93,7 +95,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   }
 
   return (
-    <div className="page-x pb-28 pt-6 md:pt-8 lg:pb-16">
+    <div className={`page-x pt-6 md:pt-8 lg:pb-16 ${showBar ? 'pb-28' : 'pb-12'}`}>
       <div className="evento-box">
         <button type="button" onClick={onBack} className="flex items-center gap-1.5 font-ui text-sm text-ink-2 hover:text-brand">
           <Ico name="arrowLeft" className="size-4" /> Voltar à seleção
@@ -103,6 +105,10 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         <div className="mt-4 evento-grid">
           <div className="flex min-w-0 flex-col gap-6">
             <EventSummary order={order} />
+            {/* Celular: cupom (opcional) logo abaixo dos ingressos e antes do seguro; no desktop fica na coluna da direita */}
+            <div className="lg:hidden">
+              <Coupons c={c} t={t} order={order} dispatch={dispatch} />
+            </div>
             <InsuranceStep c={c} t={t} dispatch={dispatch} alert={alertStep === 'seguro'} />
             <ClubStep c={c} t={t} order={order} dispatch={dispatch} alert={alertStep === 'clube'} />
             <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} />
@@ -119,12 +125,14 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
             <Totals t={t} order={order} remaining={remaining} />
-            <Coupons c={c} t={t} order={order} dispatch={dispatch} />
+            <div className="hidden lg:block">
+              <Coupons c={c} t={t} order={order} dispatch={dispatch} />
+            </div>
           </aside>
         </div>
       </div>
 
-      <MobileTotal total={t.total} remaining={remaining} ready={ready} onBuy={buyMobile} />
+      {showBar && <MobileTotal total={t.total} remaining={remaining} ready={ready} onBuy={buyMobile} />}
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
     </div>
@@ -151,23 +159,24 @@ function EventSummary({ order }) {
         <Ico name="expand" className={`mt-2 size-6 text-ink transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <ul id={id} className="mt-4 border-t border-line">
+        <ul id={id} className="mt-4 flex flex-col gap-4">
           {order.lines.map((l) => (
-            <li key={l.key} className="flex items-start gap-4 border-b border-line py-4">
-              <span className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${l.kind === 'combo' ? 'bg-combo-0 text-combo' : 'bg-brand-0 text-brand'}`}>
-                <Ico name="ticket" className="size-5" />
+            // Figma 10115:204765: cada item num fundo claro arredondado, sem linhas divisórias
+            <li key={l.key} className="flex items-center gap-3 rounded-3xl bg-body p-4">
+              <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${l.kind === 'combo' ? 'bg-combo-0 text-combo' : 'bg-brand-0 text-brand'}`}>
+                <Ico name="ticket" className="size-6" />
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-ui text-[11px] font-medium uppercase text-ink-2">{sessionTitle(l.session)}</span>
-                <span className="mt-1 block text-sm font-semibold text-ink">
+              <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
+                <span className="block text-sm font-semibold uppercase leading-5 text-ink-3">{sessionTitle(l.session)}</span>
+                <span className="block text-base font-semibold leading-6 text-ink">
                   {l.kind === 'combo' ? `${l.qty}x ${l.combo.name}, ${l.sector.name}` : `${l.qty} ${l.qty === 1 ? 'ingresso' : 'ingressos'}, ${l.sector.name}`}
                 </span>
-                <span className="mt-1 block font-ui text-xs text-ink-3">
+                <span className="block text-sm leading-5 text-ink-3">
                   {l.kind === 'combo' ? comboDetail(l.combo) : `${l.qty}x ${l.fare.name}`}
                   {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
                 </span>
               </span>
-              <span className="text-sm font-semibold text-ink">{brl(l.amount)}</span>
+              <span className="whitespace-nowrap text-base font-semibold leading-6 text-ink">{brl(l.amount)}</span>
             </li>
           ))}
         </ul>

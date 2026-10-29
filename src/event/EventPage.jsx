@@ -239,10 +239,10 @@ function About() {
           </p>
         ))}
       </div>
-      <ul className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
         {a.credits.map(([k, v, d]) => (
-          // Figma 9720:324216: fundo claro com borda rosa
-          <li key={k} className="flex flex-col gap-[5px] rounded-lg border border-brand bg-body p-[14px]">
+          // Figma 9720:324216 / 8515:120880: fundo claro, sem borda
+          <li key={k} className="flex min-h-[92px] flex-col gap-[5px] rounded-lg bg-body p-[14px]">
             <p className="text-xs font-semibold uppercase leading-4 text-[#ed2a78]">{k}</p>
             <p className="text-[13px] font-semibold leading-tight text-ink">{v}</p>
             {d && <p className="text-xs leading-4 text-ink-2">{d}</p>}

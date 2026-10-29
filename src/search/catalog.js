@@ -124,6 +124,11 @@ export const venueFaq = (v) => [
 /** Página do evento interna (src/event): por enquanto todos os cards abrem o evento modelo. */
 const EVENT_URL = '/evento/o-estranho-mundo-de-jack'
 
+/** Data de hoje (ISO, fuso local). Os eventos "É hoje" usam esta data, então o filtro "Hoje" da Agenda funciona em qualquer dia de teste. */
+const isoDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+export const TODAY = isoDate(new Date())
+const HOJE = TODAY
+
 // Eventos com arte própria (imagens do Figma). Cada arte aparece só no evento correspondente,
 // para o teste não confundir: a do Jack, por exemplo, só está no "O estranho mundo de Jack de Tim Burton".
 // [título, categoria, local, data ISO, preço mín, preço máx, tags, imagem, data final, classe da imagem]
@@ -135,7 +140,7 @@ const FEATURED = [
   ['Human Bodies — Exposição Internacional', 'Exposição', 'Centro de Eventos FIERGS', '2026-11-03', 50, 120, ['ultimos'], 'ev-3.png'],
   ['Calado — Turnê', 'Musical', 'Teatro Via Sul', '2026-12-12', 80, 300, ['sessaoExtra'], 'ev-5.png'],
   ['Trio Aurora — Acústico', 'Musical', 'Teatro Bradesco', '2026-11-21', 70, 260, [], 'ev-1.png'],
-  ['Lado B — Rap ao Vivo', 'Show', 'Auditório Araújo Vianna', '2026-10-29', 60, 220, ['hoje'], 'ev-7.png'],
+  ['Lado B — Rap ao Vivo', 'Show', 'Auditório Araújo Vianna', HOJE, 60, 220, ['hoje'], 'ev-7.png'],
 ]
 
 // Demais eventos: sem arte do produtor; usam uma imagem genérica gerada por IA, sem texto (gen-<slug>.jpg).
@@ -166,7 +171,7 @@ const RAW = [
   ['Improviso Total', 'Comédia', 'Teatro de Câmara Túlio Piva', '2026-11-18', 40, 70, ['sessaoExtra']],
   ['Histórias de Vó', 'Família/Infantil', 'Teatro de Câmara Túlio Piva', '2026-11-19', 20, 50, []],
   ['Recital de Piano', 'Musical', 'Teatro de Câmara Túlio Piva', '2026-11-23', 50, 140, []],
-  ['Palestra: Cultura em Cena', 'Palestra', 'Teatro de Câmara Túlio Piva', '2026-10-29', 0, 40, ['hoje']],
+  ['Palestra: Cultura em Cena', 'Palestra', 'Teatro de Câmara Túlio Piva', HOJE, 0, 40, ['hoje']],
   ['Monólogos Gaúchos', 'Espetáculo', 'Teatro de Câmara Túlio Piva', '2026-11-30', 30, 80, []],
   ['Jazz na Cidade Baixa', 'Show', 'Teatro de Câmara Túlio Piva', '2026-12-04', 45, 110, ['maisVendidos']],
   ['Mostra de Curtas', 'Exposição', 'Teatro de Câmara Túlio Piva', '2026-12-09', 0, 20, []],

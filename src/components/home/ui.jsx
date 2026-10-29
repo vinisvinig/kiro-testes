@@ -261,13 +261,26 @@ function useFullBleed(railRef) {
 
 /**
  * Trilho horizontal de cards.
- * Desktop: barra de rolagem nativa estilizada. Mobile: progresso + setas abaixo,
- * e opcionalmente um botão "Ver tudo" de largura total.
+ * Desktop: barra de rolagem própria abaixo. Mobile (Figma 5531:19939): sem barra de rolagem; as setas ficam
+ * acima dos cards, uma em cada canto (`mobileNav="split"`) ou juntas à direita (`"right"`), ou abaixo
+ * dos cards à direita (`"below"`). Opcionalmente um botão "Ver tudo" de largura total.
  */
-export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', seeAllHref, seeAllLight = false, children }) {
+export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', mobileNav = 'right', seeAllHref, seeAllLight = false, children }) {
   useFullBleed(railRef)
+  const nav =
+    mobileNav === 'split' ? (
+      <div className="flex items-center justify-between md:hidden">
+        <IconButton icon={asset('ic-chevron-left.svg')} label="Anterior" onClick={() => onScroll(-1)} />
+        <IconButton icon={asset('ic-chevron-right.svg')} label="Próximo" onClick={() => onScroll(1)} />
+      </div>
+    ) : (
+      <div className="flex justify-end md:hidden">
+        <CarouselNav onScroll={onScroll} />
+      </div>
+    )
   return (
     <div className="flex flex-col gap-5 md:gap-0">
+      {mobileNav !== 'below' && nav}
       {/* Desktop: o trilho ocupa a tela toda (os cards passam das margens dos dois lados, como no Figma 6384:38271).
           O padding e o scroll-padding iguais à margem fazem o 1º e o último card pararem alinhados ao conteúdo.
           A barra nativa ficaria da largura da tela, então ela é escondida e a barra própria fica abaixo, na largura do conteúdo. */}
@@ -278,10 +291,7 @@ export function Carousel({ railRef, onScroll, gap = 'gap-2 md:gap-8', seeAllHref
         {children}
       </div>
       <ScrollProgress railRef={railRef} interactive className="mt-4 hidden w-full md:block" />
-      <div className="flex items-center justify-between md:hidden">
-        <ScrollProgress railRef={railRef} />
-        <CarouselNav onScroll={onScroll} />
-      </div>
+      {mobileNav === 'below' && nav}
       {seeAllHref && (
         <Pill
           as={Link}

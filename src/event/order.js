@@ -193,7 +193,13 @@ export function deriveOrder(o) {
     })
   }
 
-  lines.sort((a, b) => sessionOrder(a.session.id) - sessionOrder(b.session.id) || SECTORS.indexOf(a.sector) - SECTORS.indexOf(b.sector))
+  // Ingressos com tarifa que exige código validador (BIN) ficam por último, logo acima do campo do código:
+  // a proximidade mostra que o código é daqueles ingressos.
+  const needsCode = (l) => (l.kind === 'fare' && l.fare?.validator ? 1 : 0)
+  lines.sort(
+    (a, b) =>
+      needsCode(a) - needsCode(b) || sessionOrder(a.session.id) - sessionOrder(b.session.id) || SECTORS.indexOf(a.sector) - SECTORS.indexOf(b.sector),
+  )
 
   const count = lines.reduce((a, l) => a + l.tickets, 0)
   const bySession = {}
@@ -227,6 +233,8 @@ export function deriveOrder(o) {
     blocker = `Escolha mais ${l.missing} ${l.missing === 1 ? 'lugar' : 'lugares'} no mapa do ${l.combo.name} (${l.sector.name}).`
   } else if (pendingFares) blocker = `Defina a tarifa de ${pendingFares} ${pendingFares === 1 ? 'assento' : 'assentos'}.`
   else if (pendingCodes.length) blocker = 'Informe e valide o código validador no resumo do pedido.'
+  // Única pendência é o código validador: no celular o Comprar vira "Pendente" e leva até o código
+  const codePending = !!blocker && !incomplete.length && !pendingFares && pendingCodes.length > 0
 
   return {
     lines,
@@ -242,6 +250,7 @@ export function deriveOrder(o) {
     codeOk,
     pendingFares,
     blocker,
+    codePending,
     canBuy: !blocker,
   }
 }

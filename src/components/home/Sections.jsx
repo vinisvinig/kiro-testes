@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { asset, useScroller, CarouselNav, SectionHeader, SeeAll, Pill, Carousel, ScrollProgress } from './ui.jsx'
 import EventCard from './EventCard.jsx'
 import { categories, collections as collectionsBase, posts } from './data.js'
 import { Link } from '../../router.jsx'
 import { searchUrl, venueUrl } from '../../search/search.js'
-import { EVENTS, VENUES, eventsByTitle } from '../../search/catalog.js'
+import { CITIES, EVENTS, TODAY, VENUES, eventsByTitle } from '../../search/catalog.js'
 
 /** Protótipo: +3 cards repetidos em cada carrossel para ter mais conteúdo para rolar. */
 const plus3 = (list) => [...list, ...list.slice(0, 3)]
@@ -20,16 +20,22 @@ const trending = eventsByTitle([
 ])
 // Agenda e Explore não exibem tags (Figma): só "Em alta agora" mostra os selos.
 const noTags = (list) => list.map((e) => ({ ...e, tags: [] }))
-// "Agenda Rio Grande do Sul": eventos de Porto Alegre
-const agenda = noTags(eventsByTitle([
-  'Lado B — Rap ao Vivo',
-  'Human Bodies — Exposição Internacional',
-  'Kim Walker-Smith — Worship Nights',
-  'Quarteto de Cordas POA',
-  'Noite do Choro',
-  'Riograndense Fest',
-  'Cirque Lumière',
-]))
+// Agenda: eventos da cidade e do período escolhidos nos dois seletores (Figma 10115:204077)
+const STATES = { AC: 'Acre', CE: 'Ceará', MG: 'Minas Gerais', PR: 'Paraná', RJ: 'Rio de Janeiro', RS: 'Rio Grande do Sul', SC: 'Santa Catarina', SE: 'Sergipe', SP: 'São Paulo' }
+const PERIODS = [
+  { value: 'hoje', label: 'Hoje', empty: 'hoje' },
+  { value: 'semana', label: 'Esta semana', empty: 'esta semana' },
+  { value: 'mes', label: 'Este mês', empty: 'este mês' },
+]
+const addDays = (iso, n) => {
+  const d = new Date(`${iso}T12:00:00`)
+  d.setDate(d.getDate() + n)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+const inPeriod = (date, period) =>
+  period === 'hoje' ? date === TODAY : period === 'semana' ? date >= TODAY && date <= addDays(TODAY, 6) : date >= TODAY && date.slice(0, 7) === TODAY.slice(0, 7)
+const agendaFor = (city, period) =>
+  noTags(EVENTS.filter((e) => e.cityName === city && inPeriod(e.date, period)).sort((a, b) => a.date.localeCompare(b.date)))
 const explore = noTags(eventsByTitle([
   'Trio Aurora — Acústico',
   'Calado — Turnê',
@@ -73,7 +79,7 @@ export function Categories() {
 }
 
 /* ---------- Seções de eventos (Em alta, Agenda, Explore) ---------- */
-function EventSection({ bg, padding, header, top, events, seeAll }) {
+function EventSection({ bg, padding, header, top, events, seeAll, mobileNav, empty }) {
   const [ref, scroll] = useScroller()
   return (
     <section className={`${bg} ${padding}`}>
@@ -81,11 +87,15 @@ function EventSection({ bg, padding, header, top, events, seeAll }) {
         <div className="mx-auto flex max-w-content flex-col gap-5 md:gap-6">
           {top}
           {header(scroll)}
-          <Carousel railRef={ref} onScroll={scroll} seeAllHref={seeAll}>
-            {events.map((e, i) => (
-              <EventCard key={i} {...e} />
-            ))}
-          </Carousel>
+          {events.length === 0 && empty ? (
+            empty
+          ) : (
+            <Carousel railRef={ref} onScroll={scroll} seeAllHref={seeAll} mobileNav={mobileNav}>
+              {events.map((e, i) => (
+                <EventCard key={e.id ?? i} {...e} />
+              ))}
+            </Carousel>
+          )}
         </div>
       </div>
     </section>
@@ -98,6 +108,7 @@ export function Trending() {
       bg="bg-body-2"
       padding="py-22 md:pb-28"
       events={trending}
+      mobileNav="split"
       seeAll={searchUrl({})}
       top={
         <Pill variant="soft" icon={asset('ic-gps.svg')} className="w-full md:hidden">
@@ -117,26 +128,132 @@ export function Trending() {
   )
 }
 
+/**
+ * Botão em pílula com lista suspensa (Figma "Cidade da seção" e "Período", 10115:204077).
+ * Fecha ao escolher, ao clicar fora ou com Esc; setas do teclado percorrem as opções.
+ */
+function MenuButton({ label, value, options, onChange, menuWidth, menuAlign = 'left' }) {
+  const id = useId()
+  const [open, setOpen] = useState(false)
+  const wrap = useRef(null)
+  const btn = useRef(null)
+  const current = options.find((o) => o.value === value)
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => wrap.current && !wrap.current.contains(e.target) && setOpen(false)
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        btn.current?.focus()
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    // Leva o foco para a opção escolhida, para as setas funcionarem
+    requestAnimationFrame(() => wrap.current?.querySelector('[aria-selected="true"]')?.focus())
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+  const onListKey = (e) => {
+    if (!['ArrowDown', 'ArrowUp'].includes(e.key)) return
+    e.preventDefault()
+    const items = [...e.currentTarget.querySelectorAll('[role=option]')]
+    const i = items.indexOf(document.activeElement)
+    items[Math.max(0, Math.min(items.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))]?.focus()
+  }
+  // No celular a lista da cidade fica centralizada sob o botão e a do período à esquerda, como no Figma
+  const align = menuAlign === 'center' ? 'left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0' : 'left-0'
+  return (
+    <div ref={wrap} className={`relative max-md:w-full ${open ? 'z-20' : ''}`}>
+      <button
+        ref={btn}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-list`}
+        aria-label={`${label}: ${current?.label}`}
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex w-full items-center justify-between gap-[10px] rounded-full border border-brand px-6 py-[14px] font-ui text-[15px] font-semibold leading-none text-brand transition hover:border-brand-700 hover:text-brand-700 md:w-auto md:justify-center"
+      >
+        {current?.label}
+        <svg viewBox="0 0 24 24" aria-hidden className={`size-[14px] fill-current transition-transform ${open ? 'rotate-180' : ''}`}>
+          <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+        </svg>
+      </button>
+      {open && (
+        <ul
+          id={`${id}-list`}
+          role="listbox"
+          aria-label={label}
+          onKeyDown={onListKey}
+          className={`uhuu-dropdown absolute top-[calc(100%+4px)] max-h-[272px] overflow-y-auto rounded-xl border border-line bg-white py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)] ${align}`}
+          style={{ minWidth: menuWidth }}
+        >
+          {options.map((o) => {
+            const on = o.value === value
+            return (
+              <li
+                key={o.value}
+                role="option"
+                aria-selected={on}
+                tabIndex={-1}
+                onClick={() => (onChange(o.value), setOpen(false), btn.current?.focus())}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onChange(o.value), setOpen(false), btn.current?.focus())}
+                className={`cursor-pointer whitespace-nowrap px-4 py-3 font-ui text-sm font-medium leading-5 outline-none focus:bg-body-2 ${on ? 'bg-brand-0 text-brand focus:bg-brand-0' : 'text-ink hover:bg-body-2'}`}
+              >
+                {o.label}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+const CITY_OPTIONS = CITIES.map((c) => ({ value: c.name, label: c.name }))
 export function Agenda() {
+  const [city, setCity] = useState('Porto Alegre')
+  const [period, setPeriod] = useState('hoje')
+  const events = useMemo(() => agendaFor(city, period), [city, period])
+  const uf = CITIES.find((c) => c.name === city)?.uf
+  const periodLabel = PERIODS.find((p) => p.value === period)
   return (
     <EventSection
+      // key: ao trocar cidade/período o trilho é recriado e volta ao início (e o arrasto do mouse se liga ao trilho novo)
+      key={`${city}-${period}`}
       bg="bg-body"
       padding="py-16 md:py-22"
-      events={agenda}
+      events={events}
+      mobileNav="split"
+      empty={
+        <div className="flex flex-col items-start gap-3 rounded-2xl border border-line bg-white p-6">
+          <p className="text-lg font-semibold leading-6 text-ink">
+            Nenhum evento em {city} {periodLabel.empty}.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {period !== 'mes' && (
+              <Pill variant="outlineBrand" size="sm" onClick={() => setPeriod(period === 'hoje' ? 'semana' : 'mes')}>
+                Ver {period === 'hoje' ? 'esta semana' : 'este mês'}
+              </Pill>
+            )}
+            <Pill as={Link} to={searchUrl({ cidade: city })} variant="ghost" size="sm">
+              Todos os eventos de {city}
+            </Pill>
+          </div>
+        </div>
+      }
       header={(scroll) => (
         <div className="flex flex-col gap-8 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-4">
           <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-center">
             <h2 className="text-2xl font-bold leading-none text-ink md:text-[30px]">
-              Agenda<span className="md:hidden"> Rio Grande do Sul</span>
+              Agenda<span className="md:hidden"> {STATES[uf] || city}</span>
             </h2>
-            <Pill as={Link} to={searchUrl({ cidade: 'Porto Alegre' })} variant="outline" iconRight={asset('ic-chevron-down.svg')} className="max-md:w-full">
-              Porto Alegre
-            </Pill>
-            <Pill variant="outline" iconRight={asset('ic-chevron-down.svg')} className="max-md:w-full">
-              Hoje
-            </Pill>
+            <MenuButton label="Cidade" value={city} options={CITY_OPTIONS} onChange={setCity} menuWidth={156} menuAlign="center" />
+            <MenuButton label="Período" value={period} options={PERIODS} onChange={setPeriod} menuWidth={112} />
           </div>
-          <div className="hidden md:block">
+          <div className={`hidden ${events.length ? 'md:block' : ''}`}>
             <CarouselNav onScroll={scroll} />
           </div>
         </div>
@@ -144,7 +261,6 @@ export function Agenda() {
     />
   )
 }
-
 export function Explore() {
   return (
     <EventSection
@@ -301,7 +417,7 @@ export function Venues() {
           <SectionHeader icon={asset('ic-stadium.svg')} title="Conheça as casas">
             <CarouselNav onScroll={scroll} />
           </SectionHeader>
-          <Carousel railRef={ref} onScroll={scroll} gap="gap-2 md:gap-6">
+          <Carousel railRef={ref} onScroll={scroll} gap="gap-2 md:gap-6" mobileNav="below">
             {HOME_VENUES.map((v, i) => (
               <Link
                 key={`${v.slug}-${i}`}

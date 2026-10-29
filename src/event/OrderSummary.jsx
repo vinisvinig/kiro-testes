@@ -8,8 +8,13 @@ export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${Str
 
 export const SUMMARY_ID = 'resumo-pedido'
 
-/** Itens, valores, total e código validador: compartilhado entre o card (desktop) e a barra expandida (mobile). */
-function SummaryDetails({ order, derived: d, dispatch }) {
+/**
+ * Itens, código validador, valores e total: compartilhado entre o card (desktop) e a barra expandida (mobile).
+ * O código validador (BIN) fica logo abaixo dos ingressos, antes dos valores; os ingressos que dependem
+ * dele são listados por último (order.js), para ficarem colados ao campo.
+ * `feesLink`: no celular o "Entenda as taxas" fica logo abaixo dos valores (Figma 9986:126561).
+ */
+function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
   const empty = d.count === 0
   return (
     <>
@@ -23,6 +28,13 @@ function SummaryDetails({ order, derived: d, dispatch }) {
             ))}
           </ul>
         )}
+        {d.validators.length > 0 && (
+          <div className="mt-3 flex flex-col gap-3">
+            {d.validators.map((v) => (
+              <ValidatorBox key={v.id} validator={v} state={order.codes[v.id]} dispatch={dispatch} />
+            ))}
+          </div>
+        )}
       </div>
 
       <dl className="flex flex-col gap-1.5 border-t border-line pt-4 font-ui text-xs text-ink-2">
@@ -30,6 +42,7 @@ function SummaryDetails({ order, derived: d, dispatch }) {
         <Row label={`Taxa de serviço, ${SERVICE_FEE * 100}%`} value={empty ? 'R$ -' : brl(d.fee)} />
         <Row label="Possível taxa de parcelamento" value={empty ? 'até R$ -' : `até ${brl(d.installmentFee)}`} />
       </dl>
+      {feesLink}
 
       <div className="border-t border-line pt-4">
         <div className="flex items-baseline justify-between gap-2">
@@ -38,11 +51,6 @@ function SummaryDetails({ order, derived: d, dispatch }) {
         </div>
         <p className="mt-1 font-ui text-xs text-ink-3">{empty ? '-' : `Ou parcelado no cartão até 3x de ${brl(d.installment)}`}</p>
       </div>
-
-      {/* Código validador: entre o total e o Comprar */}
-      {d.validators.map((v) => (
-        <ValidatorBox key={v.id} validator={v} state={order.codes[v.id]} dispatch={dispatch} />
-      ))}
     </>
   )
 }
@@ -140,7 +148,7 @@ function ValidatorBox({ validator: v, state = { value: '', status: 'idle' }, dis
     if (value && !applied) dispatch({ type: 'codeApply', validator: v.id })
   }
   return (
-    <form onSubmit={submit} className={`rounded-2xl border-2 p-4 ${tone}`} aria-labelledby={`${id}-t`}>
+    <form data-validator={v.id} onSubmit={submit} className={`scroll-mt-4 rounded-2xl border-2 p-4 ${tone}`} aria-labelledby={`${id}-t`}>
       <p id={`${id}-t`} className="text-base font-bold text-ink">
         Código validador
       </p>
@@ -197,82 +205,148 @@ function Row({ label, value, className = '' }) {
   )
 }
 
+/** Botão quadrado rosa com seta (Figma expand_less / expand_more, 9986:126648 e 9986:126561). */
+function ToggleIcon({ open }) {
+  return (
+    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-brand text-white">
+      <Ico name="expand" className={`size-6 transition-transform ${open ? '' : 'rotate-180'}`} />
+    </span>
+  )
+}
+
 /**
- * Resumo do pedido no celular (Figma 9977:125080): barra fixa com seta, quantidade, total e Comprar.
- * A seta expande o resumo completo (itens, valores e código validador) acima da barra.
+ * Resumo do pedido no celular. Fechado (Figma 9986:126648): barra fixa com o botão de abrir, quantidade,
+ * total e Comprar. Aberto (Figma 9986:126561): o botão de recolher fica no topo, ao lado do título, e o
+ * Comprar vai para o fim do painel.
+ * Se a única pendência é o código validador, o Comprar vira "Pendente" (amarelo) e abre o resumo já
+ * rolado até o código.
  */
 export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
   const [open, setOpen] = useState(false)
+  const [focusCode, setFocusCode] = useState(false)
   const panelId = useId()
   const panel = useRef(null)
   useModalBehavior(open, () => setOpen(false))
   useEffect(() => {
-    if (open) panel.current?.focus()
-  }, [open])
+    if (!open) return
+    const pending = focusCode && d.validators.find((v) => !d.codeOk(v.id))
+    if (!pending) return void panel.current?.focus()
+    // Rola o painel até o código pendente e põe o cursor no campo
+    requestAnimationFrame(() => {
+      // Procura dentro do painel: o card do desktop (escondido no celular) também tem o campo
+      const box = panel.current?.querySelector(`[data-validator="${pending.id}"]`)
+      box?.scrollIntoView({ block: 'start' })
+      box?.querySelector('input')?.focus({ preventScroll: true })
+    })
+    setFocusCode(false)
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const openAtCode = () => {
+    setFocusCode(true)
+    setOpen(true)
+  }
+  const buy = (
+    <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} className="min-w-0 flex-1" />
+  )
 
   return (
     <div className="lg:hidden">
       {open && <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setOpen(false)} aria-hidden />}
       <div className="fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col border-t border-line bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
-        {open && (
-          <div
-            ref={panel}
-            id={panelId}
-            role="region"
-            aria-label="Resumo do pedido"
-            tabIndex={-1}
-            className="flex min-h-0 flex-col gap-5 overflow-y-auto px-4 pb-2 pt-5 outline-none"
-          >
-            <div>
-              <Eyebrow>Resumo do pedido</Eyebrow>
-              <p className="mt-2 text-2xl font-bold leading-tight text-ink">{countLabel(d.count)}</p>
-              {d.sessions > 1 && <p className="mt-1 font-ui text-xs text-ink-3">Em {d.sessions} datas diferentes</p>}
-            </div>
-            <SummaryDetails order={order} derived={d} dispatch={dispatch} />
-            <button type="button" onClick={onFees} className="flex items-center gap-1.5 self-start font-ui text-sm font-semibold text-brand underline hover:no-underline">
-              <Ico name="info" className="size-4" /> Entenda as taxas
-            </button>
-          </div>
-        )}
-
-        <div className={`flex items-center gap-6 p-4 ${open ? 'border-t border-line' : ''}`}>
-          <button
-            type="button"
-            onClick={() => setOpen(!open)}
-            aria-expanded={open}
-            aria-controls={panelId}
-            aria-label={open ? 'Recolher resumo do pedido' : 'Ver resumo do pedido'}
-            className="-m-1 flex shrink-0 items-center gap-6 rounded-lg p-1 text-left"
-          >
-            <Ico name="expand" className={`size-8 text-ink transition-transform ${open ? '' : 'rotate-180'}`} />
-            <span className="flex flex-col gap-1 whitespace-nowrap">
-              <span className="text-xs font-light leading-4 text-ink-3">
-                {d.count} {d.count === 1 ? 'ingresso' : 'ingressos'} • total à vista
+        {open ? (
+          <div ref={panel} id={panelId} role="region" aria-label="Resumo do pedido" tabIndex={-1} className="flex min-h-0 flex-col gap-6 overflow-y-auto px-4 pb-6 pt-4 outline-none">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-expanded
+              aria-controls={panelId}
+              aria-label="Recolher resumo do pedido"
+              className="-m-1 flex items-center gap-6 rounded-lg p-1 text-left"
+            >
+              <ToggleIcon open />
+              <span className="flex flex-col gap-1">
+                <Eyebrow>Resumo do pedido</Eyebrow>
+                <span className="text-2xl font-semibold leading-none text-black">{countLabel(d.count)}</span>
               </span>
-              <span className="text-xl font-semibold leading-none text-black">{brl(d.total)}</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={onBuy}
-            disabled={!d.canBuy}
-            className="min-w-0 flex-1 rounded-full bg-brand px-6 py-[14px] font-ui text-[15px] font-semibold leading-[18px] text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-brand/30"
-          >
-            Comprar
-          </button>
-        </div>
-        {/* Pendência (ex.: código validador): toca e abre o resumo para resolver */}
-        {!d.canBuy && d.count > 0 && !open && (
-          <button type="button" onClick={() => setOpen(true)} className="-mt-2 block truncate px-4 pb-3 text-left font-ui text-[11px] text-orange underline">
-            {d.blocker}
-          </button>
-        )}
-        {!d.canBuy && d.count > 0 && open && (
-          <p className="px-4 pb-3 text-center font-ui text-xs text-orange" aria-live="polite">
-            {d.blocker}
-          </p>
+            </button>
+            <SummaryDetails
+              order={order}
+              derived={d}
+              dispatch={dispatch}
+              feesLink={
+                <button type="button" onClick={onFees} className="flex items-center gap-2 self-start text-base font-semibold leading-6 text-brand underline hover:no-underline">
+                  <Ico name="info" className="size-4" /> Entenda as taxas
+                </button>
+              }
+            />
+            <div className="flex flex-col gap-2">
+              <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} className="w-full" />
+              {!d.canBuy && d.count > 0 && !d.codePending && (
+                <p className="text-center font-ui text-xs text-orange" aria-live="polite">
+                  {d.blocker}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-6 p-4">
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                aria-expanded={false}
+                aria-controls={panelId}
+                aria-label="Ver resumo do pedido"
+                className="-m-1 flex shrink-0 items-center gap-6 rounded-lg p-1 text-left"
+              >
+                <ToggleIcon open={false} />
+                <span className="flex flex-col gap-1 whitespace-nowrap">
+                  <span className="text-xs font-light leading-4 text-ink-3">
+                    {d.count} {d.count === 1 ? 'ingresso' : 'ingressos'} • total à vista
+                  </span>
+                  <span className="text-xl font-semibold leading-none text-black">{brl(d.total)}</span>
+                </span>
+              </button>
+              {buy}
+            </div>
+            {/* Outras pendências (lugares do combo, tarifa): toca e abre o resumo para resolver */}
+            {!d.canBuy && d.count > 0 && !d.codePending && (
+              <button type="button" onClick={() => setOpen(true)} className="-mt-2 block truncate px-4 pb-3 text-left font-ui text-[11px] text-orange underline">
+                {d.blocker}
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>
+  )
+}
+
+/** Comprar; com o código validador pendente vira "Pendente" (amarelo) e leva até o código. */
+function BuyButton({ d, onBuy, onPending, className = '' }) {
+  if (d.codePending) {
+    return (
+      <button
+        type="button"
+        onClick={onPending}
+        aria-describedby="comprar-pendente-codigo"
+        className={`rounded-full bg-mark px-6 py-[14px] font-ui text-[15px] font-semibold leading-[18px] text-ink transition hover:brightness-95 ${className}`}
+      >
+        Pendente
+        <span id="comprar-pendente-codigo" className="sr-only">
+          {d.blocker}
+        </span>
+      </button>
+    )
+  }
+  return (
+    <button
+      type="button"
+      onClick={onBuy}
+      disabled={!d.canBuy}
+      className={`rounded-full bg-brand px-6 py-[14px] font-ui text-[15px] font-semibold leading-[18px] text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-brand/30 ${className}`}
+    >
+      Comprar
+    </button>
   )
 }
