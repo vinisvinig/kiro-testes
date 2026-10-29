@@ -97,9 +97,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   return (
     <div className={`page-x pt-6 md:pt-8 lg:pb-16 ${showBar ? 'pb-28' : 'pb-12'}`}>
       <div className="evento-box">
-        <button type="button" onClick={onBack} className="flex items-center gap-1.5 font-ui text-sm text-ink-2 hover:text-brand">
-          <Ico name="arrowLeft" className="size-4" /> Voltar à seleção
-        </button>
+        <BackButton onClick={onBack}>Voltar à seleção de ingressos</BackButton>
         <h1 className="sr-only">Finalizar compra</h1>
 
         <div className="mt-4 evento-grid">
@@ -136,6 +134,20 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
     </div>
+  )
+}
+
+/** Voltar (Figma 9807:160204): quadrado rosa com seta + texto 24px. */
+function BackButton({ onClick, children }) {
+  return (
+    <button type="button" onClick={onClick} className="group flex items-center gap-4 text-left">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white transition group-hover:brightness-110">
+        <svg viewBox="0 0 24 24" aria-hidden className="size-4 translate-x-[2px] fill-current">
+          <path d="M11.67 3.87 9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z" />
+        </svg>
+      </span>
+      <span className="text-xl font-bold leading-none text-ink md:text-2xl">{children}</span>
+    </button>
   )
 }
 
@@ -985,9 +997,7 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
   return (
     <div className="page-x pb-16 pt-6 md:pt-10">
       <div className="evento-box">
-        <button type="button" onClick={onBack} className="flex items-center gap-1.5 font-ui text-sm text-ink-2 hover:text-brand">
-          <Ico name="arrowLeft" className="size-4" /> Trocar forma de pagamento
-        </button>
+        <BackButton onClick={onBack}>Trocar forma de pagamento</BackButton>
         <h1 className="mt-4 text-[28px] font-bold leading-tight text-ink md:text-[32px]">Finalizar compra</h1>
         {/* grid-cols-1 + min-w-0: sem isso o código Pix (uma linha longa) alargava o card além da tela no celular */}
         <div className="mt-6 evento-grid">
