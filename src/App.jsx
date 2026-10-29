@@ -18,9 +18,7 @@ import SearchPage from './search/SearchPage.jsx'
 import LoginDialog from './LoginDialog.jsx'
 import LocalPage from './local/LocalPage.jsx'
 import EventPage from './event/EventPage.jsx'
-import { EVENT } from './event/eventData.js'
 import { parseParams } from './search/search.js'
-import { VENUES } from './search/catalog.js'
 import { useLocation } from './router.jsx'
 
 // Home — "Desktop - Home - nenhuma localização definida (Light)" (Figma 6384:38271)
@@ -48,18 +46,10 @@ export default function App() {
   const localSlug = path.match(/^\/local\/([^/]+)\/?$/)?.[1]
   const eventSlug = path.match(/^\/evento\/([^/]+)\/?$/)?.[1]
 
+  // Título da aba fixo em "Uhuu.com" em todas as páginas (pedido do teste de usuário)
   useEffect(() => {
-    if (eventSlug) {
-      document.title = `${EVENT.title} — ingressos | Uhuu.com`
-    } else if (localSlug) {
-      const v = VENUES.find((x) => x.slug === localSlug)
-      document.title = `${v ? v.name : 'Local'} — eventos e ingressos | Uhuu.com`
-    } else if (path === '/busca') {
-      document.title = `${params.q ? `“${params.q}” — ` : ''}Busca de eventos | Uhuu.com`
-    } else {
-      document.title = 'Uhuu.com — Ingressos para shows, teatro e eventos'
-    }
-  }, [path, localSlug, eventSlug, params.q])
+    document.title = 'Uhuu.com'
+  }, [path])
 
   let page = <Home />
   if (path === '/busca') page = <SearchPage params={params} search={search} />

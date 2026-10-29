@@ -34,7 +34,7 @@ function Gate({ onOk }) {
 
   useEffect(() => {
     refs.current[0]?.focus()
-    document.title = 'Uhuu.com — acesso restrito'
+    document.title = 'Uhuu.com'
   }, [])
 
   const focus = (i) => refs.current[Math.max(0, Math.min(LEN - 1, i))]?.focus()
