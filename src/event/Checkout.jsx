@@ -786,11 +786,13 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
         <label htmlFor={`${id}-inst`} className="text-sm font-semibold text-ink">
           Parcelamento
         </label>
+        {/* Figma 9633:43874: 16px de recuo dos dois lados e ícone expand_more arredondado (no lugar da seta nativa) */}
+        <div className="relative">
         <select
           id={`${id}-inst`}
           value={c.installments}
           onChange={(e) => dispatch({ type: 'installments', n: +e.target.value })}
-          className="h-11 rounded-lg border border-line bg-white px-3 font-ui text-sm text-ink outline-none focus:border-brand"
+          className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-line bg-white pl-4 pr-12 font-ui text-sm text-ink outline-none focus:border-brand"
         >
           {INSTALLMENTS.map((i) => {
             const total = t.total * (1 + i.rate)
@@ -801,6 +803,10 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
             )
           })}
         </select>
+        <svg viewBox="0 0 16 16" aria-hidden className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 fill-ink">
+          <path d="M10.58 6 8 8.59 5.41 6a.66.66 0 0 0-.94.94L7.53 10c.26.26.68.26.94 0l3.06-3.06a.66.66 0 0 0-.95-.94Z" />
+        </svg>
+        </div>
       </div>
       <p className="col-span-2 font-ui text-xs text-ink-3">
         {valid ? `Total no cartão: ${brl(t.cardTotal)}.` : 'Preencha os dados do cartão para finalizar a compra.'}
