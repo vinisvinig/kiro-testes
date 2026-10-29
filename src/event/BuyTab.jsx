@@ -724,7 +724,8 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           <Fee value={price} />
         </span>
         {selected && (
-          <span className="flex flex-wrap gap-2 md:col-span-3">
+          // order-first: as etiquetas ficam no topo da linha, como o "N selecionados" dos setores
+          <span className="order-first flex flex-wrap gap-2 md:col-span-3">
             <span className="rounded-full bg-combo-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-combo">
               {seated ? 'No pedido' : `${state.n} ${state.n === 1 ? 'combo' : 'combos'} no pedido`}
             </span>
