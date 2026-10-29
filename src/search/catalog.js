@@ -157,7 +157,6 @@ const RAW = [
   ['Rio Grande Rodeio', 'Show', 'Centro de Eventos FIERGS', '2026-11-20', 25, 110, []],
   ['Riocorrente', 'Espetáculo', 'Teatro Guaíra', '2026-11-22', 50, 160, []],
   ['Michel Alcoforado', 'Palestra', 'Teatro Bradesco', '2026-11-10', 90, 260, []],
-  ['Stand-up Sem Filtro', 'Comédia', 'Teatro Guaíra', '2026-11-13', 40, 100, []],
   ['Pequeno Príncipe', 'Família/Infantil', 'Teatro Claro MAIS SP', '2026-11-16', 35, 90, []],
   ['Cirque Lumière', 'Circo', 'Auditório Araújo Vianna', '2026-11-27', 70, 240, []],
   // Programação do Teatro de Câmara Túlio Piva (página de Local)

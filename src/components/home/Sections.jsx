@@ -33,7 +33,6 @@ const agenda = noTags(eventsByTitle([
 const explore = noTags(eventsByTitle([
   'Trio Aurora — Acústico',
   'Calado — Turnê',
-  'Stand-up Sem Filtro',
   'Pequeno Príncipe',
   'Bossa Nova no Rio',
   'Michel Alcoforado',
