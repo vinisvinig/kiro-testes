@@ -712,6 +712,19 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
       </span>
       <span className="grid min-w-0 flex-1 gap-2 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] md:items-center md:gap-4">
         <span className="min-w-0">
+          {/* Etiquetas no topo, 4px acima do nome (mesmo espaço do "N selecionados" nos setores) */}
+          {selected && (
+            <span className="mb-1 flex flex-wrap gap-2">
+              <span className="rounded-full bg-combo-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-combo">
+                {seated ? 'No pedido' : `${state.n} ${state.n === 1 ? 'combo' : 'combos'} no pedido`}
+              </span>
+              {missing > 0 && (
+                <span className="rounded-full bg-[#fffbeb] px-2 py-0.5 font-ui text-[10px] font-semibold text-orange">
+                  {missing === 1 ? 'Falta 1 lugar' : `Faltam ${missing} lugares`}
+                </span>
+              )}
+            </span>
+          )}
           <span className="block text-base font-semibold leading-6 text-ink">{combo.name}</span>
           <span className="block font-ui text-xs leading-4 text-ink-3">{combo.desc}</span>
         </span>
@@ -723,19 +736,6 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           <span className="text-sm font-semibold leading-5 text-ink">{brl(price)}</span>
           <Fee value={price} />
         </span>
-        {selected && (
-          // order-first: as etiquetas ficam no topo da linha, como o "N selecionados" dos setores
-          <span className="order-first flex flex-wrap gap-2 md:col-span-3">
-            <span className="rounded-full bg-combo-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-combo">
-              {seated ? 'No pedido' : `${state.n} ${state.n === 1 ? 'combo' : 'combos'} no pedido`}
-            </span>
-            {missing > 0 && (
-              <span className="rounded-full bg-[#fffbeb] px-2 py-0.5 font-ui text-[10px] font-semibold text-orange">
-                {missing === 1 ? 'Falta 1 lugar' : `Faltam ${missing} lugares`}
-              </span>
-            )}
-          </span>
-        )}
       </span>
     </>
   )
