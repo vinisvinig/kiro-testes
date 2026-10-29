@@ -4,16 +4,6 @@ import { asset } from './ui.jsx'
 // Página do evento interna (src/event). Todos os cards de demonstração abrem o evento modelo.
 const EVENT_URL = '/evento/o-estranho-mundo-de-jack'
 
-const base = {
-  title: 'Curitiba Country Festival',
-  priceFrom: 'R$ 5',
-  priceTo: 'R$ 599',
-  venue: 'Teatro Claro MAIS SP',
-  city: 'Curitiba · PR',
-  href: EVENT_URL,
-  dates: [{ dow: 'qui', day: '10', mon: 'JUL' }],
-}
-
 // Cores de borda dos badges (tokens do Figma)
 export const TAG = {
   acabando: { label: 'Acabando', icon: asset('ic-whatshot.svg'), color: 'border-orange' },
@@ -43,34 +33,7 @@ export const categories = [
   ['Exposição', 'cat-exposicao.svg'],
 ].map(([label, icon]) => ({ label, icon: asset(icon) }))
 
-export const trending = [
-  { ...base, image: asset('ev-7.png'), tags: [TAG.acabando, TAG.popular] },
-  { ...base, image: asset('ev-6.png'), tags: [TAG.corre, TAG.maisVendidos] },
-  {
-    ...base,
-    image: asset('ev-5.png'),
-    tags: [TAG.acabando, TAG.sessaoExtra],
-    dates: [
-      { dow: 'qua', day: '10', mon: 'JUL' },
-      { dow: 'sex', day: '12', mon: 'JUL' },
-    ],
-  },
-  { ...base, image: asset('ev-4.png'), imageClass: 'object-left', tags: [TAG.hoje] },
-]
-
-export const agenda = [
-  { ...base, image: asset('ev-3.png') },
-  { ...base, image: asset('ev-2.png') },
-  { ...base, image: asset('ev-1.png') },
-  { ...base, image: asset('ev-6.png') },
-]
-
-export const explore = [
-  { ...base, image: asset('ev-1.png') },
-  { ...base, image: asset('ev-3.png') },
-  { ...base, image: asset('ev-7.png') },
-  { ...base, image: asset('ev-2.png') },
-]
+// Os eventos das seções da home vêm do catálogo (src/search/catalog.js), o mesmo da busca.
 
 export const collections = [
   ['Dia dos Namorados', 'col-namorados.png'],

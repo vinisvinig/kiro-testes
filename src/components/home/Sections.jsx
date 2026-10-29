@@ -1,16 +1,42 @@
 import { useState } from 'react'
 import { asset, useScroller, CarouselNav, SectionHeader, SeeAll, Pill, Carousel, ScrollProgress } from './ui.jsx'
 import EventCard from './EventCard.jsx'
-import { categories, trending as trendingBase, agenda as agendaBase, explore as exploreBase, collections as collectionsBase, posts } from './data.js'
+import { categories, collections as collectionsBase, posts } from './data.js'
 import { Link } from '../../router.jsx'
 import { searchUrl, venueUrl } from '../../search/search.js'
-import { EVENTS, VENUES } from '../../search/catalog.js'
+import { EVENTS, VENUES, eventsByTitle } from '../../search/catalog.js'
 
 /** Protótipo: +3 cards repetidos em cada carrossel para ter mais conteúdo para rolar. */
 const plus3 = (list) => [...list, ...list.slice(0, 3)]
-const trending = plus3(trendingBase)
-const agenda = plus3(agendaBase)
-const explore = plus3(exploreBase)
+// Eventos de cada seção, pelo título no catálogo. Sem repetição, para cada card ser um evento diferente.
+const trending = eventsByTitle([
+  'Guns N’Roses',
+  'Curitiba Country Festival',
+  'O estranho mundo de Jack de Tim Burton',
+  'Kim Walker-Smith — Worship Nights',
+  'Rock in Rio Experience',
+  'Human Bodies — Exposição Internacional',
+  'Calado — Turnê',
+])
+// "Agenda Rio Grande do Sul": eventos de Porto Alegre
+const agenda = eventsByTitle([
+  'Lado B — Rap ao Vivo',
+  'Human Bodies — Exposição Internacional',
+  'Kim Walker-Smith — Worship Nights',
+  'Quarteto de Cordas POA',
+  'Noite do Choro',
+  'Riograndense Fest',
+  'Cirque Lumière',
+])
+const explore = eventsByTitle([
+  'Trio Aurora — Acústico',
+  'Calado — Turnê',
+  'Stand-up Sem Filtro',
+  'Pequeno Príncipe',
+  'Bossa Nova no Rio',
+  'Michel Alcoforado',
+  'Jazz na Cidade Baixa',
+])
 const collections = plus3(collectionsBase)
 
 const PRODUCER_URL = 'https://sobre.uhuu.com/Venda-Na-Uhuu'

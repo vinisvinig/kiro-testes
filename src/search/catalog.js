@@ -2,6 +2,7 @@
 // Substitua por chamadas à API real mantendo o mesmo formato (ver src/api.js).
 import { asset } from '../components/home/ui.jsx'
 import { TAG } from '../components/home/data.js'
+import { placeholder } from '../lib/placeholder.js'
 
 /** Categorias do Figma (dropdown "Categoria" e chips da home), com ícone. */
 export const CATEGORIES = [
@@ -61,7 +62,8 @@ const RAW_VENUES = [
   ['Auditório Araújo Vianna', 'Auditório', 'Porto Alegre', ['casa-2.png'], 'Av. Osvaldo Aranha, 685'],
   ['Riograndense', 'Estádio', 'Porto Alegre', ['casa-2.png'], 'Av. Padre Cacique, 891'],
   ['Rio Venue', 'Casa de Shows', 'São Paulo', ['casa-2.png'], 'Rua Augusta, 1200'],
-  ['Estádio do Morumbi', 'Estádio', 'São Paulo', ['casa-2.png'], 'Praça Roberto Gomes Pedrosa, 1'],
+  ['Estádio MorumBIS', 'Estádio', 'São Paulo', ['casa-2.png'], 'Praça Roberto Gomes Pedrosa, 1'],
+  ['Pedreira Paulo Leminski', 'Arena', 'Curitiba', ['casa-2.png'], 'Rua João Gava, 970'],
   ['Parque Ibirapuera', 'Parque', 'São Paulo', ['casa-1.png'], 'Av. Pedro Álvares Cabral, s/n'],
   ['Teatro Claro MAIS SP', 'Teatro', 'São Paulo', ['casa-1.png'], 'Rua Olimpíadas, 360'],
   ['Jeunesse Arena', 'Arena', 'Rio de Janeiro', ['casa-2.png'], 'Av. Embaixador Abelardo Bueno, 3401'],
@@ -120,58 +122,69 @@ export const venueFaq = (v) => [
   },
 ]
 
-const IMAGES = ['ev-1.png', 'ev-2.png', 'ev-3.png', 'ev-5.png', 'ev-6.png', 'ev-7.png', 'ev-4.png'].map(asset)
+/** Página do evento interna (src/event): por enquanto todos os cards abrem o evento modelo. */
 const EVENT_URL = '/evento/o-estranho-mundo-de-jack'
 
-// [título, categoria, local, data ISO, preço mín, preço máx, tags]
+// Eventos com arte própria (imagens do Figma). Cada arte aparece só no evento correspondente,
+// para o teste não confundir: a do Jack, por exemplo, só está no "O estranho mundo de Jack de Tim Burton".
+// [título, categoria, local, data ISO, preço mín, preço máx, tags, imagem, data final, classe da imagem]
+const FEATURED = [
+  ['O estranho mundo de Jack de Tim Burton', 'Espetáculo', 'Estádio MorumBIS', '2026-11-14', 89, 450, ['popular', 'sessaoExtra'], 'ev-2.png', '2026-11-27'],
+  ['Guns N’Roses', 'Show', 'Mineirão', '2026-11-18', 290, 1400, ['corre', 'maisVendidos'], 'ev-6.png'],
+  ['Curitiba Country Festival', 'Show', 'Pedreira Paulo Leminski', '2027-05-24', 120, 890, ['acabando'], 'ev-4.png', '2027-05-25', 'object-left'],
+  ['Kim Walker-Smith — Worship Nights', 'Show', 'Auditório Araújo Vianna', '2026-12-05', 150, 520, ['popular'], 'hero-1.png', null, 'object-left'],
+  ['Human Bodies — Exposição Internacional', 'Exposição', 'Centro de Eventos FIERGS', '2026-11-03', 50, 120, ['ultimos'], 'ev-3.png'],
+  ['Calado — Turnê', 'Musical', 'Teatro Via Sul', '2026-12-12', 80, 300, ['sessaoExtra'], 'ev-5.png'],
+  ['Trio Aurora — Acústico', 'Musical', 'Teatro Bradesco', '2026-11-21', 70, 260, [], 'ev-1.png'],
+  ['Lado B — Rap ao Vivo', 'Show', 'Auditório Araújo Vianna', '2026-10-29', 60, 220, ['hoje'], 'ev-7.png'],
+]
+
+// Demais eventos: sem arte, usam uma imagem provisória com o nome do evento.
 const RAW = [
-  ['Rio 2', 'Show', 'Estádio do Morumbi', '2026-10-10', 120, 690, ['popular']],
-  ['Rios de Alegria', 'Show', 'Parque Ibirapuera', '2026-10-12', 0, 80, ['hoje']],
-  ['Rock in Rio Experience', 'Show', 'Jeunesse Arena', '2026-10-17', 250, 980, ['acabando', 'maisVendidos']],
-  ['Samba do Rio', 'Show', 'Vivo Rio', '2026-10-18', 60, 220, []],
-  ['O Rio que Mora em Mim', 'Espetáculo', 'Theatro Municipal do Rio', '2026-10-21', 40, 180, ['sessaoExtra']],
-  ['Riograndense Fest', 'Show', 'Riograndense', '2026-10-24', 35, 150, ['corre']],
-  ['Noite Carioca', 'Show', 'Rio Venue', '2026-10-25', 50, 200, []],
-  ['Rio Comedy Club', 'Comédia', 'Vivo Rio', '2026-10-30', 45, 120, ['popular']],
-  ['Do Rio ao Sertão', 'Musical', 'Teatro Bradesco', '2026-11-01', 70, 320, []],
-  ['Rio Kids — A Aventura', 'Família/Infantil', 'Jeunesse Arena', '2026-11-02', 30, 90, []],
-  ['Circo do Rio', 'Circo', 'Riograndense', '2026-11-06', 40, 140, ['acabando']],
+  ['Rio 2 — O Musical', 'Musical', 'Jeunesse Arena', '2026-12-10', 120, 690, ['popular']],
+  ['Rios de Alegria', 'Show', 'Parque Ibirapuera', '2026-11-29', 0, 80, []],
+  ['Rock in Rio Experience', 'Show', 'Jeunesse Arena', '2026-12-17', 250, 980, ['acabando', 'maisVendidos']],
+  ['Samba do Rio', 'Show', 'Vivo Rio', '2026-12-18', 60, 220, []],
+  ['O Rio que Mora em Mim', 'Espetáculo', 'Theatro Municipal do Rio', '2026-11-25', 40, 180, ['sessaoExtra']],
+  ['Riograndense Fest', 'Show', 'Riograndense', '2026-11-24', 35, 150, ['corre']],
+  ['Noite Carioca', 'Show', 'Rio Venue', '2026-11-27', 50, 200, []],
+  ['Rio Comedy Club', 'Comédia', 'Vivo Rio', '2026-11-30', 45, 120, ['popular']],
+  ['Do Rio ao Sertão', 'Musical', 'Teatro Bradesco', '2026-12-01', 70, 320, []],
+  ['Rio Kids — A Aventura', 'Família/Infantil', 'Jeunesse Arena', '2026-12-02', 30, 90, []],
+  ['Circo do Rio', 'Circo', 'Riograndense', '2026-12-06', 40, 140, ['acabando']],
   ['Rio Antigo: Fotografias', 'Exposição', 'Theatro Municipal do Rio', '2026-11-08', 0, 25, []],
   ['Palestra: O Futuro do Rio', 'Palestra', 'Rio Venue', '2026-11-12', 90, 250, []],
   ['Bossa Nova no Rio', 'Show', 'Vivo Rio', '2026-11-14', 80, 280, ['maisVendidos']],
   ['Rio Grande Rodeio', 'Show', 'Centro de Eventos FIERGS', '2026-11-20', 25, 110, []],
   ['Riocorrente', 'Espetáculo', 'Teatro Guaíra', '2026-11-22', 50, 160, []],
-  ['Curitiba Country Festival', 'Show', 'Teatro Claro MAIS SP', '2026-10-10', 5, 599, ['acabando', 'popular']],
-  ['Guns N’Roses', 'Show', 'Mineirão', '2026-10-15', 290, 1400, ['corre', 'maisVendidos', 'ultimos']],
-  ['Kim Walker-Smith', 'Show', 'Auditório Araújo Vianna', '2026-10-19', 150, 520, []],
-  ['O estranho mundo de Jack', 'Exposição', 'Parque Ibirapuera', '2026-10-20', 60, 140, ['popular']],
-  ['Human Bodies', 'Exposição', 'Centro de Eventos FIERGS', '2026-10-27', 50, 120, []],
-  ['Calado — Turnê 2026', 'Musical', 'Teatro Via Sul', '2026-11-05', 80, 300, ['sessaoExtra']],
   ['Michel Alcoforado', 'Palestra', 'Teatro Bradesco', '2026-11-10', 90, 260, []],
   ['Stand-up Sem Filtro', 'Comédia', 'Teatro Guaíra', '2026-11-13', 40, 100, []],
   ['Pequeno Príncipe', 'Família/Infantil', 'Teatro Claro MAIS SP', '2026-11-16', 35, 90, []],
-  ['Cirque Lumière', 'Circo', 'Auditório Araújo Vianna', '2026-11-27', 70, 240, ['hoje']],
-  ['Morilo', 'Show', 'Teatro de Câmara Túlio Piva', '2026-10-09', 5, 599, ['corre', 'maisVendidos', 'ultimos', 'popular']],
+  ['Cirque Lumière', 'Circo', 'Auditório Araújo Vianna', '2026-11-27', 70, 240, []],
   // Programação do Teatro de Câmara Túlio Piva (página de Local)
-  ['Quarteto de Cordas POA', 'Musical', 'Teatro de Câmara Túlio Piva', '2026-10-11', 40, 120, ['popular']],
-  ['Dança Contemporânea: Raízes', 'Espetáculo', 'Teatro de Câmara Túlio Piva', '2026-10-14', 30, 90, ['acabando']],
-  ['Noite do Choro', 'Show', 'Teatro de Câmara Túlio Piva', '2026-10-16', 35, 80, []],
-  ['Improviso Total', 'Comédia', 'Teatro de Câmara Túlio Piva', '2026-10-18', 40, 70, ['sessaoExtra']],
-  ['Histórias de Vó', 'Família/Infantil', 'Teatro de Câmara Túlio Piva', '2026-10-19', 20, 50, []],
-  ['Recital de Piano', 'Musical', 'Teatro de Câmara Túlio Piva', '2026-10-23', 50, 140, []],
-  ['Palestra: Cultura em Cena', 'Palestra', 'Teatro de Câmara Túlio Piva', '2026-10-26', 0, 40, ['hoje']],
-  ['Monólogos Gaúchos', 'Espetáculo', 'Teatro de Câmara Túlio Piva', '2026-10-31', 30, 80, []],
-  ['Jazz na Cidade Baixa', 'Show', 'Teatro de Câmara Túlio Piva', '2026-11-04', 45, 110, ['maisVendidos']],
-  ['Mostra de Curtas', 'Exposição', 'Teatro de Câmara Túlio Piva', '2026-11-09', 0, 20, []],
+  ['Quarteto de Cordas POA', 'Musical', 'Teatro de Câmara Túlio Piva', '2026-11-11', 40, 120, ['popular']],
+  ['Dança Contemporânea: Raízes', 'Espetáculo', 'Teatro de Câmara Túlio Piva', '2026-11-14', 30, 90, ['acabando']],
+  ['Noite do Choro', 'Show', 'Teatro de Câmara Túlio Piva', '2026-11-06', 35, 80, []],
+  ['Improviso Total', 'Comédia', 'Teatro de Câmara Túlio Piva', '2026-11-18', 40, 70, ['sessaoExtra']],
+  ['Histórias de Vó', 'Família/Infantil', 'Teatro de Câmara Túlio Piva', '2026-11-19', 20, 50, []],
+  ['Recital de Piano', 'Musical', 'Teatro de Câmara Túlio Piva', '2026-11-23', 50, 140, []],
+  ['Palestra: Cultura em Cena', 'Palestra', 'Teatro de Câmara Túlio Piva', '2026-10-29', 0, 40, ['hoje']],
+  ['Monólogos Gaúchos', 'Espetáculo', 'Teatro de Câmara Túlio Piva', '2026-11-30', 30, 80, []],
+  ['Jazz na Cidade Baixa', 'Show', 'Teatro de Câmara Túlio Piva', '2026-12-04', 45, 110, ['maisVendidos']],
+  ['Mostra de Curtas', 'Exposição', 'Teatro de Câmara Túlio Piva', '2026-12-09', 0, 20, []],
 ]
 
 const DOW = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb']
 const MON = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
 const brl = (v) => (v === 0 ? 'Grátis' : `R$ ${v}`)
 
-export const EVENTS = RAW.map(([title, category, venueName, date, min, max, tags], i) => {
+const cardDate = (iso) => {
+  const d = new Date(`${iso}T12:00:00`)
+  return { dow: DOW[d.getDay()], day: String(d.getDate()).padStart(2, '0'), mon: MON[d.getMonth()] }
+}
+
+export const EVENTS = [...FEATURED, ...RAW].map(([title, category, venueName, date, min, max, tags, image, end, imageClass], i) => {
   const venue = VENUES.find((v) => v.name === venueName)
-  const d = new Date(`${date}T12:00:00`)
   return {
     id: i + 1,
     title,
@@ -184,12 +197,16 @@ export const EVENTS = RAW.map(([title, category, venueName, date, min, max, tags
     priceMin: min,
     priceMax: max,
     // Campos no formato do <EventCard>
-    image: IMAGES[i % IMAGES.length],
+    image: image ? asset(image) : placeholder({ w: 804, h: 456, label: title, seed: category + title }),
+    imageClass: imageClass || '',
     href: EVENT_URL,
     tags: tags.map((t) => TAG[t]),
-    dates: [{ dow: DOW[d.getDay()], day: String(d.getDate()).padStart(2, '0'), mon: MON[d.getMonth()] }],
+    dates: end ? [cardDate(date), cardDate(end)] : [cardDate(date)],
     priceFrom: brl(min),
     priceTo: brl(max),
     city: `${venue.city} · ${venue.uf}`,
   }
 })
+
+/** Eventos pelo título, na ordem pedida (seções da home). */
+export const eventsByTitle = (titles) => titles.map((t) => EVENTS.find((e) => e.title === t)).filter(Boolean)

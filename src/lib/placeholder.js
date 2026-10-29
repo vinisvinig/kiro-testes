@@ -45,7 +45,7 @@ export function placeholder({ w = 400, h = 300, label = '', seed = '' }) {
       </linearGradient>
     </defs>
     <rect width="${w}" height="${h}" fill="url(#g)"/>
-    <text x="50%" y="50%" fill="rgba(255,255,255,0.92)" font-family="Inter, Arial, sans-serif"
+    <text x="50%" y="50%" fill="rgba(255,255,255,0.92)" font-family="'Barlow Semi Condensed', Arial, sans-serif"
       font-size="${fontSize}" font-weight="700" text-anchor="middle" dominant-baseline="middle">${safeLabel}</text>
   </svg>`
 
