@@ -256,11 +256,8 @@ export function FeesDialog({ open, onClose }) {
           </li>
         ))}
       </ul>
-      <div className="mt-8 flex items-start gap-3 rounded-xl border border-info bg-[#eff6ff] p-4">
-        <Ico name="info" className="size-6 text-info" />
-        <p className="font-ui text-sm leading-5 text-ink-2">O total é atualizado antes de você concluir a compra.</p>
-      </div>
-      <button type="button" onClick={onClose} className="mt-6 w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
+      {/* Figma 9147:141007: sem o aviso azul; o Entendi fica 32px abaixo da lista */}
+      <button type="button" onClick={onClose} className="mt-8 w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
         Entendi
       </button>
     </Dialog>
