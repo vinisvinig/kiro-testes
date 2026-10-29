@@ -18,8 +18,10 @@ const trending = eventsByTitle([
   'Human Bodies — Exposição Internacional',
   'Calado — Turnê',
 ])
+// Agenda e Explore não exibem tags (Figma): só "Em alta agora" mostra os selos.
+const noTags = (list) => list.map((e) => ({ ...e, tags: [] }))
 // "Agenda Rio Grande do Sul": eventos de Porto Alegre
-const agenda = eventsByTitle([
+const agenda = noTags(eventsByTitle([
   'Lado B — Rap ao Vivo',
   'Human Bodies — Exposição Internacional',
   'Kim Walker-Smith — Worship Nights',
@@ -27,8 +29,8 @@ const agenda = eventsByTitle([
   'Noite do Choro',
   'Riograndense Fest',
   'Cirque Lumière',
-])
-const explore = eventsByTitle([
+]))
+const explore = noTags(eventsByTitle([
   'Trio Aurora — Acústico',
   'Calado — Turnê',
   'Stand-up Sem Filtro',
@@ -36,7 +38,7 @@ const explore = eventsByTitle([
   'Bossa Nova no Rio',
   'Michel Alcoforado',
   'Jazz na Cidade Baixa',
-])
+]))
 const collections = plus3(collectionsBase)
 
 const PRODUCER_URL = 'https://sobre.uhuu.com/Venda-Na-Uhuu'
