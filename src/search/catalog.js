@@ -2,7 +2,6 @@
 // Substitua por chamadas à API real mantendo o mesmo formato (ver src/api.js).
 import { asset } from '../components/home/ui.jsx'
 import { TAG } from '../components/home/data.js'
-import { placeholder } from '../lib/placeholder.js'
 
 /** Categorias do Figma (dropdown "Categoria" e chips da home), com ícone. */
 export const CATEGORIES = [
@@ -139,7 +138,7 @@ const FEATURED = [
   ['Lado B — Rap ao Vivo', 'Show', 'Auditório Araújo Vianna', '2026-10-29', 60, 220, ['hoje'], 'ev-7.png'],
 ]
 
-// Demais eventos: sem arte, usam uma imagem provisória com o nome do evento.
+// Demais eventos: sem arte do produtor; usam uma imagem genérica gerada por IA, sem texto (gen-<slug>.jpg).
 const RAW = [
   ['Rio 2 — O Musical', 'Musical', 'Jeunesse Arena', '2026-12-10', 120, 690, ['popular']],
   ['Rios de Alegria', 'Show', 'Parque Ibirapuera', '2026-11-29', 0, 80, []],
@@ -197,7 +196,8 @@ export const EVENTS = [...FEATURED, ...RAW].map(([title, category, venueName, da
     priceMin: min,
     priceMax: max,
     // Campos no formato do <EventCard>
-    image: image ? asset(image) : placeholder({ w: 804, h: 456, label: title, seed: category + title }),
+    // Sem arte própria: imagem genérica gerada por IA (Figma, aba "Imagens para. o Kiro"), public/figma/gen-<slug>.jpg
+    image: asset(image || `gen-${slugify(title)}.jpg`),
     imageClass: imageClass || '',
     href: EVENT_URL,
     tags: tags.map((t) => TAG[t]),
