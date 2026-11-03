@@ -40,7 +40,6 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
       <dl className="flex flex-col gap-1.5 border-t border-line pt-4 font-ui text-xs text-ink-2">
         <Row label="Ingressos" value={empty ? 'R$ -' : brl(d.subtotal)} />
         <Row label={`Taxa de serviço, ${SERVICE_FEE * 100}%`} value={empty ? 'R$ -' : brl(d.fee)} />
-        <Row label="Possível taxa de parcelamento" value={empty ? 'até R$ -' : `até ${brl(d.installmentFee)}`} />
       </dl>
       {feesLink}
 

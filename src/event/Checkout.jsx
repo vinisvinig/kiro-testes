@@ -852,8 +852,9 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
         {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {order.validators.length > 0 && row('Código validador', 'Validado', 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {row('Taxa de serviço', brl(t.fee))}
-        {row('Seguro', brl(t.insurance))}
-        {row('Clube Planeta', brl(t.club))}
+        {/* Adicionais só aparecem quando contratados */}
+        {t.insurance > 0 && row('Seguro', brl(t.insurance))}
+        {t.club > 0 && row('Clube Planeta', brl(t.club))}
         {row('Entrega', t.shipping === null ? 'A definir' : t.shipping ? brl(t.shipping) : 'Grátis')}
         {t.coins > 0 && row('Moedas Uhuu', `− ${brl(t.coins)}`, 'text-success')}
       </dl>
@@ -912,7 +913,6 @@ function Coupons({ c, t, order, dispatch }) {
           ))}
         </ul>
       )}
-      {t.applied.length > 0 && <p className="mt-3 font-ui text-[11px] leading-4 text-ink-2">Use vários cupons. Cada um tem seu limite de aplicações, e cada ingresso recebe apenas 1 cupom.</p>}
       <form onSubmit={apply} className="mt-4 flex flex-col gap-3" noValidate>
         <label htmlFor={`${id}-c`} className="sr-only">
           Cupom de desconto
