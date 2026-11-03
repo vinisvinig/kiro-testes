@@ -197,6 +197,8 @@ function InfoTab({ onBuy, onFees }) {
       <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
           <About />
+          <TopicsCard eyebrow="Ingressos & benefícios" title="Tipos de ingresso e descontos" items={EVENT.ticketTypes} />
+          <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
           <GalleryCard />
           <VenueCard />
           <VenueMap />
@@ -249,6 +251,28 @@ function About() {
           </li>
         ))}
       </ul>
+    </Card>
+  )
+}
+
+/** Card de texto por assunto (Figma "Tipos de ingresso e descontos" e "Pontos de venda"). */
+function TopicsCard({ eyebrow, title, items }) {
+  return (
+    <Card>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <CardTitle className="mt-2">{title}</CardTitle>
+      <div className="mt-6 flex flex-col gap-4">
+        {items.map(([label, lines]) => (
+          <div key={label} className="flex flex-col gap-2">
+            <h3 className="text-lg font-bold leading-none text-ink">{label}</h3>
+            <div className="text-sm leading-5 text-ink-2">
+              {lines.map((l) => (
+                <p key={l}>{l}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </Card>
   )
 }
