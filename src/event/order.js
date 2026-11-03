@@ -10,7 +10,7 @@ export const initialOrder = {
   modality: null, // 'individual' | 'combo' (exibição; o pedido pode misturar os dois)
   open: null, // setor ou combo expandido
   qty: {}, // setores livres: { 'sessão|setor': { inteira: 2, meia: 1 } }
-  seats: {}, // lugar marcado: { 'sessão|setor': [{ id: 'A1', fare: null | 'inteira' | ... }] }
+  seats: {}, // assento marcado: { 'sessão|setor': [{ id: 'A1', fare: null | 'inteira' | ... }] }
   openSeat: null, // assento com o seletor de tarifa aberto
   combos: {}, // { 'sessão|combo': { n: 1, seats: ['A1', ...] } }
   codes: {}, // códigos validadores: { banrisul: { value, status: idle | applied | error } }
@@ -92,8 +92,8 @@ export function orderReducer(o, a) {
       return { ...o, combos: { ...o.combos, [k]: { n, seats } } }
     }
     case 'comboSeat': {
-      // Combo com assento marcado é sempre 1 unidade: entra no pedido no 1º lugar escolhido
-      // e sai quando todos os lugares são removidos.
+      // Combo com assento marcado é sempre 1 unidade: entra no pedido no 1º assento escolhido
+      // e sai quando todos os assentos são removidos.
       const c = comboById(a.combo)
       const k = keyOf(o.sessionId, c.id)
       const cur = o.combos[k] || { n: 0, seats: [] }
@@ -230,7 +230,7 @@ export function deriveOrder(o) {
   if (!count) blocker = 'Selecione ao menos um ingresso.'
   else if (incomplete.length) {
     const l = incomplete[0]
-    blocker = `Escolha mais ${l.missing} ${l.missing === 1 ? 'lugar' : 'lugares'} no mapa do ${l.combo.name} (${l.sector.name}).`
+    blocker = `Escolha o assento de mais ${l.missing} ${l.missing === 1 ? 'ingresso' : 'ingressos'} no mapa do ${l.combo.name} (${l.sector.name}).`
   } else if (pendingFares) blocker = `Defina a tarifa de ${pendingFares} ${pendingFares === 1 ? 'assento' : 'assentos'}.`
   else if (pendingCodes.length) blocker = 'Informe e valide o código validador no resumo do pedido.'
   // Única pendência é o código validador: no celular o Comprar vira "Pendente" e leva até o código

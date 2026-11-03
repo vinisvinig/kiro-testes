@@ -60,12 +60,12 @@ export const SESSIONS = [
 
 export const sessionTitle = (s) => (s.kind === 'passaporte' ? `Passaporte ${s.label} (3 dias)` : `${s.label}, ${s.time}`)
 
-/** Setores (Figma "Escolha onde você quer ficar"). kind: 'livre' = pista/sem assento, 'assento' = lugar marcado. */
+/** Setores (Figma "Escolha onde você quer ficar"). kind: 'livre' = pista/sem assento, 'assento' = assento marcado. */
 export const SECTORS = [
   { id: 'pista-premium', name: 'Pista Premium', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Portão B', base: 195.5 },
-  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', badge: 'Espaço Aberto', lot: 'LOTE 1 · Espaço Aberto, Entrada Principal', base: 178 },
-  { id: 'area-vip', name: 'Área VIP', kind: 'livre', badge: 'Espaço Aberto', lot: 'LOTE 1 · Espaço Aberto, Entrada Principal', base: 184 },
-  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', badge: 'Espaço Livre', lot: 'LOTE 1 · Espaço Livre, Entrada Principal', base: 184, soldOut: true },
+  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 178 },
+  { id: 'area-vip', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 184 },
+  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 184, soldOut: true },
   { id: 'cadeira-coberta', name: 'Cadeira Coberta', kind: 'assento', badge: 'Assento marcado', lot: 'LOTE 1 · Assentos numerados, Portão A', base: 391 },
 ]
 
@@ -84,19 +84,19 @@ export const minFare = (sector, session) => Math.min(...faresFor(sector, session
 /**
  * Combos (Figma 9828:108002 "Combo com setor"): cada combo pertence a um setor e já traz as
  * tarifas definidas (ex.: 3 inteiras, 1 meia e 1 cortesia), então o usuário não escolhe tarifa.
- * Em setor com assento marcado ele só escolhe os lugares no mapa.
+ * Em setor com assento marcado ele só escolhe os assentos no mapa.
  */
 export const COMBO_FARES = { inteira: 'Inteira', meia: 'Meia-entrada', cortesia: 'Cortesia' }
 const combo = (id, name, desc, sector, price, items) => ({ id, name, desc, sector, price, items, size: items.reduce((a, [, n]) => a + n, 0) })
 export const COMBOS = [
-  combo('conexoes-pista', 'Combo de Conexões', '5 lugares, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
-  combo('amizade-especial', 'Combo de Amizade Especial', '5 lugares, com 30% de desconto.', 'pista-premium', 391, [['inteira', 5]]),
-  combo('amizade-premium', 'Combo de Amizade Premium', '5 lugares, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 4], ['cortesia', 1]]),
-  combo('conexoes-coberta', 'Combo de Conexões', '5 lugares, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
-  combo('amigos-coberta', 'Combo Amigos', '5 lugares, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 4], ['cortesia', 1]]),
+  combo('conexoes-pista', 'Combo de Conexões', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
+  combo('amizade-especial', 'Combo de Amizade Especial', '5 ingressos, com 30% de desconto.', 'pista-premium', 391, [['inteira', 5]]),
+  combo('amizade-premium', 'Combo de Amizade Premium', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 4], ['cortesia', 1]]),
+  combo('conexoes-coberta', 'Combo de Conexões', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
+  combo('amigos-coberta', 'Combo Amigos', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 4], ['cortesia', 1]]),
 ]
 export const comboPrice = (c, session) => c.price * (session?.mult ?? 1)
-/** Mesmo texto da lista de combos, sem o ponto final (ex.: "5 lugares, sendo 1 cortesia"). */
+/** Mesmo texto da lista de combos, sem o ponto final (ex.: "5 ingressos, sendo 1 cortesia"). */
 export const comboDetail = (c) => c.desc.replace(/\.$/, '')
 /** "3 Inteira, 1 Meia-entrada e 1 Cortesia" */
 export const comboItemsLabel = (c) => {
@@ -104,7 +104,7 @@ export const comboItemsLabel = (c) => {
   return parts.length > 1 ? `${parts.slice(0, -1).join(', ')} e ${parts.at(-1)}` : parts[0]
 }
 
-/** Mapa de assentos da Cadeira Coberta: fileiras A–D, 8 lugares cada. */
+/** Mapa de assentos da Cadeira Coberta: fileiras A–D, 8 assentos cada. */
 export const SEAT_ROWS = ['A', 'B', 'C', 'D'].map((r) => Array.from({ length: 8 }, (_, i) => `${r}${i + 1}`))
 
 const OCCUPIED_BASE = ['A3', 'B2', 'B3', 'C4', 'D7']

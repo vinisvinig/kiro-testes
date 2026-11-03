@@ -587,7 +587,7 @@ function SeatChips({ ids, onRemove }) {
   )
 }
 
-/* Lugar marcado, ingresso individual: a tarifa é escolhida no próprio mapa */
+/* Assento marcado, ingresso individual: a tarifa é escolhida no próprio mapa */
 const SHORT = { inteira: 'Inteira', meia: 'Meia', banrisul: 'Banrisul' }
 
 function SeatBody({ sector, order, dispatch, session }) {
@@ -695,7 +695,7 @@ function Combos({ order, dispatch, session, onMap }) {
           )
         })}
       </ul>
-      <Note className="mt-4">As tarifas de cada combo já estão incluídas. Nos combos com assento marcado, escolha todos os lugares no mapa para liberar a compra.</Note>
+      <Note className="mt-4">As tarifas de cada combo já estão incluídas. Nos combos com assento marcado, escolha no mapa o assento de cada ingresso para liberar a compra.</Note>
     </Card>
   )
 }
@@ -720,7 +720,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
               </span>
               {missing > 0 && (
                 <span className="rounded-full bg-[#fffbeb] px-2 py-0.5 font-ui text-[10px] font-semibold text-orange">
-                  {missing === 1 ? 'Falta 1 lugar' : `Faltam ${missing} lugares`}
+                  {missing === 1 ? 'Falta 1 ingresso' : `Faltam ${missing} ingressos`}
                 </span>
               )}
             </span>
@@ -743,7 +743,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
     open || selected ? 'border-combo ring-1 ring-combo' : 'border-line hover:border-ink-4'
   }`
 
-  // Com assento marcado: a linha expande o mapa para escolher os lugares (1 combo = 1 mapa).
+  // Com assento marcado: a linha expande o mapa para escolher os assentos (1 combo = 1 mapa).
   if (seated) {
     return (
       <button type="button" onClick={onToggle} aria-expanded={open} className={frame}>
@@ -776,21 +776,21 @@ function ComboSeats({ combo, sector, order, state, dispatch }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-line bg-body-2 p-3 md:p-4">
       <InfoBanner>
-        Escolha os {combo.size} lugares deste combo no mapa: {comboItemsLabel(combo)}. As tarifas já estão incluídas.
+        Escolha no mapa os assentos dos {combo.size} ingressos deste combo: {comboItemsLabel(combo)}. As tarifas já estão incluídas.
       </InfoBanner>
       <div className="rounded-2xl border border-line bg-white p-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-semibold text-ink">
-            {chosen} de {needed} lugares
+            {chosen} de {needed} ingressos
           </p>
           <p className={`font-ui text-xs font-semibold ${done ? 'text-success' : 'text-orange'}`} aria-live="polite">
-            {done ? 'Todos os lugares escolhidos' : needed - chosen === 1 ? 'Falta 1' : `Faltam ${needed - chosen}`}
+            {done ? 'Todos os assentos escolhidos' : needed - chosen === 1 ? 'Falta 1' : `Faltam ${needed - chosen}`}
           </p>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-body-3" role="progressbar" aria-valuemin={0} aria-valuemax={needed} aria-valuenow={chosen} aria-label={`Lugares escolhidos no ${combo.name}`}>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-body-3" role="progressbar" aria-valuemin={0} aria-valuemax={needed} aria-valuenow={chosen} aria-label={`Ingressos com assento escolhido no ${combo.name}`}>
           <div className={`h-full rounded-full transition-all ${done ? 'bg-success' : 'bg-combo'}`} style={{ width: `${(chosen / needed) * 100}%` }} />
         </div>
-        {chosen > 0 && !done && <p className="mt-2 font-ui text-xs text-ink-3">O botão Comprar fica disponível quando todos os lugares deste combo forem escolhidos.</p>}
+        {chosen > 0 && !done && <p className="mt-2 font-ui text-xs text-ink-3">O botão Comprar fica disponível quando todos os ingressos deste combo tiverem assento escolhido.</p>}
       </div>
 
       <SeatMap
@@ -799,7 +799,7 @@ function ComboSeats({ combo, sector, order, state, dispatch }) {
         selected={new Set(state.seats)}
         full={chosen >= needed}
         onToggle={toggle}
-        hint={`Escolha exatamente ${needed} lugares`}
+        hint={`Escolha exatamente ${needed} ingressos`}
       />
       {chosen > 0 && <SeatChips ids={state.seats} onRemove={toggle} />}
     </div>

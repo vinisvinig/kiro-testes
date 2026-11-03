@@ -129,7 +129,7 @@ export default function EventPage({ slug, search }) {
     <>
       <Hero />
       <Tabs tab={tab} onTab={goTab} />
-      <div className={tab === 'buy' ? 'pb-24 lg:pb-0' : ''}>
+      <div className={tab === 'buy' ? 'pb-32 lg:pb-0' : ''}>
         {tab === 'info' ? (
           <InfoTab onBuy={startBuy} onFees={() => setFees(true)} />
         ) : (

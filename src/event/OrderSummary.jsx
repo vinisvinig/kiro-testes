@@ -97,7 +97,7 @@ export function OrderSummary({ order, derived, dispatch, onFees, onBuy }) {
 function SummaryLine({ line: l, codeOk, onRemove }) {
   const isCombo = l.kind === 'combo'
   let pending = null
-  if (isCombo && l.missing) pending = l.missing === 1 ? 'Falta 1 lugar' : `Faltam ${l.missing} lugares`
+  if (isCombo && l.missing) pending = l.missing === 1 ? 'Falta 1 ingresso' : `Faltam ${l.missing} ingressos`
   else if (!isCombo && !l.fare) pending = 'Tarifa pendente'
   else if (l.fare?.validator && !codeOk(l.fare.validator)) pending = 'Validação pendente'
 
@@ -313,9 +313,9 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
               </button>
               {buy}
             </div>
-            {/* Outras pendências (lugares do combo, tarifa): toca e abre o resumo para resolver */}
+            {/* Outras pendências (assentos do combo, tarifa): toca e abre o resumo para resolver */}
             {!d.canBuy && d.count > 0 && !d.codePending && (
-              <button type="button" onClick={() => setOpen(true)} className="-mt-2 block truncate px-4 pb-3 text-left font-ui text-[11px] text-orange underline">
+              <button type="button" onClick={() => setOpen(true)} className="-mt-2 block px-4 pb-3 text-left font-ui text-[11px] leading-4 text-orange underline">
                 {d.blocker}
               </button>
             )}
