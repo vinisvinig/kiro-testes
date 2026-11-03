@@ -13,6 +13,7 @@ import {
   SERVICE_FEE,
   SESSIONS,
   comboItemsLabel,
+  lotLabel,
   comboPrice,
   faresFor,
   minFare,
@@ -327,7 +328,7 @@ function SectorRow({ sector, session, open, onToggle, count }) {
           {count > 0 && <span className="rounded-full bg-brand-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-brand">{count} selecionado{count > 1 ? 's' : ''}</span>}
         </span>
         <span className={`mt-1 block text-lg font-semibold leading-6 ${disabled ? 'text-ink-3' : 'text-ink'}`}>{sector.name}</span>
-        <span className="block font-ui text-xs leading-4 text-ink-3">{sector.lot}</span>
+        <span className="block font-ui text-xs leading-4 text-ink-3">{lotLabel(sector)}</span>
       </span>
       {disabled ? (
         <span className="rounded-full bg-ink-2 px-6 py-1 font-ui text-[11px] font-medium text-white">Esgotado</span>

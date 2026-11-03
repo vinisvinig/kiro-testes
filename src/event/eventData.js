@@ -62,11 +62,11 @@ export const sessionTitle = (s) => (s.kind === 'passaporte' ? `Passaporte ${s.la
 
 /** Setores (Figma "Escolha onde você quer ficar"). kind: 'livre' = pista/sem assento, 'assento' = assento marcado. */
 export const SECTORS = [
-  { id: 'pista-premium', name: 'Pista Premium', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Portão B', base: 195.5 },
-  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 178 },
-  { id: 'area-vip', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 184 },
-  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1 · Setor livre, Entrada Principal', base: 184, soldOut: true },
-  { id: 'cadeira-coberta', name: 'Cadeira Coberta', kind: 'assento', badge: 'Assento marcado', lot: 'LOTE 1 · Assentos numerados, Portão A', base: 391 },
+  { id: 'pista-premium', name: 'Pista Premium', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 195.5 },
+  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 178 },
+  { id: 'area-vip', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 184 },
+  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 184, soldOut: true },
+  { id: 'cadeira-coberta', name: 'Cadeira Coberta', kind: 'assento', badge: 'Assento marcado', lot: 'LOTE 1', base: 391 },
 ]
 
 /** Tarifas disponíveis em todos os setores. */
@@ -182,3 +182,6 @@ export const EVENT = {
     },
   ],
 }
+
+/** Linha de detalhe dos cards de setor: só o lote ("LOTE 1"), mesmo que o dado traga portão ou modalidade. */
+export const lotLabel = (sector) => (sector.lot || '').split('·')[0].trim()
