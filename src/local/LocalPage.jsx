@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { asset, Pill, Skel, useDragScroll } from '../components/home/ui.jsx'
+import { AdArea } from '../components/home/Sections.jsx'
 import EventCard, { EventCardSkeleton, EVENT_GRID } from '../components/home/EventCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import { Link } from '../router.jsx'
@@ -26,12 +27,15 @@ export default function LocalPage({ slug }) {
       <LocalHero venue={venue} onSeeEvents={() => scrollToId('eventos-neste-local')} />
       <QuickSummary venue={venue} />
       {highlights.length > 0 && <Highlights events={highlights} />}
+      {/* Anúncios (Figma 7903:96802 e 8019:130657): após os destaques; o 2º, antes do rodapé, só no desktop */}
+      <AdArea />
       <EventsHere events={events} />
       <About venue={venue} />
       <FullSummary venue={venue} />
       <StayTuned venue={venue} />
       <Directions venue={venue} />
       <Faq items={faq} />
+      <AdArea className="hidden md:flex" />
     </>
   )
 }

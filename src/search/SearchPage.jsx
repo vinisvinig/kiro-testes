@@ -6,6 +6,7 @@ import { fetchSearch, useAsync } from '../api.js'
 import SearchBox from './SearchBox.jsx'
 import { searchUrl } from './search.js'
 import { formatRange } from './DateRangePicker.jsx'
+import { AdArea } from '../components/home/Sections.jsx'
 
 /**
  * Resultado busca (Figma 5174:49161 termo, 5510:18658 categoria, 6980:55998 um resultado).
@@ -16,27 +17,32 @@ export default function SearchPage({ params, search }) {
   const { data, loading } = useAsync(() => fetchSearch(params), search)
 
   if (!data) return <SearchSkeleton />
+  // Busca por categoria: anúncio lateral (Figma 5510:18658), só com espaço (≥ 1280px) para não cobrir os cards
+  const side = !!params.categoria && !params.q
 
   return (
     <>
+      {/* Anúncio acima da busca (Figma 5174:49161 / 6000:29661) */}
+      <AdArea variant="top" />
       <section className="bg-body pt-0 md:pb-6 md:pt-10">
         <div className="md:page-x">
           <SearchBox variant="filters" initial={params} />
         </div>
       </section>
 
-      <section className="bg-body pb-14 pt-6 md:pt-9">
-        <div className="page-x">
+      <section className="flex items-start bg-body-2">
+        <div className="page-x min-w-0 flex-1 pb-14 pt-6 md:pt-9">
           <div className="mx-auto flex max-w-content flex-col gap-6 md:gap-10" aria-busy={loading}>
-            {loading ? <ResultsSkeleton /> : <Results data={data} params={params} />}
+            {loading ? <ResultsSkeleton narrow={side} /> : <Results data={data} params={params} narrow={side} />}
           </div>
         </div>
+        {side && <AdArea variant="side" className="sticky top-24 mt-9 hidden xl:flex" />}
       </section>
     </>
   )
 }
 
-function Results({ data, params }) {
+function Results({ data, params, narrow }) {
   const { items, total, page, pages } = data
   const context = params.q
     ? `Eventos com ‘${params.q}’`
@@ -61,7 +67,8 @@ function Results({ data, params }) {
       </header>
 
       {items.length > 0 ? (
-        <ul className={EVENT_GRID}>
+        // Com o anúncio lateral os cards ficam em 2 colunas, para caber ao lado dele
+        <ul className={`${EVENT_GRID} ${narrow ? 'xl:grid-cols-2' : ''}`}>
           {items.map((e) => (
             <li key={e.id} className="flex">
               <EventCard {...e} grid />
@@ -93,7 +100,7 @@ function EmptyState({ params }) {
   )
 }
 
-function ResultsSkeleton() {
+function ResultsSkeleton({ narrow }) {
   return (
     <>
       <span className="sr-only" role="status">
@@ -103,7 +110,7 @@ function ResultsSkeleton() {
         <Skel className="h-9 w-[200px] md:h-[46px] md:w-[246px]" />
         <Skel className="h-9 w-[160px] md:h-[46px] md:w-[199px]" />
       </div>
-      <div className={EVENT_GRID}>
+      <div className={`${EVENT_GRID} ${narrow ? 'xl:grid-cols-2' : ''}`}>
         {Array.from({ length: 6 }, (_, i) => (
           <EventCardSkeleton key={i} grid />
         ))}
@@ -119,6 +126,7 @@ function ResultsSkeleton() {
 function SearchSkeleton() {
   return (
     <>
+      <AdArea variant="top" />
       <section className="bg-body md:pt-10">
         <div className="mx-auto flex flex-col gap-4 p-4 md:px-margem">
           <Skel className="h-[46px] w-full" />

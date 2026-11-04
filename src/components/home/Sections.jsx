@@ -277,30 +277,74 @@ export function Explore() {
   )
 }
 
-/* ---------- Área de anúncio (6384:38334) ---------- */
-export function AdArea() {
+/* ---------- Áreas de anúncio (Figma 200:5637) ---------- */
+/** Ícones de ação do anúncio (menu e informação), abaixo da imagem. */
+function AdActions() {
   return (
-    <section className="flex flex-col items-center gap-6 bg-body-3 px-4 py-12 md:py-22">
-      <p className="text-center text-xl font-light leading-none text-ink">Área de anúncio</p>
+    <div className="flex items-center gap-2 pl-0.5">
+      <img src={asset('ad-tool.svg')} alt="" className="h-[15px] w-4 rotate-90" />
+      <span className="relative flex size-4 items-center justify-center">
+        <img src={asset('ad-info.svg')} alt="" className="size-[15px]" />
+        <span className="absolute font-ui text-[10px] font-bold leading-none text-info">i</span>
+      </span>
+    </div>
+  )
+}
+const AdTitle = () => <p className="text-center text-xl font-light leading-none text-ink">Área de anúncio</p>
+/**
+ * Área de anúncio, em 3 formatos:
+ * - `banner` (padrão): faixa entre seções, imagem 1200×260 (desktop) / 358×260 (celular) — home e locais.
+ * - `top`: faixa acima da busca, imagem 1200×143 (desktop) / 320×100 (celular) — resultado de busca.
+ * - `side`: coluna lateral de 364px com imagem 300×600 — resultado por categoria, só em telas ≥ 1280px.
+ * As imagens `top` e `side` já trazem o selo "Ad" (exportadas do Figma).
+ */
+export function AdArea({ variant = 'banner', className = '' }) {
+  if (variant === 'side') {
+    return (
+      <aside aria-label="Anúncio" className={`flex w-[364px] shrink-0 flex-col gap-6 bg-body-3 p-8 ${className}`}>
+        <AdTitle />
+        <div className="flex flex-col gap-2">
+          <a href="#" className="block overflow-hidden rounded-xl">
+            <img src={asset('ad-lateral.jpg')} alt="Anúncio" loading="lazy" className="h-[600px] w-[300px] object-cover" />
+          </a>
+          <AdActions />
+        </div>
+      </aside>
+    )
+  }
+  if (variant === 'top') {
+    return (
+      <section aria-label="Anúncio" className={`flex flex-col items-center gap-6 bg-body-3 px-4 py-8 md:px-margem ${className}`}>
+        <AdTitle />
+        <div className="flex w-full max-w-[1200px] flex-col items-center gap-2 md:items-stretch">
+          <a href="#" className="block overflow-hidden rounded-xl">
+            <picture>
+              <source media="(min-width: 768px)" srcSet={asset('ad-topo.jpg')} />
+              <img src={asset('ad-topo-mobile.jpg')} alt="Anúncio" className="h-[100px] w-[320px] object-cover md:aspect-[1200/143] md:h-auto md:w-full" />
+            </picture>
+          </a>
+          <div className="w-[320px] md:w-auto">
+            <AdActions />
+          </div>
+        </div>
+      </section>
+    )
+  }
+  return (
+    <section aria-label="Anúncio" className={`flex flex-col items-center gap-6 bg-body-3 px-4 py-12 md:py-22 ${className}`}>
+      <AdTitle />
       <div className="flex w-full max-w-[1200px] flex-col gap-2">
         <a href="#" className="relative flex h-[260px] items-start overflow-hidden rounded-xl bg-white p-2">
-          <img src={asset('ad.png')} alt="Anúncio" className="absolute inset-0 size-full object-cover" />
+          <img src={asset('ad.png')} alt="Anúncio" loading="lazy" className="absolute inset-0 size-full object-cover" />
           <span className="relative flex h-5 w-[26px] items-center justify-center rounded bg-[#3c3c3c] pb-px font-ui text-[11px] font-bold text-white">
             Ad
           </span>
         </a>
-        <div className="flex items-center gap-2 pl-0.5">
-          <img src={asset('ad-tool.svg')} alt="" className="h-[15px] w-4 rotate-90" />
-          <span className="relative flex size-4 items-center justify-center">
-            <img src={asset('ad-info.svg')} alt="" className="size-[15px]" />
-            <span className="absolute font-ui text-[10px] font-bold leading-none text-info">i</span>
-          </span>
-        </div>
+        <AdActions />
       </div>
     </section>
   )
 }
-
 /* ---------- Coleções e eventos especiais (6384:38348) ---------- */
 export function Collections() {
   const [ref, scroll] = useScroller()

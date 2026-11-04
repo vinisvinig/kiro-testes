@@ -36,6 +36,8 @@ function Home() {
       <Venues />
       <Blog />
       <Producer />
+      {/* 2ª área de anúncio: antes do rodapé (Figma 5236:8721 e 5531:19939) */}
+      <AdArea />
     </>
   )
 }
