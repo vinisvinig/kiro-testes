@@ -103,6 +103,10 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         <div className="mt-4 evento-grid">
           <div className="flex min-w-0 flex-col gap-6">
             <EventSummary order={order} />
+            {/* Celular: resumo (com o cronômetro) logo abaixo dos ingressos e acima do cupom; no desktop fica na coluna da direita */}
+            <div className="lg:hidden">
+              <Totals t={t} order={order} remaining={remaining} />
+            </div>
             {/* Celular: cupom (opcional) logo abaixo dos ingressos e antes do seguro; no desktop fica na coluna da direita */}
             <div className="lg:hidden">
               <Coupons c={c} t={t} order={order} dispatch={dispatch} />
@@ -122,7 +126,9 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
           </div>
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
-            <Totals t={t} order={order} remaining={remaining} />
+            <div className="hidden lg:block">
+              <Totals t={t} order={order} remaining={remaining} />
+            </div>
             <div className="hidden lg:block">
               <Coupons c={c} t={t} order={order} dispatch={dispatch} />
             </div>
@@ -826,6 +832,18 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
 /* ------------------------------------------------------------------ */
 /* Coluna direita: resumo e cupons                                     */
 /* ------------------------------------------------------------------ */
+/** "Reserva garantida por mm:ss", no topo do resumo. */
+function ReserveTimer({ remaining, className = '' }) {
+  const low = remaining <= 120
+  return (
+    <div className={`flex items-center gap-2 rounded-full border px-4 py-2.5 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'} ${className}`} role="timer" aria-live="off">
+      <Ico name="timer" className="size-4 text-ink" />
+      <span className="flex-1 font-ui text-xs text-ink-2">Reserva garantida por</span>
+      <span className={`font-ui text-sm font-bold ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
+    </div>
+  )
+}
+
 function Totals({ t, order, remaining, title = 'Total à vista', showTimer = true }) {
   const low = remaining <= 120
   const row = (label, value, cls = 'text-ink-2') => (
@@ -836,13 +854,7 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
   )
   return (
     <Card as="div" id={SUMMARY_ID} className="scroll-mt-24">
-      {showTimer && (
-        <div className={`flex items-center gap-2 rounded-full border px-4 py-2.5 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'}`} role="timer" aria-live="off">
-          <Ico name="timer" className="size-4 text-ink" />
-          <span className="flex-1 font-ui text-xs text-ink-2">Reserva garantida por</span>
-          <span className={`font-ui text-sm font-bold ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
-        </div>
-      )}
+      {showTimer && <ReserveTimer remaining={remaining} />}
       <Eyebrow className={showTimer ? 'mt-5' : ''}>Resumo do pedido</Eyebrow>
       <p className="mt-2 text-2xl font-bold leading-tight text-ink">
         {order.count} {order.count === 1 ? 'ingresso' : 'ingressos'}

@@ -10,6 +10,7 @@ import { checkoutReducer, initialCheckout } from './checkout.js'
 import { Card, CardTitle, Dialog, Eyebrow, FeesDialog, Ico, VenueMap, brl } from './parts.jsx'
 import Checkout from './Checkout.jsx'
 import OrderSuccess from './OrderSuccess.jsx'
+import { mmss } from './OrderSummary.jsx'
 import { openLogin, useAuth } from '../auth.js'
 
 const mapsSearch = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
@@ -44,7 +45,9 @@ export default function EventPage({ slug, search }) {
   const [fees, setFees] = useState(false)
   const { user } = useAuth()
   const remaining = useCountdown(deadline)
-  const expired = deadline && remaining === 0 && view === 'checkout'
+  // A reserva vale na aba Comprar ingressos e na finalização
+  const reserving = view === 'buy' || view === 'checkout'
+  const expired = deadline && remaining === 0 && reserving
 
   const session = SESSIONS.find((s) => s.id === order.sessionId) || null
   const derived = useMemo(() => deriveOrder(order), [order])
@@ -52,23 +55,23 @@ export default function EventPage({ slug, search }) {
   const base = `/evento/${slug}`
   const go = (aba, opts) => navigate(aba ? `${base}?aba=${aba}` : base, opts)
 
-  // O tempo de reserva existe só na jornada de compra: começa ao entrar na finalização e
-  // para quando o usuário volta para a seleção.
+  // O tempo de reserva começa ao abrir a aba Comprar ingressos (Figma 9941:50644), segue na finalização
+  // e para quando o usuário volta para as informações do evento.
   useEffect(() => {
-    if (view === 'checkout' && !deadline) {
+    if (reserving && !deadline) {
       setDeadline(Date.now() + RESERVE_SECONDS * 1000)
       setExtended(false)
     }
-    if (view !== 'checkout' && deadline) setDeadline(null)
-  }, [view, deadline])
+    if (!reserving && deadline) setDeadline(null)
+  }, [reserving, deadline])
 
   // Quando faltam 5 minutos, a reserva ganha +5 minutos uma única vez (Figma 9945:124592).
   useEffect(() => {
-    if (view !== 'checkout' || !deadline || extended || remaining > EXTEND_AT) return
+    if (!reserving || !deadline || extended || remaining > EXTEND_AT) return
     setExtended(true)
     setDeadline((d) => d + EXTEND_SECONDS * 1000)
     setBonus(true)
-  }, [view, deadline, extended, remaining])
+  }, [reserving, deadline, extended, remaining])
 
   // Sem ingressos válidos (ou sem login), a finalização volta para a seleção; sem pedido, o resultado também.
   useEffect(() => {
@@ -128,7 +131,7 @@ export default function EventPage({ slug, search }) {
   return (
     <>
       <Hero />
-      <Tabs tab={tab} onTab={goTab} />
+      <Tabs tab={tab} onTab={goTab} remaining={deadline ? remaining : null} />
       {/* Fundo da área de conteúdo: Body Secundário #f5f5f5 (Figma 8677:38376) */}
       <div className={`bg-body-2 ${tab === 'buy' ? 'pb-32 lg:pb-0' : ''}`}>
         {tab === 'info' ? (
@@ -146,10 +149,11 @@ export default function EventPage({ slug, search }) {
       </div>
 
       <FeesDialog open={fees} onClose={() => setFees(false)} />
+      <ExpiredDialog open={!!expired} onRestart={restart} />
+      <ExtraTimeDialog open={bonus && !expired} onClose={() => setBonus(false)} />
     </>
   )
 }
-
 /* ---------------- Hero (Figma: banner com cantos arredondados) ---------------- */
 function Hero() {
   return (
@@ -164,7 +168,7 @@ function Hero() {
 }
 
 /* ---------------- Abas ---------------- */
-function Tabs({ tab, onTab }) {
+function Tabs({ tab, onTab, remaining }) {
   const item = (id, icon, label) => (
     <button
       type="button"
@@ -177,6 +181,17 @@ function Tabs({ tab, onTab }) {
     >
       <Ico name={icon} className="size-4" />
       {label}
+      {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644) */}
+      {id === 'buy' && tab === 'buy' && remaining !== null && (
+        <span
+          role="timer"
+          aria-label={`Reserva garantida por ${mmss(remaining)}`}
+          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
+        >
+          {mmss(remaining)}
+          <Ico name="timer" className="size-[14px]" />
+        </span>
+      )}
     </button>
   )
   return (
