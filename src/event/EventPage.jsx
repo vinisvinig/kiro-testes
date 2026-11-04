@@ -297,16 +297,17 @@ function GalleryCard() {
   const [open, setOpen] = useState(-1)
   const imgs = EVENT.gallery
   return (
-    <Card>
+    // Celular (Figma 10210:52064): fundo claro, fotos empilhadas com 220px e "Galeria completa" com 128px
+    <Card className="max-md:bg-body">
       <Eyebrow>Galeria & bastidores</Eyebrow>
-      <CardTitle className="mt-2">Veja o que espera por você</CardTitle>
-      <div className="mt-6 grid grid-cols-3 gap-2 md:gap-3">
+      <CardTitle className="mt-1 md:mt-2">Veja o que espera por você</CardTitle>
+      <div className="mt-4 grid grid-cols-1 gap-4 md:mt-6 md:grid-cols-3 md:gap-3">
         {imgs.slice(0, 2).map((src, i) => (
-          <button key={src} type="button" onClick={() => setOpen(i)} aria-label={`Abrir foto ${i + 1}`} className="aspect-square overflow-hidden rounded-xl">
+          <button key={src} type="button" onClick={() => setOpen(i)} aria-label={`Abrir foto ${i + 1}`} className="h-[220px] overflow-hidden rounded-xl md:aspect-square md:h-auto">
             <img src={src} alt="" loading="lazy" className="size-full object-cover transition hover:scale-105" />
           </button>
         ))}
-        <button type="button" onClick={() => setOpen(0)} className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl bg-night text-white hover:bg-night-card">
+        <button type="button" onClick={() => setOpen(0)} className="flex h-32 flex-col items-center justify-center gap-2 rounded-xl bg-night text-white hover:bg-night-card md:aspect-square md:h-auto">
           <Ico name="photos" className="size-6" />
           <span className="text-sm font-semibold">Galeria completa</span>
           <span className="font-ui text-xs text-white/70">{imgs.length} fotos</span>
