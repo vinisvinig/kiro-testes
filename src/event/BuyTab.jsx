@@ -749,8 +749,11 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
     return (
       <button type="button" onClick={onToggle} aria-expanded={open} className={frame}>
         {body}
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-body-3 text-ink">
-          <Ico name="expand" className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} />
+        {/* Mesma largura do Stepper (104px) no desktop, para nome, setor e preço ficarem alinhados entre combos livres e com assento */}
+        <span className="flex shrink-0 justify-end md:w-[104px]">
+          <span className="flex size-9 items-center justify-center rounded-full bg-body-3 text-ink">
+            <Ico name="expand" className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </span>
         </span>
       </button>
     )
@@ -759,7 +762,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
   return (
     <div className={`${frame} max-md:flex-wrap`}>
       {body}
-      <div className="max-md:flex max-md:basis-full max-md:justify-end">
+      <div className="shrink-0 max-md:flex max-md:basis-full max-md:justify-end md:w-[104px]">
         <Stepper label={combo.name} value={state.n} canAdd={state.n < COMBO_LIMIT} onChange={onQty} />
       </div>
     </div>
