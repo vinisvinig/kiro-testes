@@ -129,7 +129,8 @@ export default function EventPage({ slug, search }) {
     <>
       <Hero />
       <Tabs tab={tab} onTab={goTab} />
-      <div className={tab === 'buy' ? 'pb-32 lg:pb-0' : ''}>
+      {/* Fundo da área de conteúdo: Body Secundário #f5f5f5 (Figma 8677:38376) */}
+      <div className={`bg-body-2 ${tab === 'buy' ? 'pb-32 lg:pb-0' : ''}`}>
         {tab === 'info' ? (
           <InfoTab onBuy={startBuy} onFees={() => setFees(true)} />
         ) : (
@@ -245,7 +246,7 @@ function About() {
         {a.credits.map(([k, v, d]) => (
           // Figma 9720:324216 / 8515:120880: fundo claro, sem borda
           <li key={k} className="flex min-h-[92px] flex-col gap-[5px] rounded-lg bg-body p-[14px]">
-            <p className="text-xs font-semibold uppercase leading-4 text-[#ed2a78]">{k}</p>
+            <p className="text-xs font-semibold uppercase leading-4 text-combo">{k}</p>
             <p className="text-[13px] font-semibold leading-tight text-ink">{v}</p>
             {d && <p className="text-xs leading-4 text-ink-2">{d}</p>}
           </li>
@@ -264,7 +265,7 @@ function TopicsCard({ eyebrow, title, items }) {
       <div className="mt-6 flex flex-col gap-4">
         {items.map(([label, lines]) => (
           <div key={label} className="flex flex-col gap-2">
-            <h3 className="text-lg font-bold leading-none text-ink">{label}</h3>
+            <h3 className="text-lg font-bold leading-none text-combo">{label}</h3>
             <div className="text-sm leading-5 text-ink-2">
               {lines.map((l) => (
                 <p key={l}>{l}</p>
@@ -321,7 +322,7 @@ function VenueCard() {
           <p className="flex items-center gap-1 text-xs font-semibold text-ink">
             <Ico name="pin" className="size-4 text-brand" /> {v.name}
           </p>
-          <p className="font-ui text-[10px] text-ink-3">Show diário {EVENT.rangeLabel}</p>
+          <p className="font-ui text-[10px] text-ink-3">Show oficial, {EVENT.rangeLabel}</p>
         </div>
       </div>
     </Card>
@@ -362,7 +363,7 @@ function Faq() {
   )
 }
 
-/** Card lateral "Escolha a melhor sessão" com o preço inicial. */
+/** Card lateral "Compre agora" com o preço inicial (Figma 9150:191556). */
 function BuyCard({ onBuy, onFees }) {
   const from = Math.min(...SECTORS.filter((s) => !s.soldOut).map((s) => minFare(s)))
   const fee = from * 0.15
@@ -370,18 +371,18 @@ function BuyCard({ onBuy, onFees }) {
   return (
     <Card as="div">
       <Eyebrow>Ingressos disponíveis</Eyebrow>
-      <p className="mt-2 text-xl font-bold text-ink">Escolha a melhor sessão</p>
+      <p className="mt-2 text-2xl font-semibold leading-none text-ink">Compre agora</p>
       {/* Sessão (Figma 9150:191560): ícone + período, sem fundo nem borda. Continua levando à compra. */}
       <button type="button" onClick={onBuy} className="mt-6 flex items-center gap-3 text-left text-sm font-semibold leading-5 text-brand hover:underline" aria-label={`${EVENT.rangeLabel}: ver datas e comprar`}>
         <Ico name="calendar" className="size-6 text-ink" />
         {EVENT.rangeLabel}
       </button>
       <div className="mt-6 border-t border-line pt-6">
-        <p className="font-ui text-xs text-ink-3">Ingressos a partir de</p>
+        <p className="text-sm leading-5 text-ink-2">Ingressos a partir de</p>
         <p className="text-2xl font-bold text-ink">{brl(from)}</p>
-        <p className="font-ui text-xs text-ink-3">+ {brl(fee)} taxa de serviço</p>
-        <p className="mt-3 font-ui text-sm font-semibold text-ink">Total à vista {brl(total)}</p>
-        <p className="font-ui text-xs text-ink-3">Ou 3x de {brl((total * 1.03) / 3)} no cartão</p>
+        <p className="text-sm leading-5 text-ink-3">+ {brl(fee)} taxa de serviço</p>
+        <p className="mt-4 text-sm font-semibold leading-5 text-ink-2">Total à vista {brl(total)}</p>
+        <p className="mt-1 text-xs leading-4 text-ink-3">Ou 3x de {brl((total * 1.03) / 3)}, total {brl(total * 1.03)}</p>
         <button type="button" onClick={onFees} className="mt-3 flex items-center gap-1.5 font-ui text-xs font-semibold text-brand underline hover:no-underline">
           <Ico name="info" className="size-4" /> Entenda as taxas
         </button>

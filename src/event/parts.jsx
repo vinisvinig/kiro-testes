@@ -1,6 +1,6 @@
 // Peças compartilhadas pela Página do evento e pela seleção de ingressos.
 import { useEffect, useRef } from 'react'
-import { useModalBehavior } from '../components/home/ui.jsx'
+import { asset, useModalBehavior } from '../components/home/ui.jsx'
 
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -160,43 +160,31 @@ const MAP_BLOCKS = [
  * ficou comentada abaixo; para reativar, volte a aceitar { onPick, active } e use os trechos comentados.
  */
 export function VenueMap() {
+  // Figma 9396:161569: título "Visão geral do local" e o mapa ilustrativo como imagem, com a nota abaixo
   return (
     <Card>
-      <CardTitle>Mapa referencial do evento</CardTitle>
-      <p className="mt-4 text-sm font-medium text-ink md:mt-6">Visão geral do local</p>
-      <div className="mt-4 rounded-2xl border border-line bg-body-2 px-3 pb-4 pt-6 md:px-6 md:pt-8">
-        <div
-          role="img"
-          aria-label={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
-          className="pointer-events-none relative mx-auto max-w-[460px] select-none rounded-[50%] bg-[#b8b0bf] p-2 md:p-3"
-        >
-          <div aria-hidden="true" className="flex flex-col items-center gap-2 rounded-[50%] bg-[#ddd6e1] px-3 py-5 md:px-4 md:py-6">
-            <span className="w-1/3 rounded bg-ink-dark py-1.5 text-center font-ui text-[10px] font-semibold text-white md:text-xs">Palco</span>
-            <div className="grid w-full grid-cols-3 gap-1.5 md:gap-2">
-              {MAP_BLOCKS.map((b) => {
-                // const isActive = active && active === b.sector
-                const cls = `rounded-md px-1 py-3 text-center font-ui text-[10px] font-semibold leading-tight text-ink md:py-4 md:text-xs ${b.cls}`
-                // Interativo: ${isActive ? 'ring-2 ring-brand ring-offset-2' : ''} na classe e, com onPick,
-                // <button type="button" onClick={() => onPick(b.sector)} className={`${cls} transition hover:brightness-95`}>
-                return (
-                  <span key={b.label} className={cls}>
-                    {b.star && <Ico name="star" className="mr-0.5 inline size-3 align-[-2px]" />}
-                    {b.label}
-                  </span>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-        <Note className="mt-6">
-          Este mapa apresenta somente a localização dos setores.
-          {/* Interativo: {onPick ? 'Selecione um setor acima para ver ingressos ou assentos disponíveis.' : 'Escolha a sessão em “Comprar ingressos” para ver os setores disponíveis.'} */}
-        </Note>
+      <CardTitle>Visão geral do local</CardTitle>
+      <div className="mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body p-4 md:p-6">
+        <img
+          src={asset('mapa-estadio.png')}
+          alt={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
+          loading="lazy"
+          draggable={false}
+          className="pointer-events-none w-full select-none"
+        />
+        <p className="flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
+          <Ico name="info" className="mt-px size-3 shrink-0" />
+          Este mapa referencial do evento apresenta somente a localização dos setores.
+        </p>
       </div>
     </Card>
   )
 }
-
+/*
+ * Versão anterior (mapa desenhado em HTML, com a opção interativa comentada) — mantida para reuso:
+ * blocos MAP_BLOCKS em grade 3x2 sob o "Palco"; com onPick, cada bloco era um botão que abria o setor
+ * e o setor aberto ganhava ring-2 ring-brand.
+ */
 /* ------------------------------------------------------------------ */
 /* Pop-up "Entenda as taxas" (Figma 9147:141007)                       */
 /* ------------------------------------------------------------------ */
