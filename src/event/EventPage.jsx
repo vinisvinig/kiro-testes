@@ -157,11 +157,14 @@ export default function EventPage({ slug, search }) {
 /* ---------------- Hero (Figma: banner com cantos arredondados) ---------------- */
 function Hero() {
   return (
-    <section className="relative h-[320px] overflow-hidden rounded-b-[32px] bg-ink-dark md:h-[468px] md:rounded-bl-[80px] md:rounded-br-none">
-      <img src={EVENT.hero} alt="" className="absolute inset-0 size-full object-cover" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 bg-gradient-to-t from-black/70 via-black/40 to-transparent px-4 pb-8 pt-20 md:pb-10">
-        <span className="rounded-md bg-brand px-[14px] py-[9px] font-ui text-xs font-medium leading-4 text-white">{EVENT.period}</span>
-        <h1 className="text-center text-3xl font-bold leading-none text-white md:text-5xl">{EVENT.title}</h1>
+    // Celular (Figma 10227:101972): 520px, sem cantos arredondados, imagem enquadrada nos personagens
+    // e legenda à esquerda numa faixa escura (50%). Desktop: banner de 468px com legenda centralizada.
+    <section className="relative h-[520px] overflow-hidden bg-ink-dark md:h-[468px] md:rounded-bl-[80px]">
+      <img src={EVENT.hero} alt="" className="absolute inset-0 size-full object-cover object-[30.5%_50%] md:object-center" />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 bg-black/50 p-4 md:items-center md:bg-transparent md:bg-gradient-to-t md:from-black/70 md:via-black/40 md:to-transparent md:px-4 md:pb-10 md:pt-20">
+        <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white md:py-[9px]">{EVENT.period}</span>
+        <h1 className="text-3xl font-bold leading-none text-white md:text-center md:text-5xl">{EVENT.title}</h1>
+        <div className="h-1.5 md:hidden" />
       </div>
     </section>
   )
