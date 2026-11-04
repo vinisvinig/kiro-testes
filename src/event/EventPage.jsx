@@ -380,7 +380,7 @@ function BuyCard({ onBuy, onFees }) {
       <div className="mt-6 border-t border-line pt-6">
         <p className="text-sm leading-5 text-ink-2">Ingressos a partir de</p>
         <p className="text-2xl font-bold text-ink">{brl(from)}</p>
-        <p className="text-sm leading-5 text-ink-3">+ {brl(fee)} taxa de serviço</p>
+        <p className="text-sm leading-5 text-ink-3">+ taxa de serviço a partir de {brl(fee)}</p>
         <p className="mt-4 text-sm font-semibold leading-5 text-ink-2">Total à vista {brl(total)}</p>
         <p className="mt-1 text-xs leading-4 text-ink-3">Ou 3x de {brl((total * 1.03) / 3)}, total {brl(total * 1.03)}</p>
         <button type="button" onClick={onFees} className="mt-3 flex items-center gap-1.5 font-ui text-xs font-semibold text-brand underline hover:no-underline">
