@@ -24,9 +24,15 @@ import { Badge, Card, CardTitle, Eyebrow, Ico, InfoBanner, Note, Stepper, VenueM
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
 
-/** Taxa de serviço sempre com valor (exigência do decreto), em 12px. */
-const Fee = ({ value, as: Tag = 'span', className = '' }) => (
-  <Tag className={`font-ui text-xs leading-4 ${className || 'text-ink-3'}`}>+ taxa {brl(value * SERVICE_FEE)}</Tag>
+/**
+ * Taxa de serviço sempre com valor (exigência do decreto), em 12px.
+ * `from`: nos cards antes da seleção (modalidade e setor) o preço é o menor, então a taxa também é "a partir de".
+ */
+const Fee = ({ value, from = false, as: Tag = 'span', className = '' }) => (
+  <Tag className={`font-ui text-xs leading-4 ${className || 'text-ink-3'}`}>
+    +taxa {from ? 'a partir de ' : ''}
+    {brl(value * SERVICE_FEE)}
+  </Tag>
 )
 
 const MAP_ID = 'mapa-evento'
@@ -246,7 +252,7 @@ function ModalityPicker({ session, selected, onPick }) {
               <span className={`flex flex-col items-end ${on ? 'text-white' : ''}`}>
                 <span className={`font-ui text-[10px] font-medium leading-4 ${on ? '' : 'text-ink-3'}`}>A partir de</span>
                 <span className="text-sm font-semibold leading-5">{brl(o.from)}</span>
-                <Fee value={o.from} className={on ? 'text-white' : ''} />
+                <Fee value={o.from} from className={on ? 'text-white' : ''} />
               </span>
             </button>
           )
@@ -335,9 +341,9 @@ function SectorRow({ sector, session, open, onToggle, count }) {
       ) : (
         <>
           <span className="flex flex-col items-end text-right">
-            <span className="font-ui text-[11px] text-ink-3">a partir de</span>
+            <span className="font-ui text-[11px] text-ink-3">Ingresso a partir de</span>
             <span className="text-lg font-bold leading-6 text-brand">{brl(minFare(sector, session))}</span>
-            <Fee value={minFare(sector, session)} />
+            <Fee value={minFare(sector, session)} from />
           </span>
           <span className="flex size-9 items-center justify-center rounded-full bg-body-3 text-ink">
             <Ico name="expand" className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -632,7 +638,7 @@ function SeatBody({ sector, order, dispatch, session }) {
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-ink">{f?.name}</span>
                       <span className="block font-ui text-xs text-ink-3">
-                        Linha {s.id[0]} · Assento {s.id.slice(1)} · {f ? `${brl(f.price)} + taxa ${brl(f.price * SERVICE_FEE)}` : ''}
+                        Linha {s.id[0]} · Assento {s.id.slice(1)} · {f ? `${brl(f.price)} +taxa ${brl(f.price * SERVICE_FEE)}` : ''}
                       </span>
                     </span>
                     <button
