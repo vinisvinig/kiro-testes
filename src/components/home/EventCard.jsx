@@ -44,6 +44,18 @@ const BP = {
 /** No máximo 2 tags por card; as demais (em ordem de prioridade no dado) ficam ocultas. */
 const MAX_TAGS = 2
 
+const DOW_FULL = { dom: 'Domingo', seg: 'Segunda', ter: 'Terça', qua: 'Quarta', qui: 'Quinta', sex: 'Sexta', sáb: 'Sábado' }
+/**
+ * Chip de data do card mobile (Figma 5531:19939): data única com o dia da semana por extenso
+ * ("Quinta, 10 / JUL"); período só com início e fim, sem o dia da semana ("10 / JUL a 12 / OUT").
+ */
+export function chipDate(dates) {
+  const [a] = dates
+  const b = dates.at(-1)
+  if (dates.length === 1) return `${DOW_FULL[a.dow] || a.dow}, ${a.day} / ${a.mon}`
+  return `${a.day} / ${a.mon} a ${b.day} / ${b.mon}`
+}
+
 export default function EventCard({
   image,
   imageClass = '',
@@ -58,7 +70,6 @@ export default function EventCard({
   grid = false,
   widthClass = grid ? 'w-full' : 'w-[172px] md:w-[402px]',
 }) {
-  const d = dates[0]
   // Mesmo layout do card da home: versão desktop a partir de 768px
   const b = BP.md
   const shown = tags.slice(0, MAX_TAGS)
@@ -89,9 +100,7 @@ export default function EventCard({
         <div className={`flex flex-col gap-1 ${b.mobile}`}>
           <span className="inline-flex items-center gap-1 self-start rounded bg-body-3 p-1">
             <img src={asset('ic-today-sm.svg')} alt="" draggable={false} className="size-2.5" />
-            <span className="font-ui text-[10px] font-semibold leading-none text-ink">
-              {d.day} / {d.mon} - {d.dow}
-            </span>
+            <span className="text-[10px] font-semibold leading-none text-ink">{chipDate(dates)}</span>
           </span>
           <p className="font-ui text-[13px] font-bold leading-tight text-ink">{title}</p>
           <p className="font-ui text-[11px] font-semibold text-ink-2">
