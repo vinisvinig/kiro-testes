@@ -209,13 +209,13 @@ function BannerCarousel({ slides }) {
               tabIndex={active ? 0 : -1}
               draggable={false}
               onClick={onClick}
-              className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:aspect-[1264/420] md:h-auto md:min-h-[300px]"
+              className="relative flex h-[300px] w-full shrink-0 items-end overflow-hidden rounded-2xl md:aspect-[1264/420] md:h-auto"
             >
               <img src={s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
-              <div className="relative flex w-full flex-col items-center gap-5 bg-black/[.56] px-4 py-5">
-                <div className="flex flex-col items-center gap-3 pt-[10px]">
+              <div className="relative flex w-full flex-col items-center gap-3 bg-black/[.56] px-4 py-3 lg:gap-5 lg:py-5">
+                <div className="flex flex-col items-center gap-2 lg:gap-3 lg:pt-[10px]">
                   <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white">{s.period}</span>
-                  <p className="text-center text-3xl font-bold leading-none text-white md:text-4xl lg:text-5xl">{s.title}</p>
+                  <p className="text-center text-3xl font-bold leading-none text-white md:text-[clamp(24px,3.4vw,48px)]">{s.title}</p>
                 </div>
                 <div className="h-[10px]" />
               </div>
@@ -224,7 +224,7 @@ function BannerCarousel({ slides }) {
         />
 
         {/* Paginação */}
-        <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2 lg:bottom-5">
           {slides.map((s, i) => (
             <button
               key={s.title}
