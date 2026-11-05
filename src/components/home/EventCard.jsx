@@ -59,7 +59,7 @@ export default function EventCard({
   widthClass = grid ? 'w-full' : 'w-[172px] md:w-[402px]',
 }) {
   const d = dates[0]
-  // Teste: a grade usa o mesmo card da home (tamanho fixo 172px / 402px a partir de 768px)
+  // Mesmo layout do card da home: versão desktop a partir de 768px
   const b = BP.md
   const shown = tags.slice(0, MAX_TAGS)
   return (
@@ -68,7 +68,8 @@ export default function EventCard({
       draggable={false}
       className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-line bg-white transition hover:shadow-lg ${b.card} ${widthClass}`}
     >
-      <div className={`h-[114px] w-full overflow-hidden rounded-br-[20px] ${b.media}`}>
+      {/* Na grade o card estica até a coluna; a imagem acompanha na proporção do card da home (402×267) */}
+      <div className={`w-full overflow-hidden rounded-br-[20px] ${grid ? 'aspect-[402/267] md:rounded-br-[40px]' : `h-[114px] ${b.media}`}`}>
         <img src={image} alt="" loading="lazy" draggable={false} className={`size-full object-cover ${imageClass}`} />
       </div>
 
@@ -139,6 +140,14 @@ export function EventCardSkeleton({ grid = false, className = '' }) {
  * (~172px — 2 por linha no celular, mais colunas no tablet em vez de esticar o card);
  * a partir de 1024px, 3 colunas com o card desktop.
  */
-// Teste "tamanho fixo como na home": colunas de 172px (celular) e 402px (a partir de 768px), quantas couberem.
-// Espaço de 29px entre colunas para 3 cards caberem exatos nos 1264px de conteúdo em 1440.
-export const EVENT_GRID = 'grid grid-cols-[repeat(auto-fill,172px)] gap-2 md:grid-cols-[repeat(auto-fill,402px)] md:gap-x-[29px] md:gap-y-8'
+/**
+ * Grade de cards com colunas por largura de tela, para o card ficar perto do tamanho da home (~402px):
+ * 2 colunas até 1279px, 3 a partir de 1280px (402px em 1440) e 4 a partir de 1680px (~400px em 1920).
+ * `narrow`: com o anúncio lateral (364px) a área é menor, então 2 colunas até 1679px e 3 depois.
+ * O card estica até a coluna e a imagem mantém a proporção (ver EventCard).
+ */
+export const eventGrid = (narrow = false) =>
+  narrow
+    ? 'grid grid-cols-2 gap-2 md:gap-x-[29px] md:gap-y-8 min-[1680px]:grid-cols-3'
+    : 'grid grid-cols-2 gap-2 md:gap-x-[29px] md:gap-y-8 xl:grid-cols-3 min-[1680px]:grid-cols-4'
+export const EVENT_GRID = eventGrid()

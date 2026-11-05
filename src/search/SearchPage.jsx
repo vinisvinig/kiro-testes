@@ -1,5 +1,5 @@
 import { asset, Skel } from '../components/home/ui.jsx'
-import EventCard, { EventCardSkeleton, EVENT_GRID } from '../components/home/EventCard.jsx'
+import EventCard, { EventCardSkeleton, eventGrid } from '../components/home/EventCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import { Link } from '../router.jsx'
 import { fetchSearch, useAsync } from '../api.js'
@@ -67,8 +67,8 @@ function Results({ data, params, narrow }) {
       </header>
 
       {items.length > 0 ? (
-        // Com o anúncio lateral cabem menos colunas de 402px; a grade se ajusta sozinha (auto-fill)
-        <ul className={`${EVENT_GRID}`}>
+        // Com o anúncio lateral a grade usa menos colunas (eventGrid(narrow))
+        <ul className={eventGrid(narrow)}>
           {items.map((e) => (
             <li key={e.id} className="flex">
               <EventCard {...e} grid />
@@ -110,7 +110,7 @@ function ResultsSkeleton({ narrow }) {
         <Skel className="h-9 w-[200px] md:h-[46px] md:w-[246px]" />
         <Skel className="h-9 w-[160px] md:h-[46px] md:w-[199px]" />
       </div>
-      <div className={`${EVENT_GRID}`}>
+      <div className={eventGrid(narrow)}>
         {Array.from({ length: 6 }, (_, i) => (
           <EventCardSkeleton key={i} grid />
         ))}
