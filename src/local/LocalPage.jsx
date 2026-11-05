@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef, useState } from 'react'
-import { asset, Pill, Skel, useDragScroll } from '../components/home/ui.jsx'
+import { useId, useState } from 'react'
+import { asset, Pill, Skel } from '../components/home/ui.jsx'
 import { AdArea } from '../components/home/Sections.jsx'
 import FaqItem from '../components/FaqItem.jsx'
 import EventCard, { EventCardSkeleton, EVENT_GRID } from '../components/home/EventCard.jsx'
@@ -157,21 +157,19 @@ function SectionTitle({ icon, children, id }) {
 }
 
 function Highlights({ events }) {
-  const rail = useRef(null)
-  useDragScroll(rail)
   return (
     <section className="bg-body pb-8 pt-14 md:pb-16 md:pt-16">
       <div className="page-x">
         <div className="mx-auto flex max-w-content flex-col gap-5 md:gap-8">
           <SectionTitle icon="ic-sparkle.svg">Destaques</SectionTitle>
-          <div
-            ref={rail}
-            className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 md:-mx-margem md:px-margem lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-[29px] lg:overflow-visible lg:px-0"
-          >
+          {/* Mesma grade de "Eventos neste local" (2/3/4 colunas, imagem proporcional) */}
+          <ul className={EVENT_GRID}>
             {events.map((e) => (
-              <EventCard key={e.id} {...e} grid widthClass="w-[172px] lg:w-full" />
+              <li key={e.id} className="flex">
+                <EventCard {...e} grid />
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>
