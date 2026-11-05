@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { asset, Pill, Skel, useDragScroll } from '../components/home/ui.jsx'
 import { AdArea } from '../components/home/Sections.jsx'
+import FaqItem from '../components/FaqItem.jsx'
 import EventCard, { EventCardSkeleton, EVENT_GRID } from '../components/home/EventCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import { Link } from '../router.jsx'
@@ -376,34 +377,6 @@ function Faq({ items }) {
         </div>
       </div>
     </section>
-  )
-}
-
-function FaqItem({ item, open, onToggle }) {
-  const id = useId()
-  const panel = useRef(null)
-  const [h, setH] = useState(0)
-  useEffect(() => setH(open ? panel.current?.scrollHeight || 0 : 0), [open])
-  return (
-    <div className="rounded-lg border border-line bg-white">
-      <h3>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={`${id}-p`}
-          onClick={onToggle}
-          className="flex min-h-[70px] w-full items-center gap-4 px-4 py-6 text-left"
-        >
-          <span className="flex-1 text-base font-bold leading-tight text-ink md:text-lg">{item.q}</span>
-          <img src={asset('ic-faq-expand.svg')} alt="" className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </button>
-      </h3>
-      <div id={`${id}-p`} role="region" hidden={!open && h === 0} style={{ height: h }} className="overflow-hidden transition-[height] duration-300">
-        <p ref={panel} className="px-4 pb-6 text-base leading-6 text-ink-2">
-          {item.a}
-        </p>
-      </div>
-    </div>
   )
 }
 

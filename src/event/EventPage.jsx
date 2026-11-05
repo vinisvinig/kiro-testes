@@ -11,6 +11,7 @@ import { Card, CardTitle, Dialog, Eyebrow, FeesDialog, Ico, VenueMap, brl } from
 import Checkout from './Checkout.jsx'
 import OrderSuccess from './OrderSuccess.jsx'
 import { mmss } from './OrderSummary.jsx'
+import FaqItem from '../components/FaqItem.jsx'
 import { openLogin, useAuth } from '../auth.js'
 
 const mapsSearch = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
@@ -283,7 +284,7 @@ function TopicsCard({ eyebrow, title, items }) {
       <div className="mt-6 flex flex-col gap-4">
         {items.map(([label, lines]) => (
           <div key={label} className="flex flex-col gap-2">
-            <h3 className="text-lg font-bold leading-none text-combo">{label}</h3>
+            <h3 className="text-lg font-semibold leading-none text-combo">{label}</h3>
             <div className="text-sm leading-5 text-ink-2">
               {lines.map((l) => (
                 <p key={l}>{l}</p>
@@ -354,30 +355,12 @@ function Faq() {
     <Card>
       <Eyebrow>Informações importantes & benefícios</Eyebrow>
       <CardTitle className="mt-2">Tire suas dúvidas antes de comprar</CardTitle>
-      <ul className="mt-6 flex flex-col gap-3">
-        {EVENT.faq.map((f, i) => {
-          const isOpen = open === i
-          return (
-            <li key={f.q} className="rounded-2xl border border-line bg-white">
-              <button
-                type="button"
-                onClick={() => setOpen(isOpen ? -1 : i)}
-                aria-expanded={isOpen}
-                aria-controls={`faq-${i}`}
-                className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left text-sm font-semibold text-ink"
-              >
-                {f.q}
-                <Ico name="expand" className={`size-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isOpen && (
-                <p id={`faq-${i}`} className="px-4 pb-4 font-ui text-sm leading-6 text-ink-2">
-                  {f.a}
-                </p>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+      {/* Mesmo item de FAQ das casas/locais (Figma 7903:97391) */}
+      <div className="mt-6 flex flex-col gap-6">
+        {EVENT.faq.map((f, i) => (
+          <FaqItem key={f.q} item={f} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+        ))}
+      </div>
     </Card>
   )
 }
