@@ -1031,7 +1031,7 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
                 <h2 className="text-[28px] font-bold leading-tight text-ink">Pague com Pix</h2>
                 <p className="mt-4 font-ui text-sm text-ink-2">Escaneie o QR Code no app do seu banco ou use o código copia e cola.</p>
                 <div className={`mt-6 flex items-center gap-3 rounded-full border px-5 py-3 ${left <= 60 ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'}`} role="timer">
-                  <Ico name="timer" className="size-5 text-ink" />
+                  <Ico name="timerRound" className="size-5 text-ink" />
                   <span className="flex-1 font-ui text-sm text-ink">Pague dentro de</span>
                   <span className="text-[28px] font-bold leading-none text-ink">{mmss(left)}</span>
                 </div>
