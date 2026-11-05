@@ -377,11 +377,11 @@ function BuyCard({ onBuy, onFees }) {
     <Card as="div">
       <Eyebrow>Ingressos disponíveis</Eyebrow>
       <p className="mt-2 text-2xl font-semibold leading-none text-ink">Compre agora</p>
-      {/* Sessão (Figma 9150:191560): ícone + período, sem fundo nem borda. Continua levando à compra. */}
-      <button type="button" onClick={onBuy} className="mt-6 flex items-center gap-3 text-left text-sm font-semibold leading-5 text-brand hover:underline" aria-label={`${EVENT.rangeLabel}: ver datas e comprar`}>
+      {/* Sessão (Figma 9150:191560): ícone + período, sem fundo nem borda. Só informativo, não é clicável. */}
+      <p className="mt-6 flex items-center gap-3 text-sm font-semibold leading-5 text-brand">
         <Ico name="calendar" className="size-6 text-ink" />
         {EVENT.rangeLabel}
-      </button>
+      </p>
       <div className="mt-6 border-t border-line pt-6">
         <p className="text-sm leading-5 text-ink-2">Ingressos a partir de</p>
         <p className="text-2xl font-bold text-ink">{brl(from)}</p>
