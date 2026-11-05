@@ -59,7 +59,8 @@ export default function EventCard({
   widthClass = grid ? 'w-full' : 'w-[172px] md:w-[402px]',
 }) {
   const d = dates[0]
-  const b = BP[grid ? 'lg' : 'md']
+  // Teste: a grade usa o mesmo card da home (tamanho fixo 172px / 402px a partir de 768px)
+  const b = BP.md
   const shown = tags.slice(0, MAX_TAGS)
   return (
     <Link
@@ -67,9 +68,7 @@ export default function EventCard({
       draggable={false}
       className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-line bg-white transition hover:shadow-lg ${b.card} ${widthClass}`}
     >
-      {/* Imagem sempre na proporção do card da home (402×267 ≈ 172×114): na grade a coluna estica,
-          então a altura acompanha a largura em vez de ficar fixa (a arte do produtor não é cortada a mais). */}
-      <div className={`w-full overflow-hidden rounded-br-[20px] ${grid ? 'aspect-[402/267] lg:rounded-br-[40px]' : `h-[114px] ${b.media}`}`}>
+      <div className={`h-[114px] w-full overflow-hidden rounded-br-[20px] ${b.media}`}>
         <img src={image} alt="" loading="lazy" draggable={false} className={`size-full object-cover ${imageClass}`} />
       </div>
 
@@ -132,7 +131,7 @@ export default function EventCard({
 
 /** Placeholder do card enquanto carrega (Figma Skeleton Card). */
 export function EventCardSkeleton({ grid = false, className = '' }) {
-  return <Skel className={`h-[240px] w-full ${BP[grid ? 'lg' : 'md'].skel} ${className}`} />
+  return <Skel className={`h-[240px] w-full ${BP.md.skel} ${className}`} />
 }
 
 /**
@@ -140,4 +139,6 @@ export function EventCardSkeleton({ grid = false, className = '' }) {
  * (~172px — 2 por linha no celular, mais colunas no tablet em vez de esticar o card);
  * a partir de 1024px, 3 colunas com o card desktop.
  */
-export const EVENT_GRID = 'grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 lg:grid-cols-3 lg:gap-x-[29px] lg:gap-y-8'
+// Teste "tamanho fixo como na home": colunas de 172px (celular) e 402px (a partir de 768px), quantas couberem.
+// Espaço de 29px entre colunas para 3 cards caberem exatos nos 1264px de conteúdo em 1440.
+export const EVENT_GRID = 'grid grid-cols-[repeat(auto-fill,172px)] gap-2 md:grid-cols-[repeat(auto-fill,402px)] md:gap-x-[29px] md:gap-y-8'

@@ -67,8 +67,8 @@ function Results({ data, params, narrow }) {
       </header>
 
       {items.length > 0 ? (
-        // Com o anúncio lateral os cards ficam em 2 colunas, para caber ao lado dele
-        <ul className={`${EVENT_GRID} ${narrow ? 'xl:grid-cols-2' : ''}`}>
+        // Com o anúncio lateral cabem menos colunas de 402px; a grade se ajusta sozinha (auto-fill)
+        <ul className={`${EVENT_GRID}`}>
           {items.map((e) => (
             <li key={e.id} className="flex">
               <EventCard {...e} grid />
@@ -110,7 +110,7 @@ function ResultsSkeleton({ narrow }) {
         <Skel className="h-9 w-[200px] md:h-[46px] md:w-[246px]" />
         <Skel className="h-9 w-[160px] md:h-[46px] md:w-[199px]" />
       </div>
-      <div className={`${EVENT_GRID} ${narrow ? 'xl:grid-cols-2' : ''}`}>
+      <div className={`${EVENT_GRID}`}>
         {Array.from({ length: 6 }, (_, i) => (
           <EventCardSkeleton key={i} grid />
         ))}
