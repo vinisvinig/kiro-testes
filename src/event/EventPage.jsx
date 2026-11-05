@@ -179,12 +179,15 @@ function Tabs({ tab, onTab, remaining }) {
       role="tab"
       aria-selected={tab === id}
       onClick={() => onTab(id)}
-      className={`flex items-center gap-2 border-b-2 px-2 py-4 font-ui text-sm font-semibold transition md:px-4 ${
+      // Celular: abas dividem a largura e o cronômetro fica abaixo do título; desktop: ao lado
+      className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 border-b-2 px-2 py-3 font-ui text-sm font-semibold transition md:flex-none md:flex-row md:gap-2 md:px-4 md:py-4 ${
         tab === id ? 'border-brand text-ink' : 'border-transparent text-ink-2 hover:text-ink'
       }`}
     >
-      <Ico name={icon} className="size-4" />
-      {label}
+      <span className="flex items-center gap-2 whitespace-nowrap">
+        <Ico name={icon} className="size-4" />
+        {label}
+      </span>
       {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644) */}
       {id === 'buy' && tab === 'buy' && remaining !== null && (
         <span
