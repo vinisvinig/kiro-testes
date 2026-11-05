@@ -46,12 +46,13 @@ export default function Header() {
             <img src={asset('logo.svg')} alt="Uhuu.com" className="h-8 w-[102.9px]" />
           </Link>
 
-          {/* Desktop */}
-          <nav className="hidden items-center gap-5 md:flex" aria-label="Principal">
-            <Pill as="a" href={PRODUCER_URL} size="sm" className="hidden lg:inline-flex">
+          {/* Desktop (a partir de 1024px). Abaixo disso o "Faça seu evento na Uhuu" não cabe, então o header
+              passa direto para o menu hambúrguer, que tem essa opção — ela nunca fica oculta. */}
+          <nav className="hidden items-center gap-5 lg:flex" aria-label="Principal">
+            <Pill as="a" href={PRODUCER_URL} size="sm">
               Faça seu evento na Uhuu
             </Pill>
-            <span className="hidden h-6 w-px bg-line lg:block" aria-hidden />
+            <span className="h-6 w-px bg-line" aria-hidden />
             <div className="flex items-center gap-2">
               <Pill variant="outlineNeutral" size="sm" icon={asset('ic-place.svg')} onClick={openCities} font="font-ui">
                 Selecione a cidade
@@ -61,8 +62,8 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile */}
-          <div className="flex items-center gap-5 md:hidden">
+          {/* Celular e tablet */}
+          <div className="flex items-center gap-5 lg:hidden">
             <span className="h-6 w-px bg-line" aria-hidden />
             <div className="flex items-center gap-6">
               <CartButton bordered />
