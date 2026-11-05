@@ -158,7 +158,7 @@ function MobileBanner({ slides }) {
             tabIndex={active ? 0 : -1}
             draggable={false}
             onClick={onClick}
-            className="relative flex h-[477px] w-full shrink-0 flex-col justify-end overflow-hidden rounded-3xl"
+            className="relative flex aspect-[358/477] w-full shrink-0 flex-col justify-end overflow-hidden rounded-3xl"
           >
             <img src={s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
             <div className="relative flex flex-col items-start gap-3 bg-black/50 p-4 pb-6">

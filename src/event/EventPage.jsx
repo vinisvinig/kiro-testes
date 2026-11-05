@@ -157,9 +157,9 @@ export default function EventPage({ slug, search }) {
 /* ---------------- Hero (Figma: banner com cantos arredondados) ---------------- */
 function Hero() {
   return (
-    // Celular (Figma 10227:101972): 520px, sem cantos arredondados, imagem enquadrada nos personagens
-    // e legenda à esquerda numa faixa escura (50%). Desktop: banner de 468px com legenda centralizada.
-    <section className="relative h-[520px] overflow-hidden bg-ink-dark md:h-[468px] md:rounded-bl-[80px]">
+    // Altura proporcional à largura: celular 390×520 (Figma 10227:101972), desktop 1440×468 (mínimo 320px).
+    // Celular: sem cantos arredondados, imagem enquadrada nos personagens e legenda à esquerda numa faixa escura (50%).
+    <section className="relative aspect-[390/520] w-full overflow-hidden bg-ink-dark md:aspect-[1440/468] md:min-h-[320px] md:rounded-bl-[80px]">
       <img src={EVENT.hero} alt="" className="absolute inset-0 size-full object-cover object-[30.5%_50%] md:object-center" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 bg-black/50 p-4 md:items-center md:bg-transparent md:bg-gradient-to-t md:from-black/70 md:via-black/40 md:to-transparent md:px-4 md:pb-10 md:pt-20">
         <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white md:py-[9px]">{EVENT.period}</span>
