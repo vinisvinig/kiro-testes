@@ -25,7 +25,9 @@ const scrollToId = (id) => requestAnimationFrame(() => document.getElementById(i
 export default function Checkout({ order, checkout: c, dispatch, remaining, user, onBack, onPaid }) {
   const t = useMemo(() => deriveCheckout(c, order), [c, order])
   const [pix, setPix] = useState(null) // null | 'generating' | { code, deadline }
-  const [status, setStatus] = useState(null) // null | 'processing' | 'failed'
+  const [status, setStatus] = useState(null) // null | 'processing' | 'failed' | 'declined'
+  const [declinedOrder, setDeclinedOrder] = useState(null) // nº do pedido recusado
+  const [declinedScreen, setDeclinedScreen] = useState(false) // página "Pagamento recusado"
   // Dados do cartão ficam aqui para o "Comprar" da barra do celular saber se está tudo preenchido.
   const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
   const [cardTouched, setCardTouched] = useState({})
@@ -68,9 +70,29 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   const pay = (method, card) => {
     setStatus('processing')
     setTimeout(() => {
+      // Teste com usuários: o cartão 7777 7777 7777 7777 simula pagamento recusado (qualquer validade, CVV e nome).
+      if (method === 'cartao' && isDeclinedCard(card)) {
+        setDeclinedOrder(newOrderNumber())
+        return setStatus('declined')
+      }
       setStatus(null)
       finish(method)
     }, 2200)
+  }
+
+  // Recusado: volta para a etapa de pagamento com os dados do cartão limpos para escolher outra forma.
+  const changeMethod = () => {
+    setStatus(null)
+    setDeclinedScreen(false)
+    setCard({ number: '', name: '', expiry: '', cvv: '' })
+    setCardTouched({})
+    dispatch({ type: 'method', method: null })
+    setTimeout(() => scrollToId('etapa-pagamento'), 50)
+  }
+  const showReasons = () => {
+    setStatus(null)
+    setDeclinedScreen(true)
+    window.scrollTo({ top: 0 })
   }
 
   const genPix = () => {
@@ -78,6 +100,8 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setTimeout(() => setPix({ code: pixCode(t.total), deadline: Date.now() + PIX_SECONDS * 1000 }), 1400)
   }
+
+  if (declinedScreen) return <DeclinedScreen number={declinedOrder} onChange={changeMethod} />
 
   if (pix) {
     return (
@@ -139,9 +163,13 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
       {showBar && <MobileTotal total={t.total} remaining={remaining} ready={ready} onBuy={buyMobile} />}
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
+      <DeclinedDialog open={status === 'declined'} onClose={() => setStatus(null)} onChange={changeMethod} onReasons={showReasons} />
     </div>
   )
 }
+
+const DECLINED_CARD = '7777777777777777'
+const isDeclinedCard = (card) => onlyDigits(card?.number || '') === DECLINED_CARD
 
 /** Voltar (Figma 9807:160204): quadrado rosa com seta + texto 24px. */
 function BackButton({ onClick, children }) {
@@ -1186,5 +1214,165 @@ function FailedDialog({ open, onClose, actionLabel = 'Tentar novamente' }) {
         {actionLabel}
       </button>
     </Dialog>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Pagamento recusado (Figma 10260:108549, 10260:109029, 10260:108565) */
+/* ------------------------------------------------------------------ */
+const CONTACT_URL = 'https://uhuu.com/contato'
+
+const DeclinedIcon = ({ className = 'size-16', icon = 'size-9' }) => (
+  <span className={`flex shrink-0 items-center justify-center rounded-full bg-[#ef4444] text-white ${className}`} aria-hidden>
+    <Ico name="close" className={icon} />
+  </span>
+)
+
+const ContactLink = () => (
+  <a href={CONTACT_URL} target="_blank" rel="noreferrer" className="text-brand underline underline-offset-2 hover:text-brand-700">
+    Fale Conosco.
+  </a>
+)
+
+/** Pop-up "Pagamento recusado" (Figma 10260:108549). */
+function DeclinedDialog({ open, onClose, onChange, onReasons }) {
+  return (
+    <Dialog open={open} onClose={onClose} labelledBy="declined-t" className="max-w-[344px] !rounded-lg !px-6 !pb-10 !pt-6 text-center">
+      <div className="flex justify-end">
+        <button type="button" onClick={onClose} aria-label="Fechar" className="flex size-8 items-center justify-center rounded-full text-ink hover:bg-body-2">
+          <Ico name="close" className="size-6" />
+        </button>
+      </div>
+      <div className="flex justify-center">
+        <DeclinedIcon />
+      </div>
+      <h2 id="declined-t" className="mt-6 text-2xl font-bold leading-tight text-ink">
+        Seu pagamento foi recusado!
+      </h2>
+      <p className="mt-2 font-ui text-sm text-ink-2">Tente novamente usando outra forma de pagamento.</p>
+      <button type="button" onClick={onChange} className="mt-6 w-full rounded-full bg-brand py-[13px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
+        Alterar forma de pagamento
+      </button>
+      <button
+        type="button"
+        onClick={onReasons}
+        className="mt-4 w-full rounded-full border border-brand py-3 font-ui text-[15px] font-semibold text-brand hover:border-brand-700 hover:text-brand-700"
+      >
+        Veja os possíveis motivos da recusa
+      </button>
+      <p className="mt-6 text-left font-ui text-sm text-ink-2">
+        Precisa de ajuda? <ContactLink />
+      </p>
+    </Dialog>
+  )
+}
+
+const DECLINE_REASONS = [
+  {
+    q: 'Tipo de ingresso com validação de BINS',
+    a: 'Alguns ingressos têm desconto exclusivo para cartões de um banco ou bandeira específicos. Se o cartão usado não faz parte da promoção, o pagamento é recusado. Use um cartão participante ou escolha outro tipo de ingresso.',
+  },
+  {
+    q: 'Dados incorretos',
+    a: 'O número do cartão, a validade, o código de segurança (CVV) ou o nome do titular foram digitados de forma diferente do que consta no cartão. Confira os dados e tente novamente.',
+  },
+  {
+    q: 'Limite insuficiente',
+    a: 'O valor da compra é maior que o limite disponível no cartão. Consulte o limite no app do seu banco, escolha menos parcelas ou use outra forma de pagamento, como o Pix.',
+  },
+  {
+    q: 'Compra suspeita',
+    a: 'Por segurança, o banco emissor pode bloquear compras fora do seu padrão de uso. Fale com o seu banco para liberar a transação ou use outro cartão.',
+  },
+]
+
+/** Página "Pagamento recusado" (Figma 10260:109029 desktop / 10260:108565 celular). */
+function DeclinedScreen({ number, onChange }) {
+  const [copied, setCopied] = useState(false)
+  const [open, setOpen] = useState(null)
+  const id = useId()
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(number)
+    } catch {
+      /* sem permissão de área de transferência */
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="bg-body-3 py-8 md:py-16">
+      <div className="page-x">
+        <div className="mx-auto flex max-w-[744px] flex-col gap-6 md:gap-8">
+          <Card className="!rounded-2xl md:!p-8">
+            <h1 className="flex items-center gap-3 text-2xl font-bold leading-tight text-[#ef4444] md:text-[30px]">
+              <DeclinedIcon className="size-9" icon="size-5" />
+              Seu pagamento foi recusado!
+            </h1>
+            <p className="mt-4 font-ui text-base text-ink-2 md:text-[18px]">Tente novamente usando outra forma de pagamento.</p>
+            <div className="mt-4 flex items-center gap-2">
+              <span className="rounded-lg bg-body-2 px-3 py-1.5 font-ui text-xs text-ink-2">
+                Pedido <strong className="ml-1 text-sm text-ink">#{number}</strong>
+              </span>
+              <button type="button" onClick={copy} aria-label="Copiar número do pedido" className="flex size-8 items-center justify-center rounded-lg bg-body-2 text-ink hover:bg-body-3">
+                <Ico name="copy" className="size-4" />
+              </button>
+              <span aria-live="polite" className="font-ui text-xs text-success">
+                {copied ? 'Copiado!' : ''}
+              </span>
+            </div>
+            <div className="mt-5 border-t border-line pt-6">
+              <button type="button" onClick={onChange} className="w-full rounded-full bg-brand px-6 py-[13px] font-ui text-[15px] font-semibold text-white hover:brightness-110 sm:w-auto">
+                Alterar forma de pagamento
+              </button>
+            </div>
+          </Card>
+
+          <Card className="!rounded-2xl md:!p-8">
+            <h2 className="text-base font-bold text-ink">Possíveis motivos da recusa</h2>
+            <div className="mt-5 divide-y divide-line rounded-lg border border-line">
+              {DECLINE_REASONS.map((r, i) => {
+                const on = open === i
+                return (
+                  <div key={r.q}>
+                    <h3>
+                      <button
+                        type="button"
+                        aria-expanded={on}
+                        aria-controls={`${id}-${i}`}
+                        onClick={() => setOpen(on ? null : i)}
+                        className="flex w-full items-center gap-4 px-5 py-4 text-left"
+                      >
+                        <span className={`flex-1 text-base font-semibold leading-6 ${on ? 'text-brand' : 'text-ink'}`}>{r.q}</span>
+                        <span aria-hidden className="relative size-3 shrink-0 text-ink">
+                          <span className="absolute inset-x-0 top-1/2 h-[1.5px] -translate-y-1/2 bg-current" />
+                          {!on && <span className="absolute inset-y-0 left-1/2 w-[1.5px] -translate-x-1/2 bg-current" />}
+                        </span>
+                      </button>
+                    </h3>
+                    <div id={`${id}-${i}`} role="region" hidden={!on}>
+                      <p className="px-5 pb-5 font-ui text-sm leading-6 text-ink md:pl-14 md:pr-8">{r.a}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </Card>
+
+          <section className="rounded-2xl border border-brand/40 bg-[#fff8fb] p-6">
+            <p className="flex items-center gap-3 text-base font-bold text-ink">
+              <span className="flex size-8 items-center justify-center rounded-full bg-[#fde2ec] text-brand">
+                <Ico name="headset" className="size-4" />
+              </span>
+              Precisa de ajuda?
+            </p>
+            <p className="mt-4 font-ui text-sm text-ink-2">
+              Entre em contato com nosso time através do <ContactLink />
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
   )
 }
