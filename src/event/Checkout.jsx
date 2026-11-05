@@ -209,7 +209,7 @@ function EventSummary({ order }) {
 function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, alert = false, lockedText = 'Disponível após a etapa anterior', children }) {
   if (state === 'locked') {
     return (
-      <section id={`etapa-${id}`} aria-disabled="true" className="scroll-mt-24 rounded-3xl border border-line bg-white px-6 py-5 opacity-80">
+      <section id={`etapa-${id}`} aria-disabled="true" className="scroll-mt-24 rounded-3xl border border-line bg-white p-6 opacity-80">
         <div className="flex items-center gap-4">
           <span className="flex size-8 items-center justify-center rounded-full bg-body-3 text-ink-2">
             <Ico name={icon} className="size-4" />
@@ -224,7 +224,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
   }
   if (state === 'done') {
     return (
-      <section id={`etapa-${id}`} className="scroll-mt-24 rounded-3xl border border-line bg-white px-6 py-5">
+      <section id={`etapa-${id}`} className="scroll-mt-24 rounded-3xl border border-line bg-white p-6">
         <div className="flex items-center gap-4">
           {/* Verde quando o adicional foi contratado; cinza (como etapa não preenchida) quando a pessoa continuou sem */}
           <span className={`flex size-8 shrink-0 items-center justify-center rounded-full ${declined ? 'bg-body-3 text-ink-2' : 'bg-[#22c55e] text-white'}`}>
@@ -245,7 +245,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
     <section
       id={`etapa-${id}`}
       aria-labelledby={`etapa-${id}-t`}
-      className={`scroll-mt-24 rounded-3xl border bg-white p-5 transition-colors md:p-6 ${alert ? 'border-danger ring-1 ring-danger' : 'border-line'}`}
+      className={`scroll-mt-24 rounded-3xl border bg-white p-6 transition-colors ${alert ? 'border-danger ring-1 ring-danger' : 'border-line'}`}
     >
       {alert && (
         <p role="alert" className="mb-4 flex items-center gap-2 rounded-xl bg-[#fef2f2] px-3 py-2 font-ui text-xs font-semibold text-danger">

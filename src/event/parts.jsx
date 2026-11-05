@@ -87,10 +87,10 @@ export function Ico({ name, className = 'size-5' }) {
 /* Blocos de layout                                                    */
 /* ------------------------------------------------------------------ */
 
-/** Cartão branco com borda (Figma: raio 24, borda #d4d4d4, padding 24). */
+/** Cartão branco com borda (Figma: raio 24, borda #d4d4d4, padding 24 no celular e no desktop). */
 export function Card({ as: Tag = 'section', className = '', children, ...rest }) {
   return (
-    <Tag className={`rounded-3xl border border-line bg-white p-4 md:p-6 ${className}`} {...rest}>
+    <Tag className={`rounded-3xl border border-line bg-white p-6 ${className}`} {...rest}>
       {children}
     </Tag>
   )

@@ -217,8 +217,7 @@ function Tabs({ tab, onTab, remaining }) {
 function InfoTab({ onBuy, onFees }) {
   return (
     <div className="page-x py-6 md:py-8">
-      {/* Celular: blocos da aba Informações com 24px de espaço interno (Figma 10193:40941); a aba de compra segue com 16px */}
-      <div className="evento-box evento-grid [&>*>*]:p-6">
+      <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
           <About />
           <TopicsCard eyebrow="Ingressos & benefícios" title="Tipos de ingresso e descontos" items={EVENT.ticketTypes} />
