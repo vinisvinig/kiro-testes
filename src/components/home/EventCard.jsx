@@ -67,7 +67,9 @@ export default function EventCard({
       draggable={false}
       className={`flex shrink-0 snap-start flex-col overflow-hidden rounded-[20px] border border-line bg-white transition hover:shadow-lg ${b.card} ${widthClass}`}
     >
-      <div className={`h-[114px] w-full overflow-hidden rounded-br-[20px] ${b.media}`}>
+      {/* Imagem sempre na proporção do card da home (402×267 ≈ 172×114): na grade a coluna estica,
+          então a altura acompanha a largura em vez de ficar fixa (a arte do produtor não é cortada a mais). */}
+      <div className={`w-full overflow-hidden rounded-br-[20px] ${grid ? 'aspect-[402/267] lg:rounded-br-[40px]' : `h-[114px] ${b.media}`}`}>
         <img src={image} alt="" loading="lazy" draggable={false} className={`size-full object-cover ${imageClass}`} />
       </div>
 
