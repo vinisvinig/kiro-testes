@@ -284,7 +284,7 @@ function TopicsCard({ eyebrow, title, items }) {
       <div className="mt-6 flex flex-col gap-4">
         {items.map(([label, lines]) => (
           <div key={label} className="flex flex-col gap-2">
-            <h3 className="text-lg font-semibold leading-none text-combo">{label}</h3>
+            <h3 className="text-lg font-medium leading-none text-combo">{label}</h3>
             <div className="text-sm leading-5 text-ink-2">
               {lines.map((l) => (
                 <p key={l}>{l}</p>
