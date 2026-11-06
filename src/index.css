@@ -30,6 +30,42 @@ body {
   .evento-grid {
     @apply grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,744fr)_minmax(320px,360fr)] lg:gap-[2.222vw];
   }
+  /*
+   * "Como você quer comprar?": decide pelo espaço do bloco (container query), não pela tela.
+   * Cada opção precisa de ~380px para título, descrição e preço lado a lado sem apertar;
+   * por isso as duas só ficam uma ao lado da outra com 776px ou mais (2 × 380 + 16 de espaço).
+   */
+  .modalidades {
+    container-type: inline-size;
+  }
+  .modalidades-grid {
+    @apply grid grid-cols-1 gap-4;
+  }
+  @container (min-width: 776px) {
+    .modalidades-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* Opção estreita demais (< 300px): o preço desce para baixo do texto, alinhado à esquerda */
+  .modalidade {
+    container-type: inline-size;
+  }
+  .modalidade-linha {
+    @apply flex items-center gap-3;
+  }
+  .modalidade-preco {
+    @apply flex shrink-0 flex-col items-end text-right;
+    max-width: 45%;
+  }
+  @container (max-width: 299px) {
+    .modalidade-linha {
+      @apply flex-wrap;
+    }
+    .modalidade-preco {
+      @apply w-full items-start pl-14 text-left;
+      max-width: none;
+    }
+  }
   /* Coluna única (Comprar antes de escolher a data): mesma largura do bloco do meio, 744 em 1440 = 51,667vw */
   .evento-coluna {
     @apply mx-auto w-full max-w-[max(744px,51.667vw)];

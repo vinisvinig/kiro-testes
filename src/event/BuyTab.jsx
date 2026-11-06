@@ -228,9 +228,10 @@ function ModalityPicker({ session, selected, onPick }) {
     { id: 'combo', title: 'Combos', desc: 'Pacotes de ingressos com benefícios.', from: comboFrom, icon: 'ticket', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
   ]
   return (
-    <Card>
+    <Card className="modalidades">
       <CardTitle>Como você quer comprar?</CardTitle>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Modalidade do ingresso">
+      {/* Lado a lado só quando o bloco comporta as duas opções sem apertar o texto (ver .modalidades em index.css) */}
+      <div className="modalidades-grid mt-6" role="radiogroup" aria-label="Modalidade do ingresso">
         {opts.map((o) => {
           const on = selected === o.id
           return (
@@ -240,8 +241,9 @@ function ModalityPicker({ session, selected, onPick }) {
               role="radio"
               aria-checked={on}
               onClick={() => onPick(o.id)}
-              className={`flex items-center gap-3 rounded-[14px] border p-4 text-left transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
+              className={`modalidade rounded-[14px] border p-4 text-left transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
             >
+              <span className="modalidade-linha">
               <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? o.iconOn : o.iconIdle}`}>
                 <Ico name={o.icon} className="size-6" />
               </span>
@@ -249,10 +251,11 @@ function ModalityPicker({ session, selected, onPick }) {
                 <span className="block text-base font-semibold leading-6">{o.title}</span>
                 <span className={`block font-ui text-xs leading-4 ${on ? 'text-white' : 'text-ink-3'}`}>{o.desc}</span>
               </span>
-              <span className={`flex flex-col items-end ${on ? 'text-white' : ''}`}>
+              <span className={`modalidade-preco ${on ? 'text-white' : ''}`}>
                 <span className={`font-ui text-[10px] font-medium leading-4 ${on ? '' : 'text-ink-3'}`}>A partir de</span>
                 <span className="text-sm font-semibold leading-5">{brl(o.from)}</span>
                 <Fee value={o.from} from className={on ? 'text-white' : ''} />
+              </span>
               </span>
             </button>
           )
