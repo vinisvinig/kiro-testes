@@ -285,18 +285,40 @@ function TopicsCard({ eyebrow, title, items }) {
       <Eyebrow>{eyebrow}</Eyebrow>
       <CardTitle className="mt-2">{title}</CardTitle>
       <div className="mt-6 flex flex-col gap-4">
-        {items.map(([label, lines]) => (
+        {items.map(([label, lines, more]) => (
           <div key={label} className="flex flex-col gap-2">
-            <h3 className="text-lg font-medium leading-none text-combo">{label}</h3>
-            <div className="text-sm leading-5 text-ink-2">
-              {lines.map((l) => (
-                <p key={l}>{l}</p>
-              ))}
-            </div>
+            {/* Figma 10281:52145: título do assunto em preto (antes roxo) */}
+            <h3 className="text-lg font-medium leading-none text-ink">{label}</h3>
+            <TopicText lines={lines} more={more} />
           </div>
         ))}
       </div>
     </Card>
+  )
+}
+
+/** Texto do assunto; com `more`, mostra "Ver mais" (rosa, sublinhado) e abre o restante no lugar. */
+function TopicText({ lines, more }) {
+  const [open, setOpen] = useState(false)
+  const all = open && more ? [...lines, ...more] : lines
+  return (
+    <div className="text-sm leading-5 text-ink-2">
+      {all.map((l, i) => (
+        <p key={l}>
+          {l}
+          {more && i === all.length - 1 && (
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              aria-expanded={open}
+              className="ml-2 text-base font-semibold leading-6 text-brand underline underline-offset-2 hover:text-brand-700"
+            >
+              {open ? 'Ver menos' : 'Ver mais'}
+            </button>
+          )}
+        </p>
+      ))}
+    </div>
   )
 }
 

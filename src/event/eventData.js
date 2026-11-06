@@ -147,12 +147,13 @@ export const EVENT = {
   ticketTypes: [
     ['Inteira', ['Ingresso com valor integral, sem necessidade de comprovar direito a desconto. Consulte os valores de cada setor na seleção de ingressos.']],
     ['Meia-entrada e documentação', ['Confira os públicos contemplados e o comprovante exigido para cada benefício. Na entrada do evento, apresente documento com foto e a documentação que comprova seu direito à meia-entrada.']],
-    ['Descontos e condições', ['Benefícios de cartões parceiros e outras promoções dependem das condições do evento. Confira elegibilidade, disponibilidade e regras antes de selecionar o ingresso. Os descontos não são cumulativos.']],
+    // 3º item: texto que aparece ao tocar em "Ver mais" (Figma 10281:52145)
+    ['Descontos e condições', ['Benefícios de cartões parceiros e outras promoções dependem das condições do evento.'], ['Confira elegibilidade, disponibilidade e regras antes de selecionar o ingresso. Os descontos não são cumulativos.']],
   ],
   salesPoints: [
     ['Compra on-line · Uhuu.com', ['Compre pelo site oficial. A taxa de serviço e o total da compra são apresentados antes do pagamento. Confira os valores antes de concluir seu pedido.']],
     ['Bilheteria física · Estádio MorumBIS', ['Praça Roberto Gomes Pedrosa, 1 · Morumbi · São Paulo/SP.', 'Nos dias de evento, a partir das 10h. Compra na bilheteria sem taxa de serviço.']],
-    ['Formas de pagamento', ['Consulte as opções disponíveis no pagamento on-line. Para a compra presencial, confirme os meios aceitos diretamente com a bilheteria.']],
+    ['Formas de pagamento', ['Consulte as opções disponíveis no pagamento on-line.'], ['Para a compra presencial, confirme os meios aceitos diretamente com a bilheteria.']],
   ],
   /** Mensagem pós-compra (texto livre do produtor no AppADM). */
   thankYou:
