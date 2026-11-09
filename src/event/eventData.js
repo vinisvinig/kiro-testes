@@ -8,7 +8,7 @@ export const EVENT_HREF = `/evento/${EVENT_SLUG}`
 export const SERVICE_FEE = 0.15 // Taxa de serviço Uhuu
 export const INSTALLMENT_FEE = 0.03 // Teto da taxa de parcelamento (3x)
 export const RESERVE_SECONDS = 15 * 60 // Reserva garantida por 15 min
-export const SECTOR_LIMIT = 4 // Limite de ingressos por pedido em cada setor (modalidade individual)
+export const SECTOR_LIMIT = 6 // Limite de ingressos por pedido em cada setor (modalidade individual)
 
 export const COMBO_LIMIT = 4 // Máximo de unidades do mesmo combo por sessão
 
