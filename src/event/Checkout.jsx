@@ -967,8 +967,9 @@ function Coupons({ c, t, order, dispatch }) {
           aria-describedby={`${id}-s`}
           className={`h-12 rounded-lg border bg-white px-4 font-ui text-sm uppercase text-ink outline-none placeholder:normal-case placeholder:text-ink-3 focus:border-brand ${error ? 'border-danger' : 'border-line'}`}
         />
-        <p id={`${id}-s`} aria-live="polite" className={`font-ui text-xs ${error ? 'text-danger' : 'text-ink-3'}`}>
-          {error || (busy ? 'Validando cupom…' : 'Simulação: DESCONTO10 (10%, até 2 ingressos) ou UHUU20 (R$ 20, 1 ingresso).')}
+        {/* Cupons de teste (não exibidos): DESCONTO10 (10%, até 2 ingressos) e UHUU20 (R$ 20, 1 ingresso) */}
+        <p id={`${id}-s`} aria-live="polite" className={`font-ui text-xs empty:hidden ${error ? 'text-danger' : 'text-ink-3'}`}>
+          {error || (busy ? 'Validando cupom…' : '')}
         </p>
         <button type="submit" disabled={busy} className="rounded-full border border-brand py-[13px] font-ui text-[15px] font-semibold text-brand hover:border-brand-700 hover:text-brand-700 disabled:opacity-60">
           {busy ? 'Validando…' : 'Aplicar cupom'}
