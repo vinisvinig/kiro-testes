@@ -224,7 +224,7 @@ function ModalityPicker({ session, selected, onPick }) {
   const individualFrom = Math.min(...open.map((s) => minFare(s, session)))
   const comboFrom = Math.min(...COMBOS.map((c) => comboPrice(c, session)))
   const opts = [
-    { id: 'individual', title: 'Ingresso individual', desc: 'Escolha tipos e quantidades.', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
+    { id: 'individual', title: 'Ingressos', desc: 'Escolha tipos e quantidades.', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
     { id: 'combo', title: 'Combos', desc: 'Pacotes de ingressos com benefícios.', from: comboFrom, icon: 'ticket', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
   ]
   return (
