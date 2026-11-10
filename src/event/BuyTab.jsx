@@ -334,7 +334,7 @@ function SectorRow({ sector, session, open, onToggle, count }) {
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2">
           <Badge tone={disabled ? 'muted' : 'brand'}>{sector.badge}</Badge>
-          {count > 0 && <span className="rounded-full bg-brand-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-brand">{count} selecionado{count > 1 ? 's' : ''}</span>}
+          {count > 0 && <span className="whitespace-nowrap rounded-full bg-brand-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-brand">{count} selecionado{count > 1 ? 's' : ''}</span>}
         </span>
         <span className={`mt-1 block text-lg font-semibold leading-6 ${disabled ? 'text-ink-3' : 'text-ink'}`}>{sector.name}</span>
         <span className="block font-ui text-xs leading-4 text-ink-3">{lotLabel(sector)}</span>
@@ -343,7 +343,8 @@ function SectorRow({ sector, session, open, onToggle, count }) {
         <span className="rounded-full bg-ink-2 px-6 py-1 font-ui text-[11px] font-medium text-white">Esgotado</span>
       ) : (
         <>
-          <span className="flex flex-col items-end text-right">
+          {/* Coluna de preço limitada: quando aperta, quem quebra é o "+taxa a partir de", não o nome do setor nem as tags */}
+          <span className="flex min-w-0 max-w-[36%] flex-col items-end text-right">
             <span className="font-ui text-[11px] text-ink-3">Ingresso a partir de</span>
             <span className="text-lg font-bold leading-6 text-brand">{brl(minFare(sector, session))}</span>
             <Fee value={minFare(sector, session)} from />

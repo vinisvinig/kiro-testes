@@ -112,7 +112,7 @@ export function Badge({ children, tone = 'brand' }) {
     combo: 'border-combo text-combo',
     muted: 'border-ink-4 text-ink-3',
   }
-  return <span className={`inline-flex rounded-md border px-1.5 py-0.5 font-ui text-[10px] font-medium uppercase leading-3 ${tones[tone]}`}>{children}</span>
+  return <span className={`inline-flex whitespace-nowrap rounded-md border px-1.5 py-0.5 font-ui text-[10px] font-medium uppercase leading-3 ${tones[tone]}`}>{children}</span>
 }
 
 /** Botão +/- com contador (Figma Stepper). */
