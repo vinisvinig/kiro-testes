@@ -127,7 +127,8 @@ function SessionPicker({ selected, counts, onPick }) {
             type="button"
             onClick={() => setCalendar((v) => !v)}
             aria-expanded={calendar}
-            className="flex w-[56px] shrink-0 flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white px-1 py-3 text-ink hover:border-brand"
+            // snap-start: sem ele o encaixe da rolagem pulava este botão e o trilho começava no Passaporte, escondendo-o
+            className="flex w-[64px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white px-1 py-3 text-ink hover:border-brand"
           >
             <Ico name="calendar" className="size-5" />
             <span className="text-center font-ui text-[10px] leading-3 text-brand">Selecionar data</span>
