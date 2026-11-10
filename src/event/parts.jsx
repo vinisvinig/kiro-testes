@@ -167,13 +167,12 @@ export const InfoBanner = ({ children, title }) => (
 /* ------------------------------------------------------------------ */
 /* Mapa referencial do evento (Figma "Mapa referencial do evento")     */
 /* ------------------------------------------------------------------ */
+// Mesmos setores da imagem public/figma/mapa-estadio-4-setores.png (usados no texto alternativo)
 const MAP_BLOCKS = [
-  { label: 'Cadeira coberta 1', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
+  { label: 'Cadeira Coberta', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
   { label: 'Pista Premium', sector: 'pista-premium', cls: 'bg-[#fcd34d]', star: true },
-  { label: 'Cadeira coberta A', sector: 'cadeira-coberta', cls: 'bg-[#f0abfc]' },
-  { label: 'Cadeira coberta 2', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
-  { label: 'Pista semi Premium', sector: 'area-exclusiva', cls: 'bg-[#fcd34d]', star: true },
-  { label: 'Cadeira coberta B', sector: 'cadeira-coberta', cls: 'bg-[#f0abfc]' },
+  { label: 'Área Exclusiva', sector: 'area-exclusiva', cls: 'bg-[#fcd34d]', star: true },
+  { label: 'Área VIP', sector: 'area-vip', cls: 'bg-[#f0abfc]' },
 ]
 
 /**
@@ -188,7 +187,7 @@ export function VenueMap() {
       <CardTitle>Visão geral do local</CardTitle>
       <div className="mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body p-4 md:p-6">
         <img
-          src={asset('mapa-estadio.png')}
+          src={asset('mapa-estadio-4-setores.png')}
           alt={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
           loading="lazy"
           draggable={false}
