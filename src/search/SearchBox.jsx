@@ -108,7 +108,7 @@ function Autocomplete({ value, onChange, onSubmit, clearable }) {
     const add = (o) => opts.push({ ...o, key: `${o.group}-${opts.length}` })
     if (events.length) {
       events.forEach((e) =>
-        add({ group: 'evento', title: e.title, sub: `${e.category} · ${e.venue}, ${e.cityName}`, go: () => window.open(e.href, '_blank', 'noopener') }),
+        add({ group: 'evento', title: e.title, sub: `${e.category} · ${e.venue}, ${e.cityName}`, go: () => navigate(e.href) }), // mesma navegação do card (o endereço puro dava erro no GitHub Pages)
       )
       add({ group: 'evento', more: `Ver todos os eventos com “${term}”`, go: () => onSubmit({ q: term }) })
     }
