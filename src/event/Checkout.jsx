@@ -20,6 +20,7 @@ import { mmss } from './OrderSummary.jsx'
 import { Card, Dialog, Eyebrow, Ico, brl } from './parts.jsx'
 
 const SUMMARY_ID = 'resumo-checkout'
+const AUTO_SCROLL_STEPS = false // rolar sozinho até a próxima etapa (desligado para o teste de rolagem manual)
 const scrollToId = (id) => requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
 
 export default function Checkout({ order, checkout: c, dispatch, remaining, user, onBack, onPaid }) {
@@ -48,11 +49,12 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
     scrollToId(`etapa-${step}`)
   }
 
-  // Ao mudar de etapa, leva o usuário até ela.
+  // Ao mudar de etapa, levava o usuário até ela. Desligado para o teste com usuários: a etapa respondida
+  // minimiza e a próxima abre, mas a rolagem fica por conta da pessoa. Para religar, AUTO_SCROLL_STEPS = true.
   const first = useRef(true)
   useEffect(() => {
     if (first.current) return void (first.current = false)
-    if (c.step) scrollToId(`etapa-${c.step}`)
+    if (AUTO_SCROLL_STEPS && c.step) scrollToId(`etapa-${c.step}`)
   }, [c.step])
 
   const finish = (method) =>
