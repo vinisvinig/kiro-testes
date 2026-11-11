@@ -343,11 +343,14 @@ function SectorRow({ sector, session, open, onToggle, count }) {
       {/* No celular o ícone fica oculto para sobrar espaço ao nome e ao preço (Figma 9986:126801) */}
       <Ico name={icon} className={`hidden size-6 md:block ${disabled ? 'text-ink-4' : 'text-ink'}`} />
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-2">
-          <Badge tone={disabled ? 'muted' : 'brand'}>{sector.badge}</Badge>
-          {count > 0 && <span className="whitespace-nowrap rounded-full bg-brand-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-brand">{count} selecionado{count > 1 ? 's' : ''}</span>}
-        </span>
-        <span className={`mt-1 block text-lg font-semibold leading-6 ${disabled ? 'text-ink-3' : 'text-ink'}`}>{sector.name}</span>
+        {/* Só "Assento marcado" tem selo (Figma 9212:119244); setor livre fica sem, e a linha só aparece se houver selo ou seleção */}
+        {(sector.badge || count > 0) && (
+          <span className="mb-1 flex flex-wrap items-center gap-2">
+            {sector.badge && <Badge tone={disabled ? 'muted' : 'brand'}>{sector.badge}</Badge>}
+            {count > 0 && <span className="whitespace-nowrap rounded-full bg-brand-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-brand">{count} selecionado{count > 1 ? 's' : ''}</span>}
+          </span>
+        )}
+        <span className={`block text-lg font-semibold leading-6 ${disabled ? 'text-ink-3' : 'text-ink'}`}>{sector.name}</span>
         <span className="block font-ui text-xs leading-4 text-ink-3">{lotLabel(sector)}</span>
       </span>
       {disabled ? (
@@ -751,8 +754,8 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           <span className="block font-ui text-xs leading-4 text-ink-3">{combo.desc}</span>
         </span>
         <span className="min-w-0">
-          <Badge>{sector.badge}</Badge>
-          <span className="mt-1 block text-lg font-bold leading-tight text-ink">{sector.name}</span>
+          {sector.badge && <Badge>{sector.badge}</Badge>}
+          <span className={`block text-lg font-bold leading-tight text-ink ${sector.badge ? 'mt-1' : ''}`}>{sector.name}</span>
         </span>
         <span className="flex items-baseline gap-2 md:flex-col md:items-end md:gap-0">
           <span className="text-sm font-semibold leading-5 text-ink">{brl(price)}</span>

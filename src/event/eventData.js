@@ -62,10 +62,10 @@ export const sessionTitle = (s) => (s.kind === 'passaporte' ? `Passaporte ${s.la
 
 /** Setores (Figma "Escolha onde você quer ficar"). kind: 'livre' = pista/sem assento, 'assento' = assento marcado. */
 export const SECTORS = [
-  { id: 'pista-premium', name: 'Pista Premium', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 195.5 },
-  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 178 },
-  { id: 'area-vip', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 184 },
-  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', badge: 'Setor livre', lot: 'LOTE 1', base: 184, soldOut: true },
+  { id: 'pista-premium', name: 'Pista Premium', kind: 'livre', lot: 'LOTE 1', base: 195.5 },
+  { id: 'area-exclusiva', name: 'Área Exclusiva', kind: 'livre', lot: 'LOTE 1', base: 178 },
+  { id: 'area-vip', name: 'Área VIP', kind: 'livre', lot: 'LOTE 1', base: 184 },
+  { id: 'area-vip-livre', name: 'Área VIP', kind: 'livre', lot: 'LOTE 1', base: 184, soldOut: true },
   { id: 'cadeira-coberta', name: 'Cadeira Coberta', kind: 'assento', badge: 'Assento marcado', lot: 'LOTE 1', base: 391 },
 ]
 
