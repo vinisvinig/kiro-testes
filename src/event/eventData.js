@@ -143,13 +143,27 @@ export const EVENT = {
       ['Duração', 'Aproximadamente 2 horas', 'Sem intervalo'],
     ],
   },
-  /** Blocos de texto da página do evento (Figma 10145:90808 e 10145:90822): [título, linhas do texto] */
-  ticketTypes: [
-    ['Inteira', ['Ingresso com valor integral, sem necessidade de comprovar direito a desconto. Consulte os valores de cada setor na seleção de ingressos.']],
-    ['Meia-entrada e documentação', ['Confira os públicos contemplados e o comprovante exigido para cada benefício. Na entrada do evento, apresente documento com foto e a documentação que comprova seu direito à meia-entrada.']],
-    // 3º item: texto que aparece ao tocar em "Ver mais" (Figma 10281:52145)
-    ['Descontos e condições', ['Benefícios de cartões parceiros e outras promoções dependem das condições do evento.'], ['Confira elegibilidade, disponibilidade e regras antes de selecionar o ingresso. Os descontos não são cumulativos.']],
+  /** "Entenda os setores" (Figma 10379:64403): glossário; os 6 primeiros aparecem, o resto abre no "Ver mais". */
+  sectorTerms: [
+    ['Pista', 'Área em pé, geralmente sem lugar marcado.'],
+    ['Mezanino', 'Piso elevado, com assentos ou espaço em pé, conforme o local.'],
+    ['Camarote', 'Área reservada. Capacidade, mobiliário e serviços variam.'],
+    ['Plateia e cadeiras', 'Área com assentos. Confira se há lugar marcado.'],
+    ['Balcão nobre', 'Área elevada com assentos, conforme a configuração do teatro.'],
+    ['Frisa', 'Grupos de assentos em áreas laterais ou em níveis do teatro.'],
+    ['Arquibancada', 'Degraus ou assentos em níveis, com visão ampla do palco.'],
+    ['Área VIP', 'Espaço reservado, em geral com serviços exclusivos e acesso separado.'],
+    ['Assento marcado', 'Você escolhe o lugar no mapa e ele fica reservado para você.'],
+    ['Setor livre', 'Entrada por ordem de chegada, sem lugar definido dentro do setor.'],
   ],
+  /** "Compare os setores" (Figma 10145:90808): setor do protótipo e a característica; os 3 primeiros aparecem. */
+  sectorCompare: [
+    ['pista-premium', 'Em pé · próximo ao palco'],
+    ['cadeira-coberta', 'Assento marcado · área coberta'],
+    ['area-exclusiva', 'Em pé · lugar livre'],
+    ['area-vip', 'Em pé · área reservada'],
+  ],
+  /** Blocos de texto da página do evento (Figma 10145:90808 e 10145:90822): [título, linhas do texto] */
   salesPoints: [
     ['Compra on-line · Uhuu.com', ['Compre pelo site oficial. A taxa de serviço e o total da compra são apresentados antes do pagamento. Confira os valores antes de concluir seu pedido.']],
     ['Bilheteria física · Estádio MorumBIS', ['Praça Roberto Gomes Pedrosa, 1 · Morumbi · São Paulo/SP.', 'Nos dias de evento, a partir das 10h. Compra na bilheteria sem taxa de serviço.']],

@@ -4,7 +4,7 @@ import { flushSync } from 'react-dom'
 import { Lightbox } from '../local/Gallery.jsx'
 import { navigate } from '../router.jsx'
 import BuyTab from './BuyTab.jsx'
-import { EVENT, RESERVE_SECONDS, SECTORS, SESSIONS, minFare } from './eventData.js'
+import { EVENT, RESERVE_SECONDS, SECTORS, SERVICE_FEE, SESSIONS, minFare } from './eventData.js'
 import { deriveOrder, initialOrder, orderReducer } from './order.js'
 import { checkoutReducer, initialCheckout } from './checkout.js'
 import { Card, CardTitle, Dialog, Eyebrow, FeesDialog, Ico, VenueMap, brl } from './parts.jsx'
@@ -219,12 +219,14 @@ function InfoTab({ onBuy, onFees }) {
     <div className="page-x py-6 md:py-8">
       <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
+          {/* Ordem do Figma 8677:38377: setores e preços logo após o "Sobre"; mapa antes da galeria */}
           <About />
-          <TopicsCard eyebrow="Ingressos & benefícios" title="Tipos de ingresso e descontos" items={EVENT.ticketTypes} />
+          <SectorsGuide />
+          <PricesCard />
           <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
+          <VenueMap />
           <GalleryCard />
           <VenueCard />
-          <VenueMap />
           <Faq />
         </div>
         <aside className="order-first lg:order-none lg:sticky lg:top-24 lg:self-start">
@@ -278,7 +280,111 @@ function About() {
   )
 }
 
-/** Card de texto por assunto (Figma "Tipos de ingresso e descontos" e "Pontos de venda"). */
+/** "Ver mais" rosa sublinhado (mesmo estilo dos outros blocos). */
+const MoreButton = ({ open, onClick, controls }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-expanded={open}
+    aria-controls={controls}
+    className="self-start text-base font-semibold leading-6 text-brand underline underline-offset-2 hover:text-brand-700"
+  >
+    {open ? 'Ver menos' : 'Ver mais'}
+  </button>
+)
+
+/** Caixa cinza com borda usada nos dois blocos novos (Figma: #f5f5f5, borda #d4d4d4, raio 16, padding 16). */
+const InfoTile = ({ title, titleClass = 'text-ink', gap = 'gap-1', children }) => (
+  <li className={`flex flex-col ${gap} rounded-2xl border border-line bg-body-2 p-4`}>
+    <p className={`text-base font-semibold leading-6 ${titleClass}`}>{title}</p>
+    <p className="text-sm leading-5 text-ink-2">{children}</p>
+  </li>
+)
+
+/** "Entenda os setores" (Figma 10379:64403): glossário em grade de 2 colunas. */
+function SectorsGuide() {
+  const [more, setMore] = useState(false)
+  const terms = more ? EVENT.sectorTerms : EVENT.sectorTerms.slice(0, 6)
+  return (
+    <Card className="md:!p-8">
+      <Eyebrow>Setores do evento</Eyebrow>
+      <CardTitle className="mt-2">Entenda os setores</CardTitle>
+      <p className="mt-6 text-sm leading-5 text-ink-2">Saiba o que cada nome costuma indicar antes de escolher.</p>
+      <ul id="setores-termos" className="mt-4 grid gap-4 sm:grid-cols-2">
+        {terms.map(([t, d]) => (
+          <InfoTile key={t} title={t}>
+            {d}
+          </InfoTile>
+        ))}
+      </ul>
+      <p className="mt-6 text-sm leading-5 text-ink-2">Os setores e serviços variam por evento. Consulte o mapa e as condições para confirmar as opções disponíveis.</p>
+      <div className="mt-6 flex">
+        <MoreButton open={more} onClick={() => setMore(!more)} controls="setores-termos" />
+      </div>
+    </Card>
+  )
+}
+
+/** "Preços e tipos de ingresso" (Figma 10145:90808): Ingresso x Combo e o menor valor de cada setor. */
+function PricesCard() {
+  const [more, setMore] = useState(false)
+  const rows = EVENT.sectorCompare
+    .map(([id, trait]) => {
+      const s = SECTORS.find((x) => x.id === id && !x.soldOut)
+      if (!s) return null
+      const price = minFare(s)
+      return { id, name: s.name, trait, price, fee: price * SERVICE_FEE }
+    })
+    .filter(Boolean)
+  const shown = more ? rows : rows.slice(0, 3)
+  return (
+    <Card className="md:!p-8">
+      <Eyebrow>Ingressos & benefícios</Eyebrow>
+      <CardTitle className="mt-2">Preços e tipos de ingresso</CardTitle>
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+        <InfoTile title="Ingresso" titleClass="text-brand" gap="gap-2">
+          Um ingresso por pessoa. Escolha a quantidade e os assentos, quando houver.
+        </InfoTile>
+        <InfoTile title="Combo" titleClass="text-combo" gap="gap-2">
+          Pacote com quantidade e tipos de ingresso definidos. Assentos no setor do combo.
+        </InfoTile>
+      </ul>
+      <hr className="mt-6 border-line" />
+      <h3 className="mt-6 text-xl font-bold leading-6 text-ink">Compare os setores</h3>
+      <p className="mt-4 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p>
+      {/* Desktop: cabeçalho Setor | Valor; no celular cada setor vira um bloco com o valor embaixo */}
+      <div className="mt-4 hidden gap-4 px-4 py-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
+        <span>Setor</span>
+        <span>Valor</span>
+      </div>
+      <ul id="precos-setores" className="mt-4 flex flex-col gap-4 sm:mt-0" aria-label="Menor valor por setor">
+        {shown.map((r) => (
+          <li key={r.id} className="grid gap-3 rounded-2xl bg-body-2 p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
+            <div className="flex flex-col gap-2">
+              <p className="text-base font-semibold leading-6 text-ink">{r.name}</p>
+              <p className="text-sm leading-5 text-ink-2">{r.trait}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="text-lg font-bold leading-[22px] text-brand">A partir de {brl(r.price)}</p>
+              <p className="text-sm leading-5 text-ink-2">Taxa a partir de {brl(r.fee)}</p>
+              <p className="text-sm font-semibold leading-5 text-ink">Total a partir de {brl(r.price + r.fee)}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-xs leading-4 text-ink-2">
+        Obs.: Valores e taxas a partir de, sujeitos à disponibilidade. Setores e tipos de ingresso podem esgotar até a seleção.
+      </p>
+      {rows.length > 3 && (
+        <div className="mt-6 flex">
+          <MoreButton open={more} onClick={() => setMore(!more)} controls="precos-setores" />
+        </div>
+      )}
+    </Card>
+  )
+}
+
+/** Card de texto por assunto (Figma "Pontos de venda"). */
 function TopicsCard({ eyebrow, title, items }) {
   return (
     <Card>
