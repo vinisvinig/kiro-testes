@@ -46,7 +46,7 @@ body {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  /* Opção estreita demais (< 300px): o preço desce para baixo do texto, alinhado à esquerda */
+  /* Opção estreita demais (< 230px de conteúdo, celulares bem pequenos): o preço desce para baixo do texto */
   .modalidade {
     container-type: inline-size;
   }
@@ -57,7 +57,7 @@ body {
     @apply flex shrink-0 flex-col items-end text-right;
     max-width: 45%;
   }
-  @container (max-width: 299px) {
+  @container (max-width: 229px) {
     .modalidade-linha {
       @apply flex-wrap;
     }

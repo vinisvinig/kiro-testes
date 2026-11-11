@@ -223,10 +223,11 @@ function CalendarPopover({ selected, onPick, onClose }) {
 function ModalityPicker({ session, selected, onPick }) {
   const open = SECTORS.filter((s) => !s.soldOut)
   const individualFrom = Math.min(...open.map((s) => minFare(s, session)))
-  const comboFrom = Math.min(...COMBOS.map((c) => comboPrice(c, session)))
+  // Figma 10376:152167: Ingresso só com título e preço; Combo com chamada e selo "Até 50% OFF" no lugar do preço
+  // (os combos do protótipo dão 60% a 80% de desconto sobre 5 inteiras, então "até 50%" é verdadeiro).
   const opts = [
-    { id: 'individual', title: 'Ingressos', desc: 'Escolha tipos e quantidades.', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
-    { id: 'combo', title: 'Combos', desc: 'Pacotes de ingressos com benefícios.', from: comboFrom, icon: 'ticket', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
+    { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
+    { id: 'combo', title: 'Combo pra galera!', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
   ]
   return (
     <Card className="modalidades">
@@ -248,15 +249,24 @@ function ModalityPicker({ session, selected, onPick }) {
               <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? o.iconOn : o.iconIdle}`}>
                 <Ico name={o.icon} className="size-6" />
               </span>
-              <span className="min-w-0 flex-1">
+              <span className="flex min-w-0 flex-1 flex-col gap-1">
                 <span className="block text-base font-semibold leading-6">{o.title}</span>
-                <span className={`block font-ui text-xs leading-4 ${on ? 'text-white' : 'text-ink-3'}`}>{o.desc}</span>
+                {o.desc && <span className={`block font-ui text-xs leading-4 ${on ? 'text-white' : 'text-ink-3'}`}>{o.desc}</span>}
               </span>
-              <span className={`modalidade-preco ${on ? 'text-white' : ''}`}>
-                <span className={`font-ui text-[10px] font-medium leading-4 ${on ? '' : 'text-ink-3'}`}>A partir de</span>
-                <span className="text-sm font-semibold leading-5">{brl(o.from)}</span>
-                <Fee value={o.from} from className={on ? 'text-white' : ''} />
-              </span>
+              {o.off ? (
+                // Selo de desconto: fundo lilás com texto roxo; selecionado, fundo branco
+                <span className={`modalidade-preco !items-center rounded-lg p-2 text-center text-combo ${on ? 'bg-white' : 'bg-combo-0'}`}>
+                  <span className="font-ui text-xs font-medium leading-4">Até</span>
+                  <span className="whitespace-nowrap text-lg font-bold leading-[22px]">{o.off}% OFF</span>
+                </span>
+              ) : (
+                <span className={`modalidade-preco ${on ? 'text-white' : ''}`}>
+                  <span className={`font-ui text-[10px] font-medium leading-4 ${on ? '' : 'text-ink-3'}`}>A partir de</span>
+                  <span className="text-sm font-semibold leading-5">{brl(o.from)}</span>
+                  {/* Figma usa 8px; 10px para continuar legível */}
+                  <span className={`font-ui text-[10px] leading-4 ${on ? 'text-white' : 'text-ink-3'}`}>+taxa {brl(o.from * SERVICE_FEE)}</span>
+                </span>
+              )}
               </span>
             </button>
           )
