@@ -49,6 +49,7 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
       role="search"
       onSubmit={(e) => {
         e.preventDefault()
+        setShowFilters(false) // celular: ao buscar, recolhe os filtros para mostrar os resultados
         submit()
       }}
       className={`mx-auto flex gap-4 bg-black/5 p-4 md:rounded-2xl ${
@@ -83,9 +84,10 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
 
       {isFilters ? (
         <div id={panelId} className={`gap-4 md:flex md:flex-wrap md:items-center lg:flex-nowrap ${showFilters ? 'grid' : 'hidden'}`}>
-          <Dropdown label="Cidade" value={filters.cidade} onChange={set('cidade')} options={CITY_OPTIONS} className="md:flex-1" />
-          <Dropdown label="Categoria" value={filters.categoria} onChange={set('categoria')} options={CATEGORY_OPTIONS} className="md:flex-1" />
-          <DateRangePicker de={filters.de} ate={filters.ate} onChange={setRange} className="md:flex-1" />
+          {/* clearable: no celular cada campo preenchido ganha o "x" cinza para limpar */}
+          <Dropdown label="Cidade" value={filters.cidade} onChange={set('cidade')} options={CITY_OPTIONS} className="md:flex-1" clearable />
+          <Dropdown label="Categoria" value={filters.categoria} onChange={set('categoria')} options={CATEGORY_OPTIONS} className="md:flex-1" clearable />
+          <DateRangePicker de={filters.de} ate={filters.ate} onChange={setRange} className="md:flex-1" clearable />
           <Dropdown
             label="Relevância"
             sheetTitle="Ordenar por"
@@ -94,6 +96,8 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
             options={SORT_OPTIONS}
             placeholder={false}
             className="md:flex-1"
+            clearable
+            clearValue={DEFAULT_SORT}
           />
           <Pill type="submit" className="max-md:w-full max-md:py-[10px]">
             Buscar

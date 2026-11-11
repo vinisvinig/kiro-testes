@@ -17,6 +17,25 @@ export function FieldShell({ open, className = '', children, ...rest }) {
 }
 
 /**
+ * "x" num círculo cinza, à esquerda do ícone do campo, para limpar o filtro (filtros do celular).
+ * Fica fora do botão do campo (botão dentro de botão não é válido) e por cima dele, à direita.
+ */
+export function ClearChip({ label, onClear, className = '' }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClear}
+      className={`absolute right-11 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full bg-body-3 text-ink hover:bg-line ${className}`}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden className="size-3.5 fill-current">
+        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+      </svg>
+    </button>
+  )
+}
+
+/**
  * Select próprio do design system (Figma Selectbox Cidade/Categoria/Relevância).
  * Desktop: lista suspensa de 220px. Mobile: modal "Selecione a …".
  * options: [{ value, label, icon? }]
@@ -30,6 +49,9 @@ export default function Dropdown({
   placeholder = true,
   searchable = false,
   className = '',
+  // Celular: mostra o "x" para limpar quando o valor é diferente de clearValue (vazio, ou o padrão da ordenação)
+  clearable = false,
+  clearValue = '',
 }) {
   const id = useId()
   const isDesktop = useIsDesktop()
@@ -39,6 +61,7 @@ export default function Dropdown({
   const wrapRef = useRef(null)
   const btnRef = useRef(null)
   const current = options.find((o) => o.value === value)
+  const showClear = clearable && !!value && value !== clearValue
 
   const list = useMemo(() => {
     const f = normalize(filter)
@@ -130,13 +153,14 @@ export default function Dropdown({
           aria-activedescendant={open && isDesktop ? `${id}-o-${active}` : undefined}
           onClick={() => setOpen((o) => !o)}
           onKeyDown={onKeyDown}
-          className="flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none"
+          className={`flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none ${showClear ? 'max-md:pr-4' : ''}`}
         >
-          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${current ? 'text-ink' : 'text-ink-3'}`}>
+          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${current ? 'text-ink' : 'text-ink-3'} ${showClear ? 'max-md:pr-10' : ''}`}>
             {current ? current.label : label}
           </span>
           <img src={asset('ic-expand.svg')} alt="" className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
+        {showClear && <ClearChip label={`Limpar ${label.toLowerCase()}`} onClear={() => (onChange(clearValue), btnRef.current?.focus())} className="md:hidden" />}
       </FieldShell>
 
       {open && isDesktop && (

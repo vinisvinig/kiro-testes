@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { asset, Sheet, useIsDesktop } from '../components/home/ui.jsx'
-import { FieldShell } from './Dropdown.jsx'
+import { ClearChip, FieldShell } from './Dropdown.jsx'
 
 /* ---------- datas (sempre em horário local, formato ISO yyyy-mm-dd) ---------- */
 const pad = (n) => String(n).padStart(2, '0')
@@ -35,7 +35,7 @@ export const formatRange = (de, ate) => (!de ? '' : !ate || ate === de ? br(de) 
  * Desktop: popover com atalhos + 2 meses (Figma 5363:21015), aplica ao escolher.
  * Mobile: modal com atalhos em chips + 1 mês + Cancelar/Aplicar (Figma "modal data").
  */
-export default function DateRangePicker({ de, ate, onChange, className = '' }) {
+export default function DateRangePicker({ de, ate, onChange, className = '', clearable = false }) {
   const isDesktop = useIsDesktop()
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState({ de, ate })
@@ -65,6 +65,7 @@ export default function DateRangePicker({ de, ate, onChange, className = '' }) {
   }
 
   const text = formatRange(de, ate)
+  const mobileClear = clearable && !!text
 
   return (
     <div ref={wrapRef} className={`relative min-w-0 ${className}`}>
@@ -78,10 +79,13 @@ export default function DateRangePicker({ de, ate, onChange, className = '' }) {
           onClick={() => setOpen((o) => !o)}
           className="flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none"
         >
-          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${text ? 'text-ink' : 'text-ink-3'}`}>
+          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${text ? 'text-ink' : 'text-ink-3'} ${mobileClear ? 'max-md:pr-10' : ''}`}>
             {text || 'Data'}
           </span>
+          {/* Celular (filtros): calendário sempre visível e o "x" cinza fica ao lado (ClearChip abaixo) */}
+          {mobileClear && <img src={asset('ic-calendar.svg')} alt="" className="size-4 md:hidden" />}
           {text ? (
+            // "x" antigo, dentro do campo no lugar do calendário: continua no desktop
             <span
               role="button"
               tabIndex={0}
@@ -97,14 +101,15 @@ export default function DateRangePicker({ de, ate, onChange, className = '' }) {
                   onChange({ de: '', ate: '' })
                 }
               }}
-              className="flex size-5 items-center justify-center rounded-full hover:bg-body-2"
+              className={`flex size-5 items-center justify-center rounded-full hover:bg-body-2 ${mobileClear ? 'max-md:hidden' : ''}`}
             >
               <img src={asset('ic-close.svg')} alt="" className="size-3.5" />
             </span>
           ) : (
-            <img src={asset('ic-calendar.svg')} alt="" className="size-4" />
+            <img src={asset('ic-calendar.svg')} alt="" className={`size-4 ${mobileClear ? 'max-md:hidden' : ''}`} />
           )}
         </button>
+        {mobileClear && <ClearChip label="Limpar data" onClear={() => (onChange({ de: '', ate: '' }), btnRef.current?.focus())} className="md:hidden" />}
       </FieldShell>
 
       {open && isDesktop && (
