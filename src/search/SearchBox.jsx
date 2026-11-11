@@ -84,7 +84,7 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
 
       {isFilters ? (
         <div id={panelId} className={`gap-4 md:flex md:flex-wrap md:items-center lg:flex-nowrap ${showFilters ? 'grid' : 'hidden'}`}>
-          {/* clearable: no celular cada campo preenchido ganha o "x" cinza para limpar */}
+          {/* clearable: cada campo preenchido ganha o "x" cinza para limpar */}
           <Dropdown label="Cidade" value={filters.cidade} onChange={set('cidade')} options={CITY_OPTIONS} className="md:flex-1" clearable />
           <Dropdown label="Categoria" value={filters.categoria} onChange={set('categoria')} options={CATEGORY_OPTIONS} className="md:flex-1" clearable />
           <DateRangePicker de={filters.de} ate={filters.ate} onChange={setRange} className="md:flex-1" clearable />

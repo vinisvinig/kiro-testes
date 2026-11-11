@@ -17,7 +17,7 @@ export function FieldShell({ open, className = '', children, ...rest }) {
 }
 
 /**
- * "x" num círculo cinza, à esquerda do ícone do campo, para limpar o filtro (filtros do celular).
+ * "x" num círculo cinza, à esquerda do ícone do campo, para limpar o filtro (celular e desktop).
  * Fica fora do botão do campo (botão dentro de botão não é válido) e por cima dele, à direita.
  */
 export function ClearChip({ label, onClear, className = '' }) {
@@ -49,7 +49,7 @@ export default function Dropdown({
   placeholder = true,
   searchable = false,
   className = '',
-  // Celular: mostra o "x" para limpar quando o valor é diferente de clearValue (vazio, ou o padrão da ordenação)
+  // Filtros: mostra o "x" para limpar quando o valor é diferente de clearValue (vazio, ou o padrão da ordenação)
   clearable = false,
   clearValue = '',
 }) {
@@ -153,14 +153,14 @@ export default function Dropdown({
           aria-activedescendant={open && isDesktop ? `${id}-o-${active}` : undefined}
           onClick={() => setOpen((o) => !o)}
           onKeyDown={onKeyDown}
-          className={`flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none ${showClear ? 'max-md:pr-4' : ''}`}
+          className={`flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none`}
         >
-          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${current ? 'text-ink' : 'text-ink-3'} ${showClear ? 'max-md:pr-10' : ''}`}>
+          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${current ? 'text-ink' : 'text-ink-3'} ${showClear ? 'pr-10' : ''}`}>
             {current ? current.label : label}
           </span>
           <img src={asset('ic-expand.svg')} alt="" className={`size-4 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
-        {showClear && <ClearChip label={`Limpar ${label.toLowerCase()}`} onClear={() => (onChange(clearValue), btnRef.current?.focus())} className="md:hidden" />}
+        {showClear && <ClearChip label={`Limpar ${label.toLowerCase()}`} onClear={() => (onChange(clearValue), btnRef.current?.focus())} />}
       </FieldShell>
 
       {open && isDesktop && (

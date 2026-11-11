@@ -79,13 +79,13 @@ export default function DateRangePicker({ de, ate, onChange, className = '', cle
           onClick={() => setOpen((o) => !o)}
           className="flex h-full w-full items-center rounded-full pl-[22px] pr-4 text-left outline-none"
         >
-          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${text ? 'text-ink' : 'text-ink-3'} ${mobileClear ? 'max-md:pr-10' : ''}`}>
+          <span className={`flex-1 truncate font-ui text-[15px] font-medium leading-none ${text ? 'text-ink' : 'text-ink-3'} ${mobileClear ? 'pr-10' : ''}`}>
             {text || 'Data'}
           </span>
-          {/* Celular (filtros): calendário sempre visível e o "x" cinza fica ao lado (ClearChip abaixo) */}
-          {mobileClear && <img src={asset('ic-calendar.svg')} alt="" className="size-4 md:hidden" />}
+          {/* Filtros: calendário sempre visível e o "x" cinza fica ao lado (ClearChip abaixo) */}
+          {mobileClear && <img src={asset('ic-calendar.svg')} alt="" className="size-4" />}
           {text ? (
-            // "x" antigo, dentro do campo no lugar do calendário: continua no desktop
+            // "x" antigo no lugar do calendário: só na busca da home (sem clearable)
             <span
               role="button"
               tabIndex={0}
@@ -101,15 +101,15 @@ export default function DateRangePicker({ de, ate, onChange, className = '', cle
                   onChange({ de: '', ate: '' })
                 }
               }}
-              className={`flex size-5 items-center justify-center rounded-full hover:bg-body-2 ${mobileClear ? 'max-md:hidden' : ''}`}
+              className={`flex size-5 items-center justify-center rounded-full hover:bg-body-2 ${mobileClear ? 'hidden' : ''}`}
             >
               <img src={asset('ic-close.svg')} alt="" className="size-3.5" />
             </span>
           ) : (
-            <img src={asset('ic-calendar.svg')} alt="" className={`size-4 ${mobileClear ? 'max-md:hidden' : ''}`} />
+            <img src={asset('ic-calendar.svg')} alt="" className={`size-4 ${mobileClear ? 'hidden' : ''}`} />
           )}
         </button>
-        {mobileClear && <ClearChip label="Limpar data" onClear={() => (onChange({ de: '', ate: '' }), btnRef.current?.focus())} className="md:hidden" />}
+        {mobileClear && <ClearChip label="Limpar data" onClear={() => (onChange({ de: '', ate: '' }), btnRef.current?.focus())} />}
       </FieldShell>
 
       {open && isDesktop && (
