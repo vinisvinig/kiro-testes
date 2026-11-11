@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { asset, Pill } from '../components/home/ui.jsx'
+import { asset, Pill, useIsDesktop } from '../components/home/ui.jsx'
 import { navigate } from '../router.jsx'
 import { CATEGORIES, CITIES } from './catalog.js'
 import { getSuggestions, splitMatch, searchUrl, venueUrl, SORTS, DEFAULT_SORT, MIN_CHARS } from './search.js'
@@ -39,6 +39,10 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
   const setRange = ({ de, ate }) => setFilters((f) => ({ ...f, de, ate }))
   const submit = (overrides = {}) => navigate(searchUrl({ q: q.trim(), ...filters, ...overrides, pagina: 1 }))
   const isFilters = variant === 'filters'
+  // Celular: os filtros ficam recolhidos atrás do botão "Filtros" para não empurrar os resultados para baixo
+  const [showFilters, setShowFilters] = useState(false)
+  const active = [filters.cidade, filters.categoria, filters.de || filters.ate, filters.ordem !== DEFAULT_SORT].filter(Boolean).length
+  const panelId = useId()
 
   return (
     <form
@@ -54,10 +58,31 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
         isFilters ? 'flex-col' : 'flex-col md:flex-row md:items-center'
       }`}
     >
-      <Autocomplete value={q} onChange={setQ} onSubmit={submit} clearable={isFilters} />
+      <div className="flex min-w-0 items-center gap-3 md:flex-1">
+        <Autocomplete value={q} onChange={setQ} onSubmit={submit} clearable={isFilters} />
+        {isFilters && (
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            aria-expanded={showFilters}
+            aria-controls={panelId}
+            aria-label={`${showFilters ? 'Ocultar' : 'Mostrar'} filtros${active ? `, ${active} ${active === 1 ? 'ativo' : 'ativos'}` : ''}`}
+            className={`relative flex size-12 shrink-0 items-center justify-center rounded-full border transition md:hidden ${
+              showFilters ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:border-brand'
+            }`}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden className="size-5 fill-current">
+              <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" />
+            </svg>
+            {active > 0 && (
+              <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-white bg-brand font-ui text-[10px] font-semibold text-white">{active}</span>
+            )}
+          </button>
+        )}
+      </div>
 
       {isFilters ? (
-        <div className="grid gap-4 md:flex md:flex-wrap md:items-center lg:flex-nowrap">
+        <div id={panelId} className={`gap-4 md:flex md:flex-wrap md:items-center lg:flex-nowrap ${showFilters ? 'grid' : 'hidden'}`}>
           <Dropdown label="Cidade" value={filters.cidade} onChange={set('cidade')} options={CITY_OPTIONS} className="md:flex-1" />
           <Dropdown label="Categoria" value={filters.categoria} onChange={set('categoria')} options={CATEGORY_OPTIONS} className="md:flex-1" />
           <DateRangePicker de={filters.de} ate={filters.ate} onChange={setRange} className="md:flex-1" />
@@ -97,6 +122,7 @@ function Autocomplete({ value, onChange, onSubmit, clearable }) {
   const wrapRef = useRef(null)
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
+  const isDesktop = useIsDesktop()
 
   const { events, cities, venues, total } = useMemo(() => getSuggestions(value), [value])
   const term = value.trim()
@@ -258,7 +284,8 @@ function Autocomplete({ value, onChange, onSubmit, clearable }) {
           autoComplete="off"
           enterKeyHint="search"
           value={value}
-          placeholder="Busque seu evento, local ou cidade..."
+          // Celular: texto curto e geral (evento, local, cidade ou artista), sem cortar
+          placeholder={isDesktop ? 'Busque seu evento, local ou cidade...' : 'O que você procura?'}
           onChange={(e) => {
             onChange(e.target.value)
             setOpen(true)
