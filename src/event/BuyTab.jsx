@@ -227,7 +227,7 @@ function ModalityPicker({ session, selected, onPick }) {
   // (os combos do protótipo dão 60% a 80% de desconto sobre 5 inteiras, então "até 50%" é verdadeiro).
   const opts = [
     { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
-    { id: 'combo', title: 'Combo pra galera!', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
+    { id: 'combo', title: 'Combo de ingressos', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
   ]
   return (
     <Card className="modalidades">
@@ -243,7 +243,7 @@ function ModalityPicker({ session, selected, onPick }) {
               role="radio"
               aria-checked={on}
               onClick={() => onPick(o.id)}
-              className={`modalidade rounded-[14px] border p-4 text-left transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
+              className={`modalidade rounded-[14px] border p-3 text-left sm:p-4 transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
             >
               <span className="modalidade-linha">
               <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? o.iconOn : o.iconIdle}`}>

@@ -46,6 +46,12 @@ body {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
+  /* Celular: espaços menores para "Combo de ingressos" caber numa linha ao lado do selo */
+  @container (max-width: 320px) {
+    .modalidade-linha {
+      @apply gap-2;
+    }
+  }
   /* Opção estreita demais (< 230px de conteúdo, celulares bem pequenos): o preço desce para baixo do texto */
   .modalidade {
     container-type: inline-size;
