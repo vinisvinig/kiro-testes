@@ -188,12 +188,12 @@ function Tabs({ tab, onTab, remaining }) {
         <Ico name={icon} className="size-4" />
         {label}
       </span>
-      {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644) */}
+      {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644); oculto no desktop a pedido (Figma 9941:50449) */}
       {id === 'buy' && tab === 'buy' && remaining !== null && (
         <span
           role="timer"
           aria-label={`Reserva garantida por ${mmss(remaining)}`}
-          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
+          className={`flex items-center gap-1 rounded-full lg:hidden px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
         >
           {mmss(remaining)}
           <Ico name="timer" className="size-[14px]" />
@@ -219,14 +219,28 @@ function InfoTab({ onBuy, onFees }) {
     <div className="page-x py-6 md:py-8">
       <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
+          {/* Atalhos para cada bloco (Figma 10379:64536), na ordem atual dos blocos */}
+          <SectionNav />
           {/* Ordem do Figma 8677:38377: setores e preços logo após o "Sobre"; mapa antes da galeria */}
-          <About />
-          <SectorsGuide />
-          <PricesCard />
-          <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
+          <div id="sec-sobre" className="scroll-mt-24">
+            <About />
+          </div>
+          <div id="sec-setores" className="scroll-mt-24">
+            <SectorsGuide />
+          </div>
+          <div id="sec-ingressos" className="scroll-mt-24">
+            <PricesCard />
+          </div>
+          <div id="sec-onde-comprar" className="scroll-mt-24">
+            <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
+          </div>
           <VenueMap />
-          <GalleryCard />
-          <VenueCard />
+          <div id="sec-galeria" className="scroll-mt-24">
+            <GalleryCard />
+          </div>
+          <div id="sec-local" className="scroll-mt-24">
+            <VenueCard />
+          </div>
           <Faq />
         </div>
         <aside className="order-first lg:order-none lg:sticky lg:top-24 lg:self-start">
@@ -277,6 +291,65 @@ function About() {
         ))}
       </ul>
     </Card>
+  )
+}
+
+const SECTIONS = [
+  ['sec-sobre', 'Sobre'],
+  ['sec-setores', 'Setores'],
+  ['sec-ingressos', 'Ingressos e benefícios'],
+  ['sec-onde-comprar', 'Onde comprar'],
+  ['sec-galeria', 'Galeria'],
+  ['sec-local', 'Local'],
+]
+
+/**
+ * Atalhos (Figma 10379:64536): faixa cinza com pílulas; a do bloco visível fica rosa.
+ * Toque rola até o bloco. No celular a faixa rola para o lado.
+ */
+function SectionNav() {
+  const [active, setActive] = useState(SECTIONS[0][0])
+  useEffect(() => {
+    // Ativo = último bloco cujo topo já passou de 1/3 da tela
+    const onScroll = () => {
+      const line = window.innerHeight / 3
+      let cur = SECTIONS[0][0]
+      for (const [id] of SECTIONS) {
+        const el = document.getElementById(id)
+        if (el && el.getBoundingClientRect().top <= line) cur = id
+      }
+      setActive(cur)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  const go = (id) => {
+    setActive(id)
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  return (
+    <nav aria-label="Seções da página" className="rounded-2xl border border-line bg-body-2 p-2">
+      <ul className="no-scrollbar flex gap-1 overflow-x-auto">
+        {SECTIONS.map(([id, label]) => {
+          const on = active === id
+          return (
+            <li key={id} className="shrink-0">
+              <button
+                type="button"
+                onClick={() => go(id)}
+                aria-current={on ? 'true' : undefined}
+                className={`whitespace-nowrap rounded-2xl border p-2 text-sm font-semibold leading-5 transition ${
+                  on ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:border-brand'
+                }`}
+              >
+                {label}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
   )
 }
 

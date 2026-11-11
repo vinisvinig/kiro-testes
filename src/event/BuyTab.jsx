@@ -61,6 +61,13 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
     <div className="page-x py-6 md:py-8">
       <div className={order.sessionId ? 'evento-box evento-grid' : 'evento-coluna grid grid-cols-1 gap-6'}>
         <div className="flex min-w-0 flex-col gap-6">
+          {/* Figma 8522:122612: o mapa fica no topo, antes da escolha de data ("Ver mapa completo" rola até ele) */}
+          <div id={MAP_ID} className="scroll-mt-24">
+            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
+                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
+            <VenueMap />
+          </div>
+
           <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
           {session && <ModalityPicker session={session} selected={order.modality} onPick={pickModality} />}
@@ -74,12 +81,6 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
               )}
             </div>
           )}
-
-          <div id={MAP_ID} className="scroll-mt-24">
-            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
-                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
-            <VenueMap />
-          </div>
         </div>
 
         {order.sessionId && (

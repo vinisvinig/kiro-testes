@@ -111,6 +111,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
         pix={pix}
         t={t}
         order={order}
+        remaining={remaining}
         onBack={() => setPix(null)}
         onPaid={() => pay('pix')}
         onExpired={() => setStatus('failed')}
@@ -1017,7 +1018,7 @@ function MobileTotal({ total, remaining, ready, onBuy }) {
 /* ------------------------------------------------------------------ */
 /* Pix (07 · Gerando Pix, 08 · Pagar com Pix)                          */
 /* ------------------------------------------------------------------ */
-function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }) {
+function PixScreen({ pix, t, order, remaining, onBack, onPaid, onExpired, status, onRetry }) {
   const [now, setNow] = useState(Date.now())
   const [copied, setCopied] = useState(false)
   const ready = typeof pix === 'object'
@@ -1102,7 +1103,8 @@ function PixScreen({ pix, t, order, onBack, onPaid, onExpired, status, onRetry }
             )}
           </Card>
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            <Totals t={t} order={order} title="Total a pagar" showTimer={false} />
+            {/* Figma 9927:39977: "Reserva garantida por" volta ao topo do resumo também na tela do Pix */}
+            <Totals t={t} order={order} remaining={remaining} title="Total a pagar" />
           </aside>
         </div>
       </div>
