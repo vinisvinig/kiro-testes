@@ -1103,8 +1103,8 @@ function PixScreen({ pix, t, order, remaining, onBack, onPaid, onExpired, status
             )}
           </Card>
           <aside className="lg:sticky lg:top-24 lg:self-start">
-            {/* Figma 9927:39977: "Reserva garantida por" volta ao topo do resumo também na tela do Pix */}
-            <Totals t={t} order={order} remaining={remaining} title="Total a pagar" />
+            {/* Tela do Pix: só o "Pague dentro de" do bloco principal; o resumo fica sem o contador da reserva */}
+            <Totals t={t} order={order} title="Total a pagar" showTimer={false} />
           </aside>
         </div>
       </div>
