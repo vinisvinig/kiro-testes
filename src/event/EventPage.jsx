@@ -596,10 +596,11 @@ function BuyCard({ onBuy, onFees }) {
   }, [])
   return (
     <Card as="div">
+      {/* Ocultos para reduzir a carga de informação (para voltar, descomente):
       <Eyebrow>Ingressos disponíveis</Eyebrow>
-      <p className="mt-2 text-2xl font-semibold leading-none text-ink">Compre agora</p>
+      <p className="mt-2 text-2xl font-semibold leading-none text-ink">Compre agora</p> */}
       {/* Sessão (Figma 9150:191560): ícone + período, sem fundo nem borda. Só informativo, não é clicável. */}
-      <p className="mt-6 flex items-center gap-3 text-sm font-semibold leading-5 text-brand">
+      <p className="flex items-center gap-3 text-sm font-semibold leading-5 text-brand">
         <Ico name="calendar" className="size-6 text-ink" />
         {EVENT.rangeLabel}
       </p>
