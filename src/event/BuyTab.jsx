@@ -40,7 +40,14 @@ const MAP_ID = 'mapa-evento'
 export default function BuyTab({ order, dispatch, derived, session, onFees, onBuy }) {
   const listRef = useRef(null)
 
-  const pickSession = (id) => id !== order.sessionId && dispatch({ type: 'session', id })
+  const modalityRef = useRef(null)
+  const pickSession = (id) => {
+    if (id !== order.sessionId) dispatch({ type: 'session', id })
+    // Celular: ao escolher a data, desce até "Como você quer comprar?" (o bloco só aparece depois do render)
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      setTimeout(() => modalityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+    }
+  }
   const pickModality = (m) => {
     if (m !== order.modality) dispatch({ type: 'modality', modality: m })
     requestAnimationFrame(() => listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
@@ -70,7 +77,11 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
 
           <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
-          {session && <ModalityPicker session={session} selected={order.modality} onPick={pickModality} />}
+          {session && (
+            <div ref={modalityRef} className="scroll-mt-24">
+              <ModalityPicker session={session} selected={order.modality} onPick={pickModality} />
+            </div>
+          )}
 
           {showList && (
             <div ref={listRef} className="scroll-mt-24">
