@@ -232,12 +232,13 @@ function InfoTab({ onBuy, onFees }) {
           <div id="sec-ingressos" className="scroll-mt-24">
             <PricesCard />
           </div>
-          <div id="sec-onde-comprar" className="scroll-mt-24">
-            <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
-          </div>
+          {/* Mapa e galeria logo depois de Ingressos e benefícios; Onde comprar vem em seguida */}
           <VenueMap />
           <div id="sec-galeria" className="scroll-mt-24">
             <GalleryCard />
+          </div>
+          <div id="sec-onde-comprar" className="scroll-mt-24">
+            <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
           </div>
           <div id="sec-local" className="scroll-mt-24">
             <VenueCard />
@@ -299,8 +300,8 @@ const SECTIONS = [
   ['sec-sobre', 'Sobre'],
   ['sec-setores', 'Setores'],
   ['sec-ingressos', 'Ingressos e benefícios'],
-  ['sec-onde-comprar', 'Onde comprar'],
   ['sec-galeria', 'Galeria'],
+  ['sec-onde-comprar', 'Onde comprar'],
   ['sec-local', 'Local'],
 ]
 
