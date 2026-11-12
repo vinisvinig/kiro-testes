@@ -52,8 +52,9 @@ const DOW_FULL = { dom: 'Domingo', seg: 'Segunda', ter: 'Terça', qua: 'Quarta',
 export function chipDate(dates) {
   const [a] = dates
   const b = dates.at(-1)
-  if (dates.length === 1) return `${DOW_FULL[a.dow] || a.dow}, ${a.day} / ${a.mon}`
-  return `${a.day} / ${a.mon} a ${b.day} / ${b.mon}`
+  // Sem a barra entre dia e mês ("Quinta, 10 JUL"; período "10 JUL a 12 OUT")
+  if (dates.length === 1) return `${DOW_FULL[a.dow] || a.dow}, ${a.day} ${a.mon}`
+  return `${a.day} ${a.mon} a ${b.day} ${b.mon}`
 }
 
 export default function EventCard({
