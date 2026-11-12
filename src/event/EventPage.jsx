@@ -223,26 +223,25 @@ function InfoTab({ onBuy, onFees }) {
         <div className="flex min-w-0 flex-col gap-6">
           {/* Atalhos para cada bloco (Figma 10379:64536), na ordem atual dos blocos */}
           <SectionNav />
-          {/* Ordem do Figma 8677:38377: setores e preços logo após o "Sobre"; mapa antes da galeria */}
+          {/* Ordem pedida: Sobre, Preços, mapa (visão geral), Setores, Galeria, Local, Pontos de venda, Dúvidas */}
           <div id="sec-sobre" className="scroll-mt-24">
             <About />
-          </div>
-          <div id="sec-setores" className="scroll-mt-24">
-            <SectorsGuide />
           </div>
           <div id="sec-ingressos" className="scroll-mt-24">
             <PricesCard />
           </div>
-          {/* Mapa e galeria logo depois de Ingressos e benefícios; Onde comprar vem em seguida */}
           <VenueMap />
+          <div id="sec-setores" className="scroll-mt-24">
+            <SectorsGuide />
+          </div>
           <div id="sec-galeria" className="scroll-mt-24">
             <GalleryCard />
           </div>
-          <div id="sec-onde-comprar" className="scroll-mt-24">
-            <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
-          </div>
           <div id="sec-local" className="scroll-mt-24">
             <VenueCard />
+          </div>
+          <div id="sec-onde-comprar" className="scroll-mt-24">
+            <TopicsCard eyebrow="Onde comprar" title="Pontos de venda" items={EVENT.salesPoints} />
           </div>
           <Faq />
         </div>
@@ -298,12 +297,13 @@ function About() {
 }
 
 const SECTIONS = [
+  // Mesma ordem dos blocos na página
   ['sec-sobre', 'Sobre'],
-  ['sec-setores', 'Setores'],
   ['sec-ingressos', 'Ingressos e benefícios'],
+  ['sec-setores', 'Setores'],
   ['sec-galeria', 'Galeria'],
-  ['sec-onde-comprar', 'Onde comprar'],
   ['sec-local', 'Local'],
+  ['sec-onde-comprar', 'Onde comprar'],
 ]
 
 /**
