@@ -37,7 +37,7 @@ const Fee = ({ value, from = false, as: Tag = 'span', className = '' }) => (
 
 const MAP_ID = 'mapa-evento'
 
-export default function BuyTab({ order, dispatch, derived, session, onFees, onBuy }) {
+export default function BuyTab({ order, dispatch, derived, session, onFees, onBuy, remaining = null }) {
   const listRef = useRef(null)
 
   const modalityRef = useRef(null)
@@ -66,7 +66,8 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
 
   return (
     <div className="page-x py-6 md:py-8">
-      <div className={order.sessionId ? 'evento-box evento-grid' : 'evento-coluna grid grid-cols-1 gap-6'}>
+      {/* Sempre em 2 colunas: o resumo (com o contador da reserva) já aparece na escolha da data */}
+      <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
           {/* Figma 8522:122612: o mapa fica no topo, antes da escolha de data ("Ver mapa completo" rola até ele) */}
           <div id={MAP_ID} className="scroll-mt-24">
@@ -94,11 +95,9 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
           )}
         </div>
 
-        {order.sessionId && (
-          <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
-            <OrderSummary order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} />
-          </aside>
-        )}
+        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+          <OrderSummary order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} remaining={remaining} />
+        </aside>
       </div>
       {order.sessionId && <MobileBuyBar order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} />}
     </div>

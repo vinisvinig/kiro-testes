@@ -57,12 +57,26 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
 const countLabel = (n) => (n === 0 ? 'Nenhum ingresso selecionado' : `${n} ${n === 1 ? 'ingresso' : 'ingressos'}`)
 
 /** Card do resumo na coluna direita (a partir de 1024px; no celular vira a barra expansível). */
-export function OrderSummary({ order, derived, dispatch, onFees, onBuy }) {
+/** "Reserva garantida por mm:ss", no topo do resumo (seleção de ingressos e finalização). */
+export function ReserveTimer({ remaining, className = '' }) {
+  const low = remaining <= 120
+  return (
+    <div className={`flex items-center gap-2 rounded-full border px-4 py-2.5 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'} ${className}`} role="timer" aria-live="off">
+      <Ico name="timer" className="size-4 text-ink" />
+      <span className="flex-1 font-ui text-xs text-ink-2">Reserva garantida por</span>
+      <span className={`font-ui text-sm font-bold ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
+    </div>
+  )
+}
+
+export function OrderSummary({ order, derived, dispatch, onFees, onBuy, remaining = null }) {
   const d = derived
   const empty = d.count === 0
 
   return (
     <Card as="div" id={SUMMARY_ID} className="flex scroll-mt-24 flex-col gap-5">
+      {/* Desktop: o contador da reserva aparece no resumo desde a escolha da data (a aba não mostra mais no desktop) */}
+      {remaining !== null && <ReserveTimer remaining={remaining} />}
       <div>
         <Eyebrow>Resumo do pedido</Eyebrow>
         <p className="mt-2 text-2xl font-bold leading-tight text-ink">{countLabel(d.count)}</p>

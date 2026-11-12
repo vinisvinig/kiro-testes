@@ -16,7 +16,7 @@ import {
   newOrderNumber,
   onlyDigits,
 } from './checkout.js'
-import { mmss } from './OrderSummary.jsx'
+import { ReserveTimer, mmss } from './OrderSummary.jsx'
 import { Card, Dialog, Eyebrow, Ico, brl } from './parts.jsx'
 
 const SUMMARY_ID = 'resumo-checkout'
@@ -879,16 +879,7 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
 /* Coluna direita: resumo e cupons                                     */
 /* ------------------------------------------------------------------ */
 /** "Reserva garantida por mm:ss", no topo do resumo. */
-function ReserveTimer({ remaining, className = '' }) {
-  const low = remaining <= 120
-  return (
-    <div className={`flex items-center gap-2 rounded-full border px-4 py-2.5 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'} ${className}`} role="timer" aria-live="off">
-      <Ico name="timer" className="size-4 text-ink" />
-      <span className="flex-1 font-ui text-xs text-ink-2">Reserva garantida por</span>
-      <span className={`font-ui text-sm font-bold ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
-    </div>
-  )
-}
+
 
 function Totals({ t, order, remaining, title = 'Total à vista', showTimer = true }) {
   const low = remaining <= 120

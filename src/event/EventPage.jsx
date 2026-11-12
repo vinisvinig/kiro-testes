@@ -145,6 +145,7 @@ export default function EventPage({ slug, search }) {
             session={session}
             onFees={() => setFees(true)}
             onBuy={buy}
+            remaining={deadline ? remaining : null}
           />
         )}
       </div>
