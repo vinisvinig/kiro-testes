@@ -69,14 +69,14 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
       {/* Sempre em 2 colunas: o resumo (com o contador da reserva) já aparece na escolha da data */}
       <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
-          {/* Figma 8522:122612: o mapa fica no topo, antes da escolha de data ("Ver mapa completo" rola até ele) */}
+          <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
+
+          {/* Mapa logo depois das datas ("Ver mapa completo" rola até ele) */}
           <div id={MAP_ID} className="scroll-mt-24">
             {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
                 <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
             <VenueMap />
           </div>
-
-          <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
           {session && (
             <div ref={modalityRef} className="scroll-mt-24">
