@@ -342,7 +342,7 @@ function SectionNav() {
                 type="button"
                 onClick={() => go(id)}
                 aria-current={on ? 'true' : undefined}
-                className={`whitespace-nowrap rounded-2xl border p-2 text-sm font-semibold leading-5 transition ${
+                className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold leading-5 transition ${
                   on ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:border-brand'
                 }`}
               >
@@ -417,6 +417,7 @@ function PricesCard() {
     <Card className="md:!p-8">
       <Eyebrow>Ingressos & benefícios</Eyebrow>
       <CardTitle className="mt-2">Preços e tipos de ingresso</CardTitle>
+      {/* Caixas "Ingresso" e "Combo" ocultas (Figma 10145:90808): no teste pareciam botões e confundiram mais do que explicaram.
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
         <InfoTile title="Ingresso" titleClass="text-brand" gap="gap-2">
           Um ingresso por pessoa. Escolha a quantidade e os assentos, quando houver.
@@ -425,15 +426,16 @@ function PricesCard() {
           Pacote com quantidade e tipos de ingresso definidos. Assentos no setor do combo.
         </InfoTile>
       </ul>
-      <hr className="mt-6 border-line" />
+      <hr className="mt-6 border-line" /> */}
+      {/* Espaços do Figma: 24 após o título, 8 entre subtítulo e texto, 16 entre os itens da tabela, 32 antes do Ver mais */}
       <h3 className="mt-6 text-xl font-bold leading-6 text-ink">Compare os setores</h3>
-      <p className="mt-4 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p>
+      <p className="mt-2 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p>
       {/* Desktop: cabeçalho Setor | Valor; no celular cada setor vira um bloco com o valor embaixo */}
-      <div className="mt-4 hidden gap-4 px-4 py-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
+      <div className="mt-4 hidden gap-4 px-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
         <span>Setor</span>
         <span>Valor</span>
       </div>
-      <ul id="precos-setores" className="mt-4 flex flex-col gap-4 sm:mt-0" aria-label="Menor valor por setor">
+      <ul id="precos-setores" className="mt-4 flex flex-col gap-4" aria-label="Menor valor por setor">
         {shown.map((r) => (
           <li key={r.id} className="grid gap-3 rounded-2xl bg-body-2 p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
             <div className="flex flex-col gap-2">
@@ -452,7 +454,7 @@ function PricesCard() {
         Obs.: Valores e taxas a partir de, sujeitos à disponibilidade. Setores e tipos de ingresso podem esgotar até a seleção.
       </p>
       {rows.length > 3 && (
-        <div className="mt-6 flex">
+        <div className="mt-8 flex">
           <MoreButton open={more} onClick={() => setMore(!more)} controls="precos-setores" />
         </div>
       )}
