@@ -257,7 +257,7 @@ function ModalityPicker({ session, selected, onPick }) {
   // (os combos do protótipo dão 60% a 80% de desconto sobre 5 inteiras, então "até 50%" é verdadeiro).
   // Teste com usuários: Combo como primeira opção (à esquerda no desktop, acima no celular)
   const opts = [
-    { id: 'combo', title: 'Pacote de ingressos', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
+    { id: 'combo', title: 'Pacote de ingressos', desc: 'Garante vantagens especiais', off: 50, tag: 'Limitado', icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
     { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
   ]
   return (
@@ -274,8 +274,12 @@ function ModalityPicker({ session, selected, onPick }) {
               role="radio"
               aria-checked={on}
               onClick={() => onPick(o.id)}
-              className={`modalidade rounded-[14px] border p-3 text-left sm:p-4 transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
+              className={`modalidade relative rounded-[14px] border p-3 text-left sm:p-4 transition ${on ? `${o.on} border-transparent text-white` : 'border-line bg-body text-ink hover:border-ink-4'}`}
             >
+              {/* Tag de escassez sobre a borda de cima (Figma 10470:208301: pílula preta, 8px da esquerda, 9px acima) */}
+              {o.tag && (
+                <span className="absolute -top-[9px] left-2 rounded-full bg-ink px-[5.5px] py-px font-ui text-[10px] font-medium leading-4 text-white">{o.tag}</span>
+              )}
               <span className="modalidade-linha">
               <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? o.iconOn : o.iconIdle}`}>
                 <Ico name={o.icon} className="size-6" />
