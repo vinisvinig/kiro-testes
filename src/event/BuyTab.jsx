@@ -20,7 +20,7 @@ import {
   occupiedFor,
 } from './eventData.js'
 import { keyOf, roomIn, takenElsewhere } from './order.js'
-import { Badge, Card, CardTitle, Eyebrow, Ico, InfoBanner, Note, Stepper, VenueMap, brl } from './parts.jsx'
+import { Badge, Card, CardTitle, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
 
@@ -62,7 +62,24 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
   //   if (order.open !== target) dispatch({ type: 'open', id: target })
   //   requestAnimationFrame(() => document.getElementById(`item-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
   // }
-  const toMap = () => document.getElementById(MAP_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // "Ver mapa completo" abre o pop-up grande do mapa (só visualização)
+  const [mapOpen, setMapOpen] = useState(false)
+  const toMap = () => setMapOpen(true)
+  // Desktop, depois de escolher data e modalidade: o mapa vai para a coluna direita, abaixo do resumo (Figma 10470:207527)
+  const mapAside = !!showList
+  // A coluna direita fica fixa enquanto rola; se for mais alta que a tela, rola junto até o fim e só então para
+  const asideRef = useRef(null)
+  const [asideTop, setAsideTop] = useState(96)
+  useEffect(() => {
+    const el = asideRef.current
+    if (!el) return
+    const fit = () => setAsideTop(Math.min(96, window.innerHeight - el.offsetHeight - 24))
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    window.addEventListener('resize', fit)
+    return () => (ro.disconnect(), window.removeEventListener('resize', fit))
+  }, [])
 
   return (
     <div className="page-x py-6 md:py-8">
@@ -87,18 +104,20 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
             </div>
           )}
 
-          {/* Mapa no fim da coluna, depois da data, da modalidade e dos setores ("Ver mapa completo" rola até ele) */}
-          <div id={MAP_ID} className="scroll-mt-24">
-            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
-                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
+          {/* Mapa no fim da coluna (no desktop, depois de escolher a modalidade, vai para baixo do resumo).
+              Estático. Versão interativa antiga:
+              <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
+          <div id={MAP_ID} className={`scroll-mt-24 ${mapAside ? 'lg:hidden' : ''}`}>
             <VenueMap />
           </div>
         </div>
 
-        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+        <aside ref={asideRef} style={{ top: asideTop }} className="hidden lg:sticky lg:flex lg:flex-col lg:gap-8 lg:self-start">
           <OrderSummary order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} remaining={remaining} />
+          {mapAside && <VenueMap compact />}
         </aside>
       </div>
+      <MapDialog open={mapOpen} onClose={() => setMapOpen(false)} />
       {order.sessionId && <MobileBuyBar order={order} derived={derived} dispatch={dispatch} onFees={onFees} onBuy={onBuy} />}
     </div>
   )

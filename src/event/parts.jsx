@@ -1,5 +1,5 @@
 // Peças compartilhadas pela Página do evento e pela seleção de ingressos.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { asset, useModalBehavior } from '../components/home/ui.jsx'
 
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -185,28 +185,61 @@ const MAP_BLOCKS = [
  * sabendo qual setor quer. A versão interativa (clicar no setor abre a lista; setor aberto em destaque)
  * ficou comentada abaixo; para reativar, volte a aceitar { onPick, active } e use os trechos comentados.
  */
-export function VenueMap() {
-  // Figma 9396:161569: título "Visão geral do local" e o mapa ilustrativo como imagem, com a nota abaixo
+const MAP_SRC = asset('mapa-estadio-claro.png')
+const MAP_ALT = `Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`
+
+/**
+ * "Visão geral do local". Clicar no mapa abre o pop-up grande (só visualização).
+ * `compact`: versão da coluna direita, abaixo do resumo (Figma 10470:207527: card 360, padding 32, mapa com padding 24).
+ */
+export function VenueMap({ compact = false }) {
+  const [open, setOpen] = useState(false)
   return (
-    <Card>
+    <Card className={compact ? '!p-8' : ''}>
       <CardTitle>Visão geral do local</CardTitle>
-      <div className="mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body p-4 md:p-6">
-        <img
-          src={asset('mapa-estadio-claro.png')}
-          alt={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
-          loading="lazy"
-          // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
-          width={632}
-          height={316}
-          draggable={false}
-          className="pointer-events-none h-auto w-full select-none"
-        />
+      <div className={`mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
+        <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <img
+            src={MAP_SRC}
+            alt={MAP_ALT}
+            loading="lazy"
+            // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
+            width={632}
+            height={316}
+            draggable={false}
+            className="h-auto w-full select-none transition group-hover:opacity-90"
+          />
+        </button>
         <p className="flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
           <Ico name="info" className="mt-px size-3 shrink-0" />
           Este mapa referencial do evento apresenta somente a localização dos setores.
         </p>
       </div>
+      <MapDialog open={open} onClose={() => setOpen(false)} />
     </Card>
+  )
+}
+
+/** Pop-up grande com o mapa, só para visualizar (abre pelo mapa ou pelo "Ver mapa completo"). */
+export function MapDialog({ open, onClose }) {
+  return (
+    <Dialog open={open} onClose={onClose} labelledBy="mapa-t" className="max-w-[1100px] !p-6 md:!p-8">
+      <div className="flex items-center justify-between gap-4">
+        <h2 id="mapa-t" className="text-2xl font-bold leading-tight text-ink">
+          Visão geral do local
+        </h2>
+        <button type="button" onClick={onClose} aria-label="Fechar" className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink hover:bg-body-2">
+          <Ico name="close" className="size-6" />
+        </button>
+      </div>
+      <div className="mt-6 rounded-3xl border border-line bg-body p-4 md:p-8">
+        <img src={MAP_SRC} alt={MAP_ALT} width={632} height={316} draggable={false} className="h-auto w-full select-none" />
+      </div>
+      <p className="mt-3 flex items-start gap-1 font-ui text-xs text-ink-3">
+        <Ico name="info" className="mt-0.5 size-3.5 shrink-0" />
+        Este mapa referencial do evento apresenta somente a localização dos setores.
+      </p>
+    </Dialog>
   )
 }
 /*
