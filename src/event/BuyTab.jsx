@@ -71,13 +71,6 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
         <div className="flex min-w-0 flex-col gap-6">
           <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
-          {/* Mapa logo depois das datas ("Ver mapa completo" rola até ele) */}
-          <div id={MAP_ID} className="scroll-mt-24">
-            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
-                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
-            <VenueMap />
-          </div>
-
           {session && (
             <div ref={modalityRef} className="scroll-mt-24">
               <ModalityPicker session={session} selected={order.modality} onPick={pickModality} />
@@ -93,6 +86,13 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
               )}
             </div>
           )}
+
+          {/* Mapa no fim da coluna, depois da data, da modalidade e dos setores ("Ver mapa completo" rola até ele) */}
+          <div id={MAP_ID} className="scroll-mt-24">
+            {/* Estático: sem clique nem destaque do setor aberto. Versão interativa:
+                <VenueMap onPick={showList ? openFromMap : undefined} active={showList ? (COMBOS.find((c) => c.id === order.open)?.sector ?? order.open) : undefined} /> */}
+            <VenueMap />
+          </div>
         </div>
 
         <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
@@ -236,9 +236,10 @@ function ModalityPicker({ session, selected, onPick }) {
   const individualFrom = Math.min(...open.map((s) => minFare(s, session)))
   // Figma 10376:152167: Ingresso só com título e preço; Combo com chamada e selo "Até 50% OFF" no lugar do preço
   // (os combos do protótipo dão 60% a 80% de desconto sobre 5 inteiras, então "até 50%" é verdadeiro).
+  // Teste com usuários: Combo como primeira opção (à esquerda no desktop, acima no celular)
   const opts = [
-    { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
     { id: 'combo', title: 'Combo de ingressos', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
+    { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
   ]
   return (
     <Card className="modalidades">
