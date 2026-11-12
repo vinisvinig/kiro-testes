@@ -478,8 +478,14 @@ function TopicsCard({ eyebrow, title, items }) {
 }
 
 /** Texto do assunto; com `more`, mostra "Ver mais" (rosa, sublinhado) e abre o restante no lugar. */
-function TopicText({ lines, more }) {
+// Só vale cortar o texto quando ele é longo: até este total de caracteres, mostra tudo sem "Ver mais".
+const TOPIC_MORE_MIN = 220
+
+function TopicText({ lines, more: hidden }) {
   const [open, setOpen] = useState(false)
+  const short = hidden && [...lines, ...hidden].join(' ').length <= TOPIC_MORE_MIN
+  if (short) lines = [...lines, ...hidden]
+  const more = short ? null : hidden
   const all = open && more ? [...lines, ...more] : lines
   return (
     <div className="text-sm leading-5 text-ink-2">
