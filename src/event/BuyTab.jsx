@@ -238,7 +238,7 @@ function ModalityPicker({ session, selected, onPick }) {
   // (os combos do protótipo dão 60% a 80% de desconto sobre 5 inteiras, então "até 50%" é verdadeiro).
   // Teste com usuários: Combo como primeira opção (à esquerda no desktop, acima no celular)
   const opts = [
-    { id: 'combo', title: 'Combo de ingressos', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
+    { id: 'combo', title: 'Pacote de ingressos', desc: 'Garante vantagens especiais', off: 50, icon: 'ticketStar', on: 'bg-combo', iconIdle: 'bg-combo-0 text-combo', iconOn: 'bg-combo-0 text-combo' },
     { id: 'individual', title: 'Ingresso', from: individualFrom, icon: 'ticket', on: 'bg-brand', iconIdle: 'bg-brand-0 text-brand', iconOn: 'bg-brand-0 text-brand' },
   ]
   return (
