@@ -1,6 +1,6 @@
 // Peças compartilhadas pela Página do evento e pela seleção de ingressos.
 import { useEffect, useRef, useState } from 'react'
-import { asset, useModalBehavior } from '../components/home/ui.jsx'
+import { asset, useIsDesktop, useModalBehavior } from '../components/home/ui.jsx'
 
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -194,22 +194,33 @@ const MAP_ALT = `Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) =>
  */
 export function VenueMap({ compact = false }) {
   const [open, setOpen] = useState(false)
+  // Celular (< 768px): o mapa é só imagem, sem pop-up
+  const zoom = useIsDesktop()
   return (
     <Card className={compact ? '!p-8' : ''}>
       <CardTitle>Visão geral do local</CardTitle>
       <div className={`mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
-        <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
-          <img
-            src={MAP_SRC}
-            alt={MAP_ALT}
-            loading="lazy"
-            // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
-            width={632}
-            height={316}
-            draggable={false}
-            className="h-auto w-full select-none transition group-hover:opacity-90"
-          />
-        </button>
+        {(() => {
+          const img = (
+            <img
+              src={MAP_SRC}
+              alt={MAP_ALT}
+              loading="lazy"
+              // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
+              width={632}
+              height={316}
+              draggable={false}
+              className="h-auto w-full select-none transition group-hover:opacity-90"
+            />
+          )
+          return zoom ? (
+            <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
+              {img}
+            </button>
+          ) : (
+            img
+          )
+        })()}
         <p className="flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
           <Ico name="info" className="mt-px size-3 shrink-0" />
           Este mapa referencial do evento apresenta somente a localização dos setores.

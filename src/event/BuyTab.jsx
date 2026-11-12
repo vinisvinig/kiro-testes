@@ -62,9 +62,12 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
   //   if (order.open !== target) dispatch({ type: 'open', id: target })
   //   requestAnimationFrame(() => document.getElementById(`item-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
   // }
-  // "Ver mapa completo" abre o pop-up grande do mapa (só visualização)
+  // "Ver mapa completo": no desktop abre o pop-up grande do mapa; no celular rola até o mapa (sem pop-up)
   const [mapOpen, setMapOpen] = useState(false)
-  const toMap = () => setMapOpen(true)
+  const toMap = () =>
+    window.matchMedia('(min-width: 768px)').matches
+      ? setMapOpen(true)
+      : document.getElementById(MAP_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   // Desktop, depois de escolher data e modalidade: o mapa vai para a coluna direita, abaixo do resumo (Figma 10470:207527)
   const mapAside = !!showList
   // A coluna direita fica fixa enquanto rola; se for mais alta que a tela, rola junto até o fim e só então para
