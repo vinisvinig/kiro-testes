@@ -193,8 +193,11 @@ export function VenueMap() {
           src={asset('mapa-estadio-4-setores.png')}
           alt={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
           loading="lazy"
+          // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
+          width={1440}
+          height={703}
           draggable={false}
-          className="pointer-events-none w-full select-none"
+          className="pointer-events-none h-auto w-full select-none"
         />
         <p className="flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
           <Ico name="info" className="mt-px size-3 shrink-0" />
