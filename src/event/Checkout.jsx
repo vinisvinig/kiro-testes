@@ -33,6 +33,7 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
   const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
   const [cardTouched, setCardTouched] = useState({})
   const [alertStep, setAlertStep] = useState(null) // etapa obrigatória sinalizada em vermelho
+  const [optOpen, setOptOpen] = useState('seguro') // opcional expandido: 'seguro' | 'clube' | null
   const cardValid = Object.keys(cardErrors(card)).length === 0
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
   // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
@@ -138,8 +139,11 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
             <div className="lg:hidden">
               <Coupons c={c} t={t} order={order} dispatch={dispatch} />
             </div>
-            <InsuranceStep c={c} t={t} dispatch={dispatch} alert={alertStep === 'seguro'} />
-            <ClubStep c={c} t={t} order={order} dispatch={dispatch} alert={alertStep === 'clube'} />
+            {/* Opcionais em destaque: um aberto por vez; o seguro começa aberto (Figma 10337:54950) */}
+            <div className="flex flex-col gap-4">
+              <InsuranceStep c={c} t={t} dispatch={dispatch} open={optOpen === 'seguro'} onToggle={() => setOptOpen((v) => (v === 'seguro' ? null : 'seguro'))} />
+              <ClubStep c={c} t={t} order={order} dispatch={dispatch} open={optOpen === 'clube'} onToggle={() => setOptOpen((v) => (v === 'clube' ? null : 'clube'))} />
+            </div>
             <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} />
             <PaymentStep
               c={c}
@@ -301,18 +305,6 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
 
 const stateOf = (c, step, answered) => (c.step === step ? 'open' : answered ? 'done' : 'locked')
 
-function CheckOption({ checked, onChange, title, detail }) {
-  return (
-    <label className={`flex cursor-pointer items-center gap-4 rounded-2xl border bg-white px-4 py-4 transition ${checked ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-ink-4'}`}>
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="size-4 accent-brand" />
-      <span>
-        <span className="block text-sm font-semibold text-ink">{title}</span>
-        <span className="mt-1 block font-ui text-xs text-ink-2">{detail}</span>
-      </span>
-    </label>
-  )
-}
-
 const PrimaryButton = ({ className = '', ...rest }) => (
   <button
     type="button"
@@ -345,50 +337,88 @@ const PurchaseTerms = ({ action }) => (
   </p>
 )
 
-/* ---------------- 02 · Seguro ---------------- */
-function InsuranceStep({ c, t, dispatch, alert }) {
+/* ---------------- Opcionais em destaque: Seguro e Clube Planeta (Figma 10337:54950) ---------------- */
+/**
+ * Card com cabeçalho colorido que abre e fecha (seguro azul, clube rosa). Não é etapa obrigatória:
+ * começa desmarcado e a jornada segue para a entrega sem precisar responder.
+ */
+function OptionalCard({ id, color, icon, title, value, added, open, onToggle, children }) {
+  const bodyId = `${id}-detalhes`
+  return (
+    <section id={`etapa-${id}`} aria-labelledby={`${id}-t`} className="scroll-mt-24 overflow-hidden rounded-2xl border bg-white" style={{ borderColor: color }}>
+      <h2>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          className="flex w-full items-center gap-4 p-5 text-left text-white md:p-6"
+          style={{ backgroundColor: color }}
+        >
+          <Ico name={icon} className="size-6 shrink-0" />
+          <span className="min-w-0 flex-1">
+            <span id={`${id}-t`} className="block text-xl font-bold leading-tight md:text-2xl">
+              {title}
+            </span>
+            <span className="mt-2 block font-ui text-sm leading-5">
+              {added ? 'Adicionado' : 'Opcional'} · {brl(value)} no pedido
+            </span>
+          </span>
+          <Ico name="expand" className={`size-5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+      </h2>
+      {open && (
+        <div id={bodyId} className="flex flex-col gap-4 p-5 md:p-6">
+          {children}
+        </div>
+      )}
+    </section>
+  )
+}
+
+/** Opção de contratar: celular em cinza com o título em negrito; desktop branco com borda rosa (Figma 10428:192069 / 10430:62772). */
+function OptionalCheck({ checked, onChange, title, detail }) {
+  return (
+    <label
+      className={`flex cursor-pointer gap-3 rounded-[14px] border p-4 transition md:items-center md:gap-4 md:rounded-2xl md:border-2 md:border-brand md:bg-white ${
+        checked ? 'border-brand bg-white ring-1 ring-brand md:ring-0' : 'border-line bg-body-2'
+      }`}
+    >
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-1 size-4 shrink-0 accent-brand md:mt-0" />
+      <span className="flex flex-col gap-2">
+        <span className="text-base font-bold leading-6 text-ink md:font-semibold">{title}</span>
+        <span className="font-ui text-sm leading-5 text-ink-3 md:text-ink-2">{detail}</span>
+      </span>
+    </label>
+  )
+}
+
+const InfoLink = ({ onClick, children }) => (
+  <button type="button" onClick={onClick} className="flex items-center gap-2 self-start text-base font-semibold leading-6 text-brand underline underline-offset-2 hover:text-brand-700">
+    <Ico name="info" className="size-4 no-underline" />
+    {children}
+  </button>
+)
+
+/* ---------------- Seguro ---------------- */
+function InsuranceStep({ c, t, dispatch, open, onToggle }) {
   const [info, setInfo] = useState(false)
   return (
-    <StepShell
-      id="seguro"
-      alert={alert}
-      state={stateOf(c, 'seguro', c.insurance !== null)}
-      icon="shield"
-      title={c.step === 'seguro' ? 'Quer proteger seus ingressos?' : 'Seguro'}
-      subtitle="Seguro opcional"
-      summary={c.insurance ? `Seguro MetLife contratado · ${brl(t.insuranceValue)}` : 'Sem seguro'}
-      onEdit={() => dispatch({ type: 'edit', step: 'seguro' })}
-      declined={c.insurance === false}
-    >
-      <p className="text-base font-bold text-ink">Seguro MetLife</p>
-      {/* Textos do Figma 9564:40662 */}
-      <div className="mt-2 flex flex-col gap-2 text-base leading-6 text-ink-2">
-        <p>Reembolso sujeito à análise da seguradora, às coberturas contratadas e às condições do seguro.</p>
-        <p>Cobertura em caso de imprevistos, como problemas de saúde.</p>
-        <p>Não cobre simples desistência ou mudança de planos.</p>
-      </div>
-      <button type="button" onClick={() => setInfo(true)} className="mt-2 font-ui text-xs text-brand underline hover:no-underline">
-        Ver condições e como solicitar reembolso
-      </button>
-      {/* Aceite dos termos do seguro (Figma 9652:43944) */}
-      <p className="mt-6 rounded-xl border border-line bg-body px-3 py-2.5 text-base leading-6 text-ink-2">
-        Ao selecionar Quero contratar o seguro, eu declaro que li e tenho conhecimento e concordo com os{' '}
-        <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink> do seguro, e dos{' '}
-        <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e Demais Disposições do Seguro</TermLink>.
+    <OptionalCard id="seguro" color="#2563eb" icon="shield" title="Proteja seu ingresso" value={t.insuranceValue} added={!!c.insurance} open={open} onToggle={onToggle}>
+      <p className="text-base leading-6 text-ink">Reembolso sujeito à análise da seguradora, às coberturas contratadas e às condições do seguro.</p>
+      <p className="font-ui text-sm leading-5 text-ink-2">Cobertura em caso de imprevistos, como problemas de saúde. Não cobre simples desistência ou mudança de planos.</p>
+      <p className="font-ui text-sm leading-5 text-ink-2">Solicitação diretamente com a MetLife, fora da Uhuu.</p>
+      <InfoLink onClick={() => setInfo(true)}>Ver condições do seguro</InfoLink>
+      <OptionalCheck
+        checked={!!c.insurance}
+        onChange={(v) => dispatch({ type: 'toggle', key: 'insurance', value: v })}
+        title="Quero contratar o seguro"
+        detail={`+ ${brl(t.insuranceValue)} no pedido`}
+      />
+      <p className="font-ui text-sm leading-5 text-ink-2">
+        Ao selecionar o seguro, declaro que li e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink>, os{' '}
+        <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e as demais disposições do seguro</TermLink>.
       </p>
-      <div className="mt-5">
-        <CheckOption
-          checked={c.insuranceDraft}
-          onChange={(v) => dispatch({ type: 'draft', key: 'insuranceDraft', value: v })}
-          title="Quero contratar o seguro"
-          detail={`+ ${brl(t.insuranceValue)} no pedido`}
-        />
-      </div>
-      <div className="mt-5 flex justify-end">
-        <PrimaryButton onClick={() => dispatch({ type: 'answer', key: 'insurance', value: c.insuranceDraft })}>
-          {c.insuranceDraft ? 'Continuar' : 'Continuar sem seguro'}
-        </PrimaryButton>
-      </div>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o seguro MetLife">
         {/* Texto do Figma 9640:241163 */}
         <div className="flex flex-col gap-6 font-sans text-base leading-6">
@@ -406,47 +436,32 @@ function InsuranceStep({ c, t, dispatch, alert }) {
           </p>
         </div>
       </InfoDialog>
-    </StepShell>
+    </OptionalCard>
   )
 }
 
-/* ---------------- 03 · Clube Planeta ---------------- */
-function ClubStep({ c, t, order, dispatch, alert }) {
+/* ---------------- Clube Planeta ---------------- */
+function ClubStep({ c, t, order, dispatch, open, onToggle }) {
   const [info, setInfo] = useState(false)
   const per = t.clubValue / Math.max(1, order.count)
   return (
-    <StepShell
-      id="clube"
-      alert={alert}
-      state={stateOf(c, 'clube', c.club !== null)}
-      icon="club"
-      title={c.step === 'clube' ? 'Quer adicionar o Clube Planeta?' : 'Clube Planeta'}
-      subtitle="Adesão opcional"
-      summary={c.club ? `Clube Planeta adicionado · ${order.count} ${order.count === 1 ? 'ingresso' : 'ingressos'} · ${brl(t.clubValue)}` : 'Sem Clube Planeta'}
-      onEdit={() => dispatch({ type: 'edit', step: 'clube' })}
-      declined={c.club === false}
-    >
-      {/* Textos do Figma 9564:40694 */}
-      <p className="text-base font-bold leading-6 text-ink">Benefícios e descontos exclusivos em eventos participantes.</p>
-      <ul className="mt-2 list-disc pl-6 text-base leading-6 text-ink-2">
-        <li>Descontos exclusivos em ingressos parceiros</li>
-        <li>Prioridade na compra de eventos selecionados</li>
-        <li>Vantagens administradas pela Uhuu</li>
+    <OptionalCard id="clube" color="#e91369" icon="club" title="Clube Planeta" value={t.clubValue} added={!!c.club} open={open} onToggle={onToggle}>
+      <p className="text-base leading-6 text-ink">Benefícios e descontos exclusivos em eventos participantes.</p>
+      <p className="font-ui text-sm leading-5 text-ink-2">
+        {brl(per)} por ingresso · {order.count} {order.count === 1 ? 'ingresso' : 'ingressos'} no pedido.
+      </p>
+      <ul className="font-ui text-sm leading-5 text-ink-2">
+        <li>• Descontos exclusivos em ingressos parceiros</li>
+        <li>• Prioridade na compra de eventos selecionados</li>
+        <li>• Vantagens administradas pela Uhuu</li>
       </ul>
-      <button type="button" onClick={() => setInfo(true)} className="mt-2 font-ui text-xs text-brand underline hover:no-underline">
-        Ver benefícios e condições do Clube Planeta
-      </button>
-      <div className="mt-5">
-        <CheckOption
-          checked={c.clubDraft}
-          onChange={(v) => dispatch({ type: 'draft', key: 'clubDraft', value: v })}
-          title="Quero adicionar o Clube Planeta"
-          detail={`${brl(per)} por ingresso. Total: + ${brl(t.clubValue)} no pedido`}
-        />
-      </div>
-      <div className="mt-5 flex justify-end">
-        <PrimaryButton onClick={() => dispatch({ type: 'answer', key: 'club', value: c.clubDraft })}>{c.clubDraft ? 'Continuar' : 'Continuar sem clube'}</PrimaryButton>
-      </div>
+      <InfoLink onClick={() => setInfo(true)}>Ver benefícios e condições</InfoLink>
+      <OptionalCheck
+        checked={!!c.club}
+        onChange={(v) => dispatch({ type: 'toggle', key: 'club', value: v })}
+        title="Quero adicionar o Clube Planeta"
+        detail={`${brl(per)} por ingresso. Total: + ${brl(t.clubValue)} no pedido`}
+      />
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o Clube Planeta">
         <p>Benefícios e descontos exclusivos em eventos e ingressos participantes.</p>
         <p>Descontos em ingressos parceiros, prioridade na compra de eventos selecionados e vantagens administradas pela Uhuu.</p>
@@ -455,7 +470,7 @@ function ClubStep({ c, t, order, dispatch, alert }) {
           elegibilidade precisam ser validadas.
         </p>
       </InfoDialog>
-    </StepShell>
+    </OptionalCard>
   )
 }
 

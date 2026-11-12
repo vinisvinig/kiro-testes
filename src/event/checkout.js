@@ -36,10 +36,12 @@ export const COUPONS = {
 }
 
 export const initialCheckout = {
-  step: 'seguro', // etapa aberta agora (null quando tudo foi respondido)
-  insurance: null, // true | false | null (não respondido)
+  // Seguro e Clube Planeta viraram opcionais em destaque (Figma 10337:54950): não são mais etapas,
+  // começam desmarcados e a jornada já abre na entrega.
+  step: 'entrega', // etapa aberta agora
+  insurance: false, // contratado ou não (marcar/desmarcar não muda a etapa)
   insuranceDraft: false,
-  club: null,
+  club: false,
   clubDraft: false,
   delivery: null, // 'bilheteria' | 'expressa'
   address: 'a1',
@@ -67,6 +69,8 @@ export function checkoutReducer(c, a) {
       return { ...c, ...drafts, step: a.step, ...(a.step === 'entrega' ? { deliveryDone: false } : {}) }
     }
     case 'draft':
+      return { ...c, [a.key]: a.value }
+    case 'toggle': // seguro / clube: só liga ou desliga, sem mexer na etapa aberta
       return { ...c, [a.key]: a.value }
     case 'answer': {
       const next = { ...c, [a.key]: a.value }
