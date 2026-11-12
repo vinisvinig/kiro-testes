@@ -295,7 +295,11 @@ const MapButton = ({ onClick }) => (
     onClick={onClick}
     className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:border-brand-700 hover:text-brand-700"
   >
-    Ver mapa completo <Ico name="pin" className="size-[14px]" />
+    Ver mapa completo
+    {/* Ícone "map" do Figma 9961:42076 (mapa dobrado), no lugar do pin: é um mapa de setores, não a localização */}
+    <svg viewBox="0 0 14 14" aria-hidden className="size-[14px] fill-current">
+      <path d="M8.548 2.905 5.631 1.884a1.18 1.18 0 0 0-.758-.006l-2.328.782a1.17 1.17 0 0 0-.793 1.108v6.913c0 .822.822 1.382 1.587 1.085l1.709-.665a.6.6 0 0 1 .402-.006l2.917 1.021c.245.087.513.087.758.006l2.328-.782a1.17 1.17 0 0 0 .793-1.108V3.319c0-.823-.822-1.383-1.587-1.085l-1.709.665a.6.6 0 0 1-.403.006ZM8.752 11.019l-3.5-1.231V2.98l3.5 1.231v6.808Z" />
+    </svg>
   </button>
 )
 
