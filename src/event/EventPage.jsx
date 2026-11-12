@@ -231,9 +231,10 @@ function InfoTab({ onBuy, onFees }) {
             <PricesCard />
           </div>
           <VenueMap />
+          {/* "Entenda os setores" oculto: no teste confundiu mais do que ajudou. Para voltar, descomente aqui e o atalho em SECTIONS.
           <div id="sec-setores" className="scroll-mt-24">
             <SectorsGuide />
-          </div>
+          </div> */}
           <div id="sec-galeria" className="scroll-mt-24">
             <GalleryCard />
           </div>
@@ -300,7 +301,7 @@ const SECTIONS = [
   // Mesma ordem dos blocos na página
   ['sec-sobre', 'Sobre'],
   ['sec-ingressos', 'Ingressos e benefícios'],
-  ['sec-setores', 'Setores'],
+  // ['sec-setores', 'Setores'], // bloco "Entenda os setores" oculto
   ['sec-galeria', 'Galeria'],
   ['sec-local', 'Local'],
   ['sec-onde-comprar', 'Onde comprar'],
