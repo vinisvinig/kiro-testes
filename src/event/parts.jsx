@@ -170,7 +170,7 @@ export const InfoBanner = ({ children, title }) => (
 /* ------------------------------------------------------------------ */
 /* Mapa referencial do evento (Figma "Mapa referencial do evento")     */
 /* ------------------------------------------------------------------ */
-// Áreas da imagem public/figma/mapa-estadio-6-setores.png (Figma 9779:104788), usadas no texto alternativo
+// Áreas da imagem public/figma/mapa-estadio-claro.png (exportação do Figma 9779:104788), usadas no texto alternativo
 const MAP_BLOCKS = [
   { label: 'Cadeira coberta 1', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
   { label: 'Pista Premium', sector: 'pista-premium', cls: 'bg-[#fcd34d]', star: true },
@@ -192,12 +192,12 @@ export function VenueMap() {
       <CardTitle>Visão geral do local</CardTitle>
       <div className="mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body p-4 md:p-6">
         <img
-          src={asset('mapa-estadio-6-setores.png')}
+          src={asset('mapa-estadio-claro.png')}
           alt={`Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`}
           loading="lazy"
           // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
-          width={1440}
-          height={720}
+          width={632}
+          height={316}
           draggable={false}
           className="pointer-events-none h-auto w-full select-none"
         />
