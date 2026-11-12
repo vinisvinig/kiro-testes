@@ -1,5 +1,5 @@
 // Página do evento (Figma 8515:120880) com as abas "Informações do evento" e "Comprar ingressos".
-import { useEffect, useMemo, useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Lightbox } from '../local/Gallery.jsx'
 import { navigate } from '../router.jsx'
@@ -216,7 +216,8 @@ function Tabs({ tab, onTab, remaining }) {
 /* ---------------- Aba de informações ---------------- */
 function InfoTab({ onBuy, onFees }) {
   return (
-    <div className="page-x py-6 md:py-8">
+    // max-lg:pb-28: espaço para a barra fixa de Comprar não cobrir o fim do conteúdo
+    <div className="page-x py-6 max-lg:pb-28 md:py-8">
       <div className="evento-box evento-grid">
         <div className="flex min-w-0 flex-col gap-6">
           {/* Atalhos para cada bloco (Figma 10379:64536), na ordem atual dos blocos */}
@@ -574,6 +575,17 @@ function BuyCard({ onBuy, onFees }) {
   const from = Math.min(...SECTORS.filter((s) => !s.soldOut).map((s) => minFare(s)))
   const fee = from * 0.15
   const total = from + fee
+  const btnRef = useRef(null)
+  const [floating, setFloating] = useState(false)
+  useEffect(() => {
+    const el = btnRef.current
+    if (!el) return
+    // Só quando o botão já passou para cima da tela (não antes de chegar nele)
+    const onScroll = () => setFloating(el.getBoundingClientRect().bottom < 0)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   return (
     <Card as="div">
       <Eyebrow>Ingressos disponíveis</Eyebrow>
@@ -593,9 +605,22 @@ function BuyCard({ onBuy, onFees }) {
           <Ico name="info" className="size-4" /> Entenda as taxas
         </button>
       </div>
-      <button type="button" onClick={onBuy} className="mt-5 w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
+      <button ref={btnRef} type="button" onClick={onBuy} className="mt-5 w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
         Comprar
       </button>
+      {/* Celular/tablet: quando o Comprar sai da tela (rolando para baixo), aparece a barra fixa no rodapé */}
+      {floating && (
+        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
+          <div className="min-w-0 flex-1">
+            <p className="font-ui text-[11px] text-ink-3">Ingressos a partir de</p>
+            <p className="text-xl font-bold leading-tight text-ink">{brl(from)}</p>
+            <p className="font-ui text-[11px] text-ink-3">+ taxa a partir de {brl(fee)}</p>
+          </div>
+          <button type="button" onClick={onBuy} className="min-w-[140px] rounded-full bg-brand px-8 py-[13px] font-ui text-[15px] font-semibold leading-[18px] text-white hover:brightness-110">
+            Comprar
+          </button>
+        </div>
+      )}
     </Card>
   )
 }
