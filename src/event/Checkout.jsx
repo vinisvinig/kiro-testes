@@ -130,10 +130,13 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
 
         <div className="mt-4 evento-grid">
           <div className="flex min-w-0 flex-col gap-6">
-            <EventSummary order={order} />
-            {/* Celular: resumo (com o cronômetro) logo abaixo dos ingressos e acima do cupom; no desktop fica na coluna da direita */}
+            {/* Desktop: evento e ingressos num card; o resumo fica na coluna da direita */}
+            <div className="hidden lg:block">
+              <EventSummary order={order} />
+            </div>
+            {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos") */}
             <div className="lg:hidden">
-              <Totals t={t} order={order} remaining={remaining} />
+              <MobileOrderCard t={t} order={order} remaining={remaining} />
             </div>
             {/* Celular: cupom (opcional) logo abaixo dos ingressos e antes do seguro; no desktop fica na coluna da direita */}
             <div className="lg:hidden">
@@ -880,6 +883,73 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
 /* ------------------------------------------------------------------ */
 /** "Reserva garantida por mm:ss", no topo do resumo. */
 
+
+/** Linhas de valores do resumo (ingressos, cupons, taxa, adicionais, entrega, moedas). */
+function SummaryRows({ t, order, className = '' }) {
+  const row = (label, value, cls = 'text-ink-2') => (
+    <div className={`flex items-center justify-between gap-2 ${cls}`}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  )
+  return (
+    <dl className={`flex flex-col gap-2 font-ui text-xs ${className}`}>
+      {row('Ingressos', brl(t.subtotal))}
+      {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'text-success')}
+      {order.validators.length > 0 && row('Código validador', 'Validado', 'text-success')}
+      {row('Taxa de serviço', brl(t.fee))}
+      {t.insurance > 0 && row('Seguro', brl(t.insurance))}
+      {t.club > 0 && row('Clube Planeta', brl(t.club))}
+      {row('Entrega', t.shipping === null ? 'A definir' : t.shipping ? brl(t.shipping) : 'Grátis')}
+      {t.coins > 0 && row('Moedas Uhuu', `− ${brl(t.coins)}`, 'text-success')}
+    </dl>
+  )
+}
+
+/**
+ * Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"):
+ * reserva no topo, espetáculo, ingressos em caixas claras, valores, divisor e total.
+ */
+function MobileOrderCard({ t, order, remaining }) {
+  return (
+    <Card as="div" id={`${SUMMARY_ID}-m`} className="flex scroll-mt-24 flex-col gap-4 !p-4">
+      <ReserveTimer remaining={remaining} />
+      <div>
+        <p className="font-ui text-xs uppercase leading-4 text-brand">Espetáculo</p>
+        <p className="mt-1 text-2xl font-bold leading-tight text-ink">{EVENT.title}</p>
+        <p className="mt-1 font-ui text-xs text-ink-3">{EVENT.venue.name}, São Paulo</p>
+      </div>
+      <ul className="flex flex-col gap-3">
+        {order.lines.map((l) => (
+          <li key={l.key} className="flex flex-col gap-1.5 rounded-3xl bg-body p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold leading-5 text-ink-3">
+              <Ico name="ticket" className={`size-6 shrink-0 ${l.kind === 'combo' ? 'text-combo' : 'text-brand'}`} />
+              {sessionTitle(l.session)}
+            </p>
+            <p className="text-base font-bold leading-6 text-ink">
+              {l.kind === 'combo' ? `${l.qty}x ${l.combo.name}, ${l.sector.name}` : `${l.qty} ${l.qty === 1 ? 'ingresso' : 'ingressos'}, ${l.sector.name}`}
+            </p>
+            <p className="flex justify-between gap-2 text-sm leading-5 text-ink-2">
+              <span>
+                {l.kind === 'combo' ? comboDetail(l.combo) : `${l.qty}x ${l.fare.name}`}
+                {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
+              </span>
+              <span className="whitespace-nowrap">{brl(l.amount)}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+      <SummaryRows t={t} order={order} />
+      <div className="border-t border-line pt-4">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-2xl font-bold leading-tight text-ink">Total à vista</span>
+          <span className="text-2xl font-bold leading-tight text-ink">{brl(t.total)}</span>
+        </div>
+        <p className="mt-2 font-ui text-xs text-ink-3">Ou parcelado no cartão até 3x de {brl(t.maxInstallment)}</p>
+      </div>
+    </Card>
+  )
+}
 
 function Totals({ t, order, remaining, title = 'Total à vista', showTimer = true }) {
   const low = remaining <= 120
