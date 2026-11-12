@@ -767,7 +767,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
             </span>
           )}
           <span className="block text-base font-semibold leading-6 text-ink">{combo.name}</span>
-          <span className="block font-ui text-xs leading-4 text-ink-3">{combo.desc}</span>
+          <span className="block font-ui text-xs leading-4 text-combo">{combo.desc}</span>
         </span>
         <span className="min-w-0">
           {sector.badge && <Badge>{sector.badge}</Badge>}
