@@ -616,13 +616,9 @@ function BuyCard({ onBuy, onFees }) {
       </button>
       {/* Celular/tablet: quando o Comprar sai da tela (rolando para baixo), aparece a barra fixa no rodapé */}
       {floating && (
-        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-line bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
-          <div className="min-w-0 flex-1">
-            <p className="font-ui text-[11px] text-ink-3">Ingressos a partir de</p>
-            <p className="text-xl font-bold leading-tight text-ink">{brl(from)}</p>
-            <p className="font-ui text-[11px] text-ink-3">+ taxa a partir de {brl(fee)}</p>
-          </div>
-          <button type="button" onClick={onBuy} className="min-w-[140px] rounded-full bg-brand px-8 py-[13px] font-ui text-[15px] font-semibold leading-[18px] text-white hover:brightness-110">
+        // Só o botão, na largura toda, sobre uma faixa branca
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] lg:hidden">
+          <button type="button" onClick={onBuy} className="w-full rounded-full bg-brand py-[14px] font-ui text-[15px] font-semibold text-white hover:brightness-110">
             Comprar
           </button>
         </div>

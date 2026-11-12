@@ -151,10 +151,17 @@ export const EVENT = {
     ['Plateia e cadeiras', 'Área com assentos. Confira se há lugar marcado.'],
     ['Balcão nobre', 'Área elevada com assentos, conforme a configuração do teatro.'],
     ['Frisa', 'Grupos de assentos em áreas laterais ou em níveis do teatro.'],
-    ['Arquibancada', 'Degraus ou assentos em níveis, com visão ampla do palco.'],
-    ['Área VIP', 'Espaço reservado, em geral com serviços exclusivos e acesso separado.'],
-    ['Assento marcado', 'Você escolhe o lugar no mapa e ele fica reservado para você.'],
-    ['Setor livre', 'Entrada por ordem de chegada, sem lugar definido dentro do setor.'],
+    // Abertos no "Ver mais" (Figma 10444:192507)
+    ['Galeria', 'Área lateral ou elevada. Posição e visibilidade variam.'],
+    ['Frontstage', 'Área próxima ao palco, geralmente sem lugar marcado.'],
+    ['Jirau', 'Área em nível elevado. Confira a localização no mapa.'],
+    ['Suíte', 'Espaço reservado para um grupo, com capacidade indicada.'],
+    ['Lounge', 'Área de experiência com os benefícios descritos na oferta.'],
+    ['Rooftop e terraço', 'Área elevada. Open bar e outros serviços só quando indicados.'],
+    ['Gold, VIP e Premium', 'Categorias especiais. Localização e benefícios variam.'],
+    ['Espaço reduzido', 'Assento ou fileira com menos espaço, conforme o local.'],
+    ['Banco extra', 'Assento adicional. Confira posição e regras de venda.'],
+    ['Cadeirante e acompanhante', 'Espaços e lugares identificados no mapa de acessibilidade.'],
   ],
   /** "Compare os setores" (Figma 10145:90808): setor do protótipo e a característica; os 3 primeiros aparecem. */
   sectorCompare: [
