@@ -388,7 +388,7 @@ const PurchaseTerms = ({ action }) => (
 /** Bloco "Serviços adicionais" com os dois opcionais, ligados por interruptor (desligados por padrão). */
 function ServicesBlock({ children }) {
   return (
-    <section aria-labelledby="servicos-t" className="rounded-3xl border border-line bg-white p-6 md:p-8">
+    <section aria-labelledby="servicos-t" className="rounded-3xl border border-line bg-white p-4 sm:p-6 md:p-8">
       <div className="flex items-center gap-3">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <svg viewBox="0 0 24 24" aria-hidden className="size-5 fill-current">
@@ -418,9 +418,11 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
         <span className="flex size-9 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: on ? '#ffffff' : iconBg, color }}>
           <Ico name={icon} className="size-[18px]" />
         </span>
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-row md:items-center md:justify-between md:gap-4">
-          <h3 className={`text-lg font-bold leading-6 md:text-xl ${fg}`}>{on ? titleOn : title}</h3>
-          <p className={`font-ui text-sm leading-5 ${on ? 'text-white' : 'text-ink-2'}`}>
+        {/* Título e valor nunca quebram no meio: lado a lado quando cabem; se não, o valor desce inteiro.
+            No celular o valor fica sempre na linha de baixo, com a largura toda (ver abaixo do cabeçalho). */}
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-0.5">
+          <h3 className={`whitespace-nowrap text-base font-bold leading-6 max-[359px]:whitespace-normal sm:text-lg md:text-xl ${fg}`}>{on ? titleOn : title}</h3>
+          <p className={`whitespace-nowrap font-ui text-sm leading-5 max-sm:hidden ${on ? 'text-white' : 'text-ink-2'}`}>
             {on ? 'Adicionado' : 'Opcional'} · {brl(value)} no pedido
           </p>
         </div>
@@ -431,6 +433,10 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
           <span className="absolute left-[10px] top-[10px] size-6 rounded-full bg-white shadow transition peer-checked:translate-x-[22px]" />
         </label>
       </div>
+      {/* Celular: valor numa linha própria, alinhado ao título, sem disputar espaço com o interruptor */}
+      <p className={`-mt-1 whitespace-nowrap pl-12 font-ui text-sm leading-5 max-[359px]:whitespace-normal sm:hidden ${on ? 'text-white' : 'text-ink-2'}`}>
+        {on ? 'Adicionado' : 'Opcional'} · {brl(value)} no pedido
+      </p>
       <button
         type="button"
         onClick={() => setOpen(!open)}
