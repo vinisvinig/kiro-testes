@@ -319,11 +319,12 @@ function ModalityPicker({ session, selected, onPick }) {
 }
 
 /** "Ver mapa completo": rola até o Mapa referencial do evento (estático) no fim da página. */
+// Oculto no desktop (lá o mapa e o botão "Visualizar mapa" ficam na coluna direita); no celular e no tablet continua
 const MapButton = ({ onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className="flex items-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:border-brand-700 hover:text-brand-700"
+    className="flex items-center gap-2 rounded-full lg:hidden border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:border-brand-700 hover:text-brand-700"
   >
     Ver mapa completo
     {/* Ícone "map" do Figma 9961:42076 (mapa dobrado), no lugar do pin: é um mapa de setores, não a localização */}
