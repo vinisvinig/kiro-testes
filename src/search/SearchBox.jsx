@@ -99,14 +99,14 @@ export default function SearchBox({ variant = 'home', initial = {} }) {
             clearable
             clearValue={DEFAULT_SORT}
           />
-          <Pill type="submit" className="max-md:w-full max-md:py-[10px]">
+          <Pill type="submit" className="max-md:h-[52px] max-md:w-full max-md:py-[14px] max-md:text-base">
             Buscar
           </Pill>
         </div>
       ) : (
         <>
           <DateRangePicker de={filters.de} ate={filters.ate} onChange={setRange} className="md:w-[262px]" />
-          <Pill type="submit" className="max-md:w-full max-md:py-[10px]">
+          <Pill type="submit" className="max-md:h-[52px] max-md:w-full max-md:py-[14px] max-md:text-base">
             Buscar
           </Pill>
         </>
