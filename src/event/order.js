@@ -3,7 +3,7 @@
 //
 // O pedido pode ter ingressos de várias datas: a seleção é guardada por "sessão|setor"
 // (ou "sessão|combo"), e trocar de data só muda o que está sendo exibido.
-import { COMBOS, COMBO_LIMIT, INSTALLMENT_FEE, SECTOR_LIMIT, SECTORS, SERVICE_FEE, SESSIONS, VALIDATORS, comboPrice, faresFor } from './eventData.js'
+import { COMBOS, COMBO_LIMIT, INSTALLMENT_FEE, SECTOR_LIMIT, SECTORS, SERVICE_FEE, SESSIONS, VALIDATORS, comboPrice, courtesyProgress, faresFor } from './eventData.js'
 
 export const initialOrder = {
   sessionId: null, // data exibida agora
@@ -205,7 +205,21 @@ export function deriveOrder(o) {
   const bySession = {}
   for (const l of lines) bySession[l.session.id] = (bySession[l.session.id] || 0) + l.tickets
 
-  const subtotal = lines.reduce((a, l) => a + l.amount, 0)
+  const gross = lines.reduce((a, l) => a + l.amount, 0)
+  // Cortesia automática (eventos com EVENT.autoCourtesy): a cada N ingressos com tarifa, o de menor valor sai de graça
+  const progress = courtesyProgress(count)
+  let courtesy = null
+  if (progress?.won) {
+    const prices = []
+    for (const l of lines) {
+      if (l.kind !== 'fare' || !l.fare) continue
+      for (let i = 0; i < l.qty; i++) prices.push(l.fare.price)
+    }
+    prices.sort((a, b) => a - b)
+    const free = prices.slice(0, progress.won)
+    if (free.length) courtesy = { n: free.length, off: free.reduce((a, p) => a + p, 0) }
+  }
+  const subtotal = gross - (courtesy?.off || 0)
   const fee = subtotal * SERVICE_FEE
   const total = subtotal + fee
   const installmentFee = total * INSTALLMENT_FEE
@@ -241,6 +255,9 @@ export function deriveOrder(o) {
     count,
     bySession,
     sessions: Object.keys(bySession).length,
+    gross, // valor dos ingressos antes da cortesia
+    courtesy, // { n, off } quando há cortesia automática
+    progress, // { every, won, missing } nos eventos com cortesia automática
     subtotal,
     fee,
     total,

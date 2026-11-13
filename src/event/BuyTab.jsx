@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   COMBOS,
   COMBO_LIMIT,
+  EVENT,
   SECTORS,
   SECTOR_LIMIT,
   SEAT_ROWS,
@@ -20,7 +21,7 @@ import {
   occupiedFor,
 } from './eventData.js'
 import { keyOf, roomIn, takenElsewhere } from './order.js'
-import { Badge, Card, CardTitle, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
+import { Badge, Card, CardTitle, CourtesyHint, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
 
@@ -41,11 +42,14 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
   const listRef = useRef(null)
 
   const modalityRef = useRef(null)
+  // Cortesia automática (ex.: Guns N' Roses): sem a escolha Ingresso/Pacote, os setores já abrem com a data
+  const auto = !!EVENT.autoCourtesy
   const pickSession = (id) => {
     if (id !== order.sessionId) dispatch({ type: 'session', id })
-    // Celular: ao escolher a data, desce até "Como você quer comprar?" (o bloco só aparece depois do render)
+    if (auto && order.modality !== 'individual') dispatch({ type: 'modality', modality: 'individual' })
+    // Celular: ao escolher a data, desce até o próximo bloco ("Como você quer comprar?" ou os setores)
     if (window.matchMedia('(max-width: 767px)').matches) {
-      setTimeout(() => modalityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+      setTimeout(() => (auto ? listRef : modalityRef).current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
     }
   }
   const pickModality = (m) => {
@@ -91,7 +95,7 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
         <div className="flex min-w-0 flex-col gap-6">
           <SessionPicker selected={order.sessionId} counts={derived.bySession} onPick={pickSession} />
 
-          {session && (
+          {session && !auto && (
             <div ref={modalityRef} className="scroll-mt-24">
               <ModalityPicker session={session} selected={order.modality} onPick={pickModality} />
             </div>
@@ -102,7 +106,7 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
               {order.modality === 'combo' ? (
                 <Combos order={order} dispatch={dispatch} session={session} onMap={toMap} />
               ) : (
-                <Sectors order={order} dispatch={dispatch} session={session} onMap={toMap} />
+                <Sectors order={order} dispatch={dispatch} session={session} onMap={toMap} progress={derived.progress} />
               )}
             </div>
           )}
@@ -332,7 +336,7 @@ const MapButton = ({ onClick }) => (
 /* ------------------------------------------------------------------ */
 /* Setores (ingresso individual): "Escolha onde você quer ficar"       */
 /* ------------------------------------------------------------------ */
-function Sectors({ order, dispatch, session, onMap }) {
+function Sectors({ order, dispatch, session, onMap, progress = null }) {
   return (
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -342,6 +346,8 @@ function Sectors({ order, dispatch, session, onMap }) {
         </div>
         <MapButton onClick={onMap} />
       </div>
+      {/* Com um setor aberto, o aviso aparece dentro dele (perto dos botões +); aqui só quando nenhum está aberto */}
+      {progress && !order.open && <CourtesyHint progress={progress} className="mt-4" />}
 
       <ul className="mt-6 flex flex-col gap-4">
         {/* Esgotados sempre por último, mantendo a ordem original dos demais */}
@@ -353,12 +359,14 @@ function Sectors({ order, dispatch, session, onMap }) {
             <li key={s.id} id={`item-${s.id}`} className="scroll-mt-28">
               <SectorRow sector={s} session={session} open={open} onToggle={() => dispatch({ type: 'open', id: s.id })} count={count} />
               {open && (
-                <div className="mt-2">
+                <div className="mt-2 flex flex-col gap-2">
                   {s.kind === 'assento' ? (
                     <SeatBody sector={s} order={order} dispatch={dispatch} session={session} />
                   ) : (
                     <FreeBody sector={s} order={order} dispatch={dispatch} session={session} />
                   )}
+                  {/* Cortesia automática: o aviso acompanha quem está escolhendo dentro do setor */}
+                  {progress && <CourtesyHint progress={progress} />}
                 </div>
               )}
             </li>

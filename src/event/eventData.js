@@ -182,6 +182,7 @@ export const EVENT = {
   gallery: ['loc-g1.png', 'loc-g2.png', 'loc-g3.png', 'loc-g4.png'].map(asset),
   venue: {
     name: 'Estádio MorumBIS',
+    city: 'São Paulo',
     address: 'Praça Roberto Gomes Pedrosa, 1, Morumbi, São Paulo, SP, CEP 05653-070',
     tip: 'A estação de metrô mais próxima é São Paulo–Morumbi, da Linha 4-Amarela. Programe a chegada considerando o trânsito e a abertura dos portões.',
   },
@@ -207,3 +208,89 @@ export const EVENT = {
 
 /** Linha de detalhe dos cards de setor: só o lote ("LOTE 1"), mesmo que o dado traga portão ou modalidade. */
 export const lotLabel = (sector) => (sector.lot || '').split('·')[0].trim()
+
+/* ------------------------------------------------------------------ */
+/* Outros eventos com a mesma página                                   */
+/* ------------------------------------------------------------------ */
+// Mesma estrutura de datas, setores e preços do evento modelo; muda o conteúdo e, no Guns, a cortesia automática.
+const BASE_EVENT = JSON.parse(JSON.stringify(EVENT))
+
+export const GUNS_SLUG = 'guns-n-roses'
+const GUNS = {
+  slug: GUNS_SLUG,
+  title: 'Guns N’Roses',
+  hero: asset('hero-3.png'),
+  heroPos: 'object-center', // celular: centraliza no globo (o logo não cabe inteiro na largura)
+  /**
+   * Cortesia automática (teste neste evento): a cada `every` ingressos no pedido, 1 sai como cortesia
+   * (o de menor valor). Sem a escolha entre Ingresso e Pacote: os setores já vêm abertos.
+   */
+  autoCourtesy: { every: 5 },
+  about: {
+    eyebrow: 'Sobre o show',
+    title: 'Uma noite de rock para cantar do começo ao fim',
+    paragraphs: [
+      'O Guns N’ Roses volta ao Brasil com a turnê Because What You Want & What You Get Are Two Completely Different Things. Axl Rose, Slash e Duff McKagan sobem ao palco com um repertório de quase três horas, que passa pelos clássicos de Appetite for Destruction, Use Your Illusion e as músicas mais recentes da banda.',
+      'Telões de alta definição, iluminação de estádio e um som pensado para todos os setores fazem de cada música um coro coletivo. Os portões abrem às 16h e o show principal começa às 20h30.',
+    ],
+    more: [
+      'Sweet Child O’ Mine, November Rain, Paradise City e Welcome to the Jungle estão entre as músicas mais esperadas da noite. A abertura fica por conta de uma banda convidada, anunciada na semana do show.',
+      'Não é permitida a entrada com alimentos, bebidas, câmeras profissionais ou guarda-chuvas. Recomendamos chegar com antecedência para passar pela revista e encontrar seu setor com tranquilidade.',
+    ],
+    credits: [
+      ['Local', 'Mineirão', 'Pampulha · Belo Horizonte/MG'],
+      ['Data e horário', '14 a 27 de novembro às 20h30', 'Abertura dos portões às 16h'],
+      ['Estacionamento', 'Estacionamento no local', 'Pago à parte e sujeito à lotação'],
+      ['Classificação etária', '16 anos', 'Menores somente acompanhados dos responsáveis'],
+      ['Acessibilidade', 'Espaços e acessos adaptados', ''],
+      ['Duração', 'Aproximadamente 3 horas', 'Com show de abertura'],
+    ],
+  },
+  salesPoints: [
+    ['Compra on-line · Uhuu.com', ['Compre pelo site oficial. A taxa de serviço e o total da compra são apresentados antes do pagamento. Confira os valores antes de concluir seu pedido.']],
+    ['Bilheteria física · Mineirão', ['Av. Antônio Abrahão Caram, 1001 · Pampulha · Belo Horizonte/MG.', 'Nos dias de show, a partir das 10h. Compra na bilheteria sem taxa de serviço.']],
+    ['Formas de pagamento', ['Consulte as opções disponíveis no pagamento on-line.'], ['Para a compra presencial, confirme os meios aceitos diretamente com a bilheteria.']],
+  ],
+  thankYou:
+    'Obrigado por comprar com a gente! 🎸\nAgora é só aquecer a voz para Sweet Child O’ Mine. Nos vemos no Mineirão para o show do Guns N’ Roses!\n\nWelcome to the jungle! 🤘',
+  venue: {
+    name: 'Mineirão',
+    city: 'Belo Horizonte',
+    address: 'Av. Antônio Abrahão Caram, 1001, Pampulha, Belo Horizonte, MG, CEP 31275-000',
+    tip: 'O Mineirão fica na região da Pampulha. Há linhas de ônibus especiais nos dias de show; programe a chegada considerando o trânsito e a abertura dos portões.',
+  },
+  faq: [
+    BASE_EVENT.faq[0],
+    BASE_EVENT.faq[1],
+    {
+      q: 'Cortesia a cada 5 ingressos',
+      a: 'Neste show, a cada 5 ingressos no mesmo pedido, 1 sai como cortesia: o de menor valor fica de graça, sem taxa de serviço. A cortesia é aplicada automaticamente no resumo do pedido.',
+    },
+    {
+      q: 'Acessibilidade física e áreas especiais',
+      a: 'O Mineirão conta com rampas, elevadores e espaços reservados para pessoas com deficiência e mobilidade reduzida. Solicite atendimento na central de ajuda com antecedência.',
+    },
+    {
+      q: 'Pontos de venda físicos e taxa de conveniência',
+      a: 'A bilheteria do Mineirão abre nos dias de show a partir das 10h, sem taxa de serviço. Na compra on-line é cobrada a taxa de serviço Uhuu de 15%.',
+    },
+  ],
+}
+
+const EXTRA_EVENTS = { [GUNS_SLUG]: GUNS }
+
+/** Troca o conteúdo do evento exibido (chamado pela página do evento ao abrir pelo endereço). */
+export function setActiveEvent(slug) {
+  const next = EXTRA_EVENTS[slug]
+  if ((EVENT.slug === (next ? next.slug : BASE_EVENT.slug))) return
+  for (const k of Object.keys(EVENT)) delete EVENT[k]
+  Object.assign(EVENT, JSON.parse(JSON.stringify(BASE_EVENT)), next ? JSON.parse(JSON.stringify(next)) : {})
+}
+
+/** Cortesia automática: quantos ingressos faltam para a próxima e quantas já foram ganhas. */
+export function courtesyProgress(count) {
+  const every = EVENT.autoCourtesy?.every
+  if (!every) return null
+  const won = Math.floor(count / every)
+  return { every, won, missing: every - (count % every) }
+}

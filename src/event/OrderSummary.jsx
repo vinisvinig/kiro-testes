@@ -2,7 +2,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useModalBehavior } from '../components/home/ui.jsx'
 import { SERVICE_FEE, comboDetail, sessionTitle } from './eventData.js'
-import { Card, Eyebrow, Ico, brl } from './parts.jsx'
+import { Card, CourtesyHint, Eyebrow, Ico, brl } from './parts.jsx'
 
 export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
@@ -38,9 +38,19 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
       </div>
 
       <dl className="flex flex-col gap-1.5 border-t border-line pt-4 font-ui text-xs text-ink-2">
-        <Row label="Ingressos" value={empty ? 'R$ -' : brl(d.subtotal)} />
+        <Row label="Ingressos" value={empty ? 'R$ -' : brl(d.gross)} />
+        {/* Cortesia automática: o ingresso de menor valor sai de graça a cada grupo completo */}
+        {d.courtesy && (
+          <div className="flex items-center justify-between gap-2 text-success">
+            <dt>
+              Cortesia ({d.courtesy.n} {d.courtesy.n === 1 ? 'ingresso' : 'ingressos'})
+            </dt>
+            <dd>− {brl(d.courtesy.off)}</dd>
+          </div>
+        )}
         <Row label={`Taxa de serviço, ${SERVICE_FEE * 100}%`} value={empty ? 'R$ -' : brl(d.fee)} />
       </dl>
+      {d.progress && !empty && <CourtesyHint progress={d.progress} />}
       {feesLink}
 
       <div className="border-t border-line pt-4">

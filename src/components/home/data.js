@@ -18,7 +18,7 @@ export const TAG = {
 export const heroSlides = [
   { image: asset('hero-1.png'), period: '16/06/25 a 03/08/25', title: 'Kim Walker-Smith', href: EVENT_URL },
   { image: asset('hero-2.png'), period: '14/11/26 a 27/11/26', title: 'O estranho mundo de Jack de Tim Burton', href: EVENT_URL },
-  { image: asset('hero-3.png'), period: '16/06/25 a 03/08/25', title: 'Guns N’Roses', href: EVENT_URL },
+  { image: asset('hero-3.png'), period: '14/11/26 a 27/11/26', title: 'Guns N’Roses', href: '/evento/guns-n-roses' },
 ]
 
 export const categories = [

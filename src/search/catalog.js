@@ -134,7 +134,8 @@ const HOJE = TODAY
 // [título, categoria, local, data ISO, preço mín, preço máx, tags, imagem, data final, classe da imagem]
 const FEATURED = [
   ['O estranho mundo de Jack de Tim Burton', 'Espetáculo', 'Estádio MorumBIS', '2026-11-14', 89, 450, ['popular', 'sessaoExtra'], 'ev-2.png', '2026-11-27'],
-  ['Guns N’Roses', 'Show', 'Mineirão', '2026-11-18', 290, 1400, ['corre', 'maisVendidos'], 'ev-6.png'],
+  // Página própria (/evento/guns-n-roses): mesmas datas e preços do evento modelo, com cortesia automática
+  ['Guns N’Roses', 'Show', 'Mineirão', '2026-11-14', 89, 450, ['corre', 'maisVendidos'], 'ev-6.png', '2026-11-27'],
   ['Curitiba Country Festival', 'Show', 'Pedreira Paulo Leminski', '2027-05-24', 120, 890, ['acabando'], 'ev-4.png', '2027-05-25', 'object-left'],
   ['Kim Walker-Smith — Worship Nights', 'Show', 'Auditório Araújo Vianna', '2026-12-05', 150, 520, ['popular'], 'hero-1.png', null, 'object-left'],
   ['Human Bodies — Exposição Internacional', 'Exposição', 'Centro de Eventos FIERGS', '2026-11-03', 50, 120, ['ultimos'], 'ev-3.png'],
@@ -203,7 +204,7 @@ export const EVENTS = [...FEATURED, ...RAW].map(([title, category, venueName, da
     // Sem arte própria: imagem genérica gerada por IA (Figma, aba "Imagens para. o Kiro"), public/figma/gen-<slug>.jpg
     image: asset(image || `gen-${slugify(title)}.jpg`),
     imageClass: imageClass || '',
-    href: EVENT_URL,
+    href: title === 'Guns N’Roses' ? '/evento/guns-n-roses' : EVENT_URL,
     tags: tags.map((t) => TAG[t]),
     dates: end ? [cardDate(date), cardDate(end)] : [cardDate(date)],
     priceFrom: brl(min),

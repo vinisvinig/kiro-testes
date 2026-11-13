@@ -209,7 +209,7 @@ function EventSummary({ order }) {
         <span className="min-w-0 flex-1">
           <span className="block font-ui text-[10px] font-semibold uppercase tracking-wide text-ink-2">Espetáculo</span>
           <span className="mt-2 block text-2xl font-bold leading-tight text-ink md:text-[28px]">{EVENT.title}</span>
-          <span className="mt-1 block font-ui text-xs text-ink-3">{EVENT.venue.name}, São Paulo</span>
+          <span className="mt-1 block font-ui text-xs text-ink-3">{EVENT.venue.name}, {EVENT.venue.city}</span>
         </span>
         <Ico name="expand" className={`mt-2 size-6 text-ink transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -921,7 +921,8 @@ function SummaryRows({ t, order, className = '' }) {
   )
   return (
     <dl className={`flex flex-col gap-2 font-ui text-xs ${className}`}>
-      {row('Ingressos', brl(t.subtotal))}
+      {row('Ingressos', brl(t.subtotal + (order.courtesy?.off || 0)))}
+      {order.courtesy && row(`Cortesia (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso' : 'ingressos'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
       {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'text-success')}
       {order.validators.length > 0 && row('Código validador', 'Validado', 'text-success')}
       {row('Taxa de serviço', brl(t.fee))}
@@ -944,7 +945,7 @@ function MobileOrderCard({ t, order, remaining }) {
       <div>
         <p className="font-ui text-xs uppercase leading-4 text-brand">Espetáculo</p>
         <p className="mt-1 text-2xl font-bold leading-tight text-ink">{EVENT.title}</p>
-        <p className="mt-1 font-ui text-xs text-ink-3">{EVENT.venue.name}, São Paulo</p>
+        <p className="mt-1 font-ui text-xs text-ink-3">{EVENT.venue.name}, {EVENT.venue.city}</p>
       </div>
       <ul className="flex flex-col gap-3">
         {order.lines.map((l) => (
@@ -994,7 +995,8 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
         {order.count} {order.count === 1 ? 'ingresso' : 'ingressos'}
       </p>
       <dl className="mt-5 flex flex-col gap-2 border-t border-line pt-4 font-ui text-xs">
-        {row('Ingressos', brl(t.subtotal))}
+        {row('Ingressos', brl(t.subtotal + (order.courtesy?.off || 0)))}
+      {order.courtesy && row(`Cortesia (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso' : 'ingressos'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
         {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {order.validators.length > 0 && row('Código validador', 'Validado', 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {row('Taxa de serviço', brl(t.fee))}
