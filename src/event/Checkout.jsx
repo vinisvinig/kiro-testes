@@ -408,7 +408,7 @@ function ServicesBlock({ children }) {
  * Um serviço: ícone, título, "Opcional/Adicionado · valor", interruptor e o link que mostra os detalhes.
  * Desligado: fundo claro e borda colorida. Ligado: card na cor do serviço com texto branco (Figma 10535:188865).
  */
-function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, value, on, onChange, moreLabel, lessLabel, children }) {
+function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, value, on, onChange, moreLabel, lessLabel, footer, children }) {
   const [open, setOpen] = useState(false)
   const bodyId = `${id}-detalhes`
   const fg = on ? 'text-white' : 'text-ink'
@@ -447,6 +447,7 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
           {children}
         </div>
       )}
+      {footer && <p className={`mt-3 font-ui text-sm leading-5 ${on ? 'text-white [&_a]:text-white' : 'text-ink-2'}`}>{footer}</p>}
     </div>
   )
 }
@@ -469,6 +470,13 @@ function InsuranceStep({ c, t, dispatch }) {
       onChange={(v) => dispatch({ type: 'toggle', key: 'insurance', value: v })}
       moreLabel="Ver mais"
       lessLabel="Ver menos"
+      // Aceite dos termos sempre visível (pedido do PO): a pessoa vê antes de ligar o seguro, sem precisar abrir os detalhes
+      footer={
+        <>
+          Ao ativar o seguro, declaro que li e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink>, os{' '}
+          <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e as demais disposições do seguro</TermLink>.
+        </>
+      }
     >
       {/* Textos do Figma 10535:188877 */}
       <p className={`font-sans text-base leading-6 ${on ? '' : 'text-ink'}`}>Reembolso em situações previstas na apólice, sujeito à análise da MetLife.</p>
@@ -480,10 +488,6 @@ function InsuranceStep({ c, t, dispatch }) {
       <button type="button" onClick={() => setInfo(true)} className="self-start text-base font-semibold underline underline-offset-2" style={on ? undefined : { color: '#2563eb' }}>
         Saiba mais
       </button>
-      <p>
-        Ao ativar o seguro, declaro que li e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink>, os{' '}
-        <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e as demais disposições do seguro</TermLink>.
-      </p>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o seguro MetLife">
         {/* Texto do Figma 9640:241163 */}
         <div className="flex flex-col gap-6 font-sans text-base leading-6">
