@@ -361,11 +361,28 @@ export function CourtesyHint({ progress, className = '' }) {
         Selecione mais <strong>{missing}</strong> para ganhar {won ? 'outro' : '1'} ingresso de cortesia.
       </>
     )
+  const done = won && full // acabou de completar: só a mensagem verde, sem barra
+  const filled = every - missing === every ? 0 : every - missing // ingressos já escolhidos no grupo atual
   return (
-    <p role="status" aria-live="polite" className={`flex items-center gap-2 rounded-xl px-3 py-2.5 font-ui text-sm leading-5 ${won && full ? 'bg-[#f0fdf4] text-success' : 'bg-combo-0 text-combo'} ${className}`}>
-      {gift}
-      <span>{text}</span>
-    </p>
+    <div role="status" aria-live="polite" className={`flex flex-col gap-2.5 rounded-xl px-3 py-2.5 font-ui text-sm leading-5 ${done ? 'bg-[#f0fdf4] text-success' : 'bg-combo-0 text-combo'} ${className}`}>
+      <p className="flex items-center gap-2">
+        {gift}
+        <span>{text}</span>
+      </p>
+      {/* Barra de progresso: um trecho por ingresso do grupo; o último é o de cortesia */}
+      {!done && (
+        <div className="flex items-center gap-2" aria-hidden>
+          <div className="flex flex-1 gap-1">
+            {Array.from({ length: every }, (_, i) => (
+              <span key={i} className={`h-2 flex-1 rounded-full transition-colors duration-300 ${i < filled ? 'bg-combo' : 'bg-white'}`} />
+            ))}
+          </div>
+          <span className="shrink-0 text-xs font-semibold leading-4">
+            {filled}/{every}
+          </span>
+        </div>
+      )}
+    </div>
   )
 }
 
