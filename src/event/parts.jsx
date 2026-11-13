@@ -170,14 +170,12 @@ export const InfoBanner = ({ children, title }) => (
 /* ------------------------------------------------------------------ */
 /* Mapa referencial do evento (Figma "Mapa referencial do evento")     */
 /* ------------------------------------------------------------------ */
-// Áreas da imagem public/figma/mapa-estadio-claro.png (exportação do Figma 9779:104788), usadas no texto alternativo
+// Áreas da imagem public/figma/mapa-estadio-setores.png (mesmos nomes dos setores da compra), usadas no texto alternativo
 const MAP_BLOCKS = [
-  { label: 'Cadeira coberta 1', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
   { label: 'Pista Premium', sector: 'pista-premium', cls: 'bg-[#fcd34d]', star: true },
-  { label: 'Cadeira coberta A', sector: 'cadeira-coberta', cls: 'bg-[#f0abfc]' },
-  { label: 'Cadeira coberta 2', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
-  { label: 'Pista semi Premium', sector: 'area-exclusiva', cls: 'bg-[#fcd34d]', star: true },
-  { label: 'Cadeira coberta B', sector: 'cadeira-coberta', cls: 'bg-[#f0abfc]' },
+  { label: 'Área Exclusiva', sector: 'area-exclusiva', cls: 'bg-[#fcd34d]', star: true },
+  { label: 'Cadeira Coberta', sector: 'cadeira-coberta', cls: 'bg-[#c4b5fd]' },
+  { label: 'Área VIP', sector: 'area-vip', cls: 'bg-[#f0abfc]' },
 ]
 
 /**
@@ -185,7 +183,7 @@ const MAP_BLOCKS = [
  * sabendo qual setor quer. A versão interativa (clicar no setor abre a lista; setor aberto em destaque)
  * ficou comentada abaixo; para reativar, volte a aceitar { onPick, active } e use os trechos comentados.
  */
-const MAP_SRC = asset('mapa-estadio-claro.png')
+const MAP_SRC = asset('mapa-estadio-setores.png')
 const MAP_ALT = `Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) => b.label).join(', ')}`
 
 /**
