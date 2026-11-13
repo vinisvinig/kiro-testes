@@ -197,6 +197,19 @@ export function VenueMap({ compact = false }) {
   return (
     <Card className={compact ? '!p-8' : ''}>
       <CardTitle>Visão geral do local</CardTitle>
+      {/* Coluna direita (desktop, Figma 10470:207527): botão "Visualizar mapa" entre o título e o mapa, abre o pop-up */}
+      {compact && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-[18px] text-brand hover:border-brand-700 hover:text-brand-700"
+        >
+          Visualizar mapa
+          <svg viewBox="0 0 14 14" aria-hidden className="size-[14px] fill-current">
+            <path d="M8.548 2.905 5.631 1.884a1.18 1.18 0 0 0-.758-.006l-2.328.782a1.17 1.17 0 0 0-.793 1.108v6.913c0 .822.822 1.382 1.587 1.085l1.709-.665a.6.6 0 0 1 .402-.006l2.917 1.021c.245.087.513.087.758.006l2.328-.782a1.17 1.17 0 0 0 .793-1.108V3.319c0-.823-.822-1.383-1.587-1.085l-1.709.665a.6.6 0 0 1-.403.006ZM8.752 11.019l-3.5-1.231V2.98l3.5 1.231v6.808Z" />
+          </svg>
+        </button>
+      )}
       <div className={`mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
         {(() => {
           const img = (
