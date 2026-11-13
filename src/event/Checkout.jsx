@@ -570,7 +570,8 @@ function DeliveryStep({ c, dispatch, alert }) {
       state={stateOf(c, 'entrega', c.deliveryDone)}
       icon="truck"
       title={c.step === 'entrega' ? (express ? 'Para onde enviamos?' : 'Escolha a modalidade de entrega') : 'Entrega'}
-      subtitle={c.step === 'entrega' ? (express ? 'Entrega expressa' : 'Entrega') : undefined}
+      // Subtítulo só depois de escolher: mostra a modalidade escolhida (antes não havia nada a dizer)
+      subtitle={c.step === 'entrega' && chosen ? chosen.name : undefined}
       summary={chosen ? `${chosen.name} · ${chosen.price ? brl(chosen.price) : 'Grátis'}${express && addr ? ` · ${addr.street}` : ''}` : ''}
       onEdit={() => dispatch({ type: 'edit', step: 'entrega' })}
     >
