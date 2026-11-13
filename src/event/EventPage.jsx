@@ -119,6 +119,7 @@ export default function EventPage({ slug, search }) {
           order={derived}
           checkout={checkout}
           dispatch={dispatchCheckout}
+          orderDispatch={dispatch}
           remaining={remaining}
           user={user}
           onBack={() => go('ingressos')}

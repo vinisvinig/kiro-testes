@@ -24,7 +24,14 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
         ) : (
           <ul className="flex flex-col gap-2">
             {d.lines.map((l) => (
-              <SummaryLine key={l.key} line={l} codeOk={d.codeOk} onRemove={() => dispatch({ type: 'removeLine', key: l.groupKey, fare: l.fare?.id ?? null, combo: l.kind === 'combo' })} />
+              <SummaryLine
+                key={l.key}
+                line={l}
+                codeOk={d.codeOk}
+                onRemove={() =>
+                  l.kind === 'courtesy' ? dispatch({ type: 'courtesy', on: false }) : dispatch({ type: 'removeLine', key: l.groupKey, fare: l.fare?.id ?? null, combo: l.kind === 'combo' })
+                }
+              />
             ))}
           </ul>
         )}
@@ -50,7 +57,7 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
         )}
         <Row label={`Taxa de serviço, ${SERVICE_FEE * 100}%`} value={empty ? 'R$ -' : brl(d.fee)} />
       </dl>
-      {d.progress && !empty && <CourtesyHint progress={d.progress} />}
+      {d.progress && !empty && <CourtesyHint progress={d.progress} onRestore={() => dispatch({ type: "courtesy", on: true })} />}
       {feesLink}
 
       <div className="border-t border-line pt-4">
@@ -118,6 +125,36 @@ export function OrderSummary({ order, derived, dispatch, onFees, onBuy, remainin
 }
 
 function SummaryLine({ line: l, codeOk, onRemove }) {
+  // Ingresso de cortesia: linha própria em verde, valor "Grátis" e lixeira que remove só a cortesia
+  if (l.kind === 'courtesy') {
+    return (
+      <li className="flex items-start gap-3 rounded-xl border border-success/40 bg-[#f0fdf4] p-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-ink">{sessionTitle(l.session)}</p>
+          <p className="flex items-center gap-1.5 font-ui text-xs text-ink-2">
+            <span className="rounded bg-success px-1 font-ui text-[10px] font-semibold text-white">Cortesia</span>
+            {l.sector.name}
+          </p>
+          <p className="font-ui text-[11px] text-ink-3">
+            {l.qty}x {l.fare.name}
+            {l.seats.length > 0 && ` · ${l.seats.join(', ')}`}
+          </p>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="font-ui text-xs font-bold text-success">Grátis</span>
+          <span className="font-ui text-[11px] text-ink-3 line-through">{brl(l.value)}</span>
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Remover a cortesia do pedido"
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-danger text-danger hover:bg-[#fef2f2]"
+        >
+          <Ico name="trash" className="size-4" />
+        </button>
+      </li>
+    )
+  }
   const isCombo = l.kind === 'combo'
   let pending = null
   if (isCombo && l.missing) pending = l.missing === 1 ? 'Falta 1 ingresso' : `Faltam ${l.missing} ingressos`

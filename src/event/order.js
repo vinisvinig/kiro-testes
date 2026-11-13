@@ -14,6 +14,7 @@ export const initialOrder = {
   openSeat: null, // assento com o seletor de tarifa aberto
   combos: {}, // { 'sessão|combo': { n: 1, seats: ['A1', ...] } }
   codes: {}, // códigos validadores: { banrisul: { value, status: idle | applied | error } }
+  noCourtesy: false, // cortesia automática removida pela pessoa
 }
 
 export const keyOf = (sessionId, id) => `${sessionId}|${id}`
@@ -111,6 +112,8 @@ export function orderReducer(o, a) {
       }
       return { ...o, qty: { ...o.qty, [a.key]: { ...o.qty[a.key], [a.fare]: 0 } } }
     }
+    case 'courtesy': // remover (on: false) ou voltar a usar (on: true) a cortesia automática
+      return { ...o, noCourtesy: !a.on }
     case 'codeInput':
       // Aceita letras e números: pode ser BIN de cartão ou código de uma empresa parceira.
       return { ...o, codes: { ...o.codes, [a.validator]: { value: a.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 20), status: 'idle' } } }
@@ -207,17 +210,37 @@ export function deriveOrder(o) {
 
   const gross = lines.reduce((a, l) => a + l.amount, 0)
   // Cortesia automática (eventos com EVENT.autoCourtesy): a cada N ingressos com tarifa, o de menor valor sai de graça
+  // A pessoa pode remover a cortesia (ex.: para usar um cupom); `progress.off` indica isso.
   const progress = courtesyProgress(count)
+  if (progress && o.noCourtesy) progress.off = true
   let courtesy = null
-  if (progress?.won) {
-    const prices = []
+  // Linhas exibidas: a cortesia sai da linha de origem e vira uma linha própria, logo abaixo dela
+  let shown = lines
+  if (progress?.won && !o.noCourtesy) {
+    const units = []
     for (const l of lines) {
       if (l.kind !== 'fare' || !l.fare) continue
-      for (let i = 0; i < l.qty; i++) prices.push(l.fare.price)
+      for (let i = 0; i < l.qty; i++) units.push(l)
     }
-    prices.sort((a, b) => a - b)
-    const free = prices.slice(0, progress.won)
-    if (free.length) courtesy = { n: free.length, off: free.reduce((a, p) => a + p, 0) }
+    units.sort((a, b) => a.fare.price - b.fare.price)
+    const free = units.slice(0, progress.won)
+    if (free.length) {
+      courtesy = { n: free.length, off: free.reduce((a, l) => a + l.fare.price, 0) }
+      const per = new Map()
+      for (const l of free) per.set(l, (per.get(l) || 0) + 1)
+      shown = []
+      for (const l of lines) {
+        const n = per.get(l) || 0
+        if (!n) {
+          shown.push(l)
+          continue
+        }
+        // Assento marcado: o assento de cortesia é o último escolhido da linha
+        const freeSeats = l.seats.slice(l.seats.length - Math.min(n, l.seats.length))
+        if (l.qty > n) shown.push({ ...l, qty: l.qty - n, tickets: l.tickets - n, amount: l.amount - n * l.fare.price, seats: l.seats.slice(0, l.seats.length - freeSeats.length) })
+        shown.push({ ...l, key: `${l.key}:cortesia`, kind: 'courtesy', qty: n, tickets: n, amount: 0, value: n * l.fare.price, seats: freeSeats })
+      }
+    }
   }
   const subtotal = gross - (courtesy?.off || 0)
   const fee = subtotal * SERVICE_FEE
@@ -251,7 +274,7 @@ export function deriveOrder(o) {
   const codePending = !!blocker && !incomplete.length && !pendingFares && pendingCodes.length > 0
 
   return {
-    lines,
+    lines: shown, // com a linha de cortesia separada (os cálculos acima usam as linhas originais)
     count,
     bySession,
     sessions: Object.keys(bySession).length,

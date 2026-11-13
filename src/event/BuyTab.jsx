@@ -348,7 +348,7 @@ function Sectors({ order, dispatch, session, onMap, progress = null }) {
         <MapButton onClick={onMap} />
       </div>
       {/* Com um setor aberto, o aviso aparece dentro dele (perto dos botões +); aqui só quando nenhum está aberto */}
-      {progress && !order.open && <CourtesyHint progress={progress} className="mt-4" />}
+      {progress && !order.open && <CourtesyHint progress={progress} onRestore={() => dispatch({ type: "courtesy", on: true })} className="mt-4" />}
 
       <ul className="mt-6 flex flex-col gap-4">
         {/* Esgotados sempre por último, mantendo a ordem original dos demais */}
@@ -367,7 +367,7 @@ function Sectors({ order, dispatch, session, onMap, progress = null }) {
                     <FreeBody sector={s} order={order} dispatch={dispatch} session={session} />
                   )}
                   {/* Cortesia automática: o aviso acompanha quem está escolhendo dentro do setor */}
-                  {progress && <CourtesyHint progress={progress} />}
+                  {progress && <CourtesyHint progress={progress} onRestore={() => dispatch({ type: "courtesy", on: true })} />}
                 </div>
               )}
             </li>

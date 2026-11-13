@@ -23,7 +23,13 @@ const SUMMARY_ID = 'resumo-checkout'
 const AUTO_SCROLL_STEPS = false // rolar sozinho até a próxima etapa (desligado para o teste de rolagem manual)
 const scrollToId = (id) => requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
 
-export default function Checkout({ order, checkout: c, dispatch, remaining, user, onBack, onPaid }) {
+export default function Checkout({ order, checkout: c, dispatch, orderDispatch, remaining, user, onBack, onPaid }) {
+  // Remover a cortesia automática (ex.: para poder usar um cupom)
+  const removeCourtesy = () => orderDispatch?.({ type: 'courtesy', on: false })
+  // Se a cortesia voltar a valer (ex.: reativada na seleção), os cupons saem: os dois não se somam
+  useEffect(() => {
+    if (order.courtesy && c.coupons.length) c.coupons.forEach((code) => dispatch({ type: 'removeCoupon', code }))
+  }, [order.courtesy, c.coupons, dispatch])
   const t = useMemo(() => deriveCheckout(c, order), [c, order])
   const [pix, setPix] = useState(null) // null | 'generating' | { code, deadline }
   const [status, setStatus] = useState(null) // null | 'processing' | 'failed' | 'declined'
@@ -131,11 +137,11 @@ export default function Checkout({ order, checkout: c, dispatch, remaining, user
           <div className="flex min-w-0 flex-col gap-6">
             {/* Desktop: evento e ingressos num card; o resumo fica na coluna da direita */}
             <div className="hidden lg:block">
-              <EventSummary order={order} />
+              <EventSummary order={order} onRemoveCourtesy={removeCourtesy} />
             </div>
             {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos") */}
             <div className="lg:hidden">
-              <MobileOrderCard t={t} order={order} remaining={remaining} />
+              <MobileOrderCard t={t} order={order} remaining={remaining} onRemoveCourtesy={removeCourtesy} />
             </div>
             {/* Celular: cupom (opcional) logo abaixo dos ingressos e antes do seguro; no desktop fica na coluna da direita */}
             <div className="lg:hidden">
@@ -200,7 +206,42 @@ const pixCode = (total) =>
 /* ------------------------------------------------------------------ */
 /* Evento e ingressos (cabeçalho com lista recolhível)                 */
 /* ------------------------------------------------------------------ */
-function EventSummary({ order }) {
+/** Ingresso de cortesia na finalização: destaque verde, "Grátis" com o valor riscado e opção de remover. */
+function CourtesyItem({ line: l, onRemove }) {
+  return (
+    <li className="flex items-center gap-3 rounded-3xl border border-success/40 bg-[#f0fdf4] p-4">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-success">
+        <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-current">
+          <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" />
+        </svg>
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
+        <span className="flex items-center gap-2 text-sm font-semibold uppercase leading-5 text-ink-3">
+          {sessionTitle(l.session)}
+          <span className="rounded bg-success px-1.5 py-px font-ui text-[10px] font-semibold normal-case text-white">Cortesia</span>
+        </span>
+        <span className="block text-base font-semibold leading-6 text-ink">
+          {l.qty} {l.qty === 1 ? 'ingresso' : 'ingressos'} de cortesia, {l.sector.name}
+        </span>
+        <span className="block text-sm leading-5 text-ink-3">
+          {l.qty}x {l.fare.name}
+          {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
+        </span>
+        {onRemove && (
+          <button type="button" onClick={onRemove} className="self-start font-ui text-xs font-semibold text-danger underline underline-offset-2 hover:no-underline">
+            Remover cortesia
+          </button>
+        )}
+      </span>
+      <span className="flex flex-col items-end">
+        <span className="whitespace-nowrap text-base font-semibold leading-6 text-success">Grátis</span>
+        <span className="whitespace-nowrap text-xs text-ink-3 line-through">{brl(l.value)}</span>
+      </span>
+    </li>
+  )
+}
+
+function EventSummary({ order, onRemoveCourtesy }) {
   const [open, setOpen] = useState(true)
   const id = useId()
   return (
@@ -215,7 +256,10 @@ function EventSummary({ order }) {
       </button>
       {open && (
         <ul id={id} className="mt-4 flex flex-col gap-4">
-          {order.lines.map((l) => (
+          {order.lines.map((l) =>
+            l.kind === 'courtesy' ? (
+              <CourtesyItem key={l.key} line={l} onRemove={onRemoveCourtesy} />
+            ) : (
             // Figma 10115:204765: cada item num fundo claro arredondado, sem linhas divisórias
             <li key={l.key} className="flex items-center gap-3 rounded-3xl bg-body p-4">
               <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${l.kind === 'combo' ? 'bg-combo-0 text-combo' : 'bg-brand-0 text-brand'}`}>
@@ -233,7 +277,8 @@ function EventSummary({ order }) {
               </span>
               <span className="whitespace-nowrap text-base font-semibold leading-6 text-ink">{brl(l.amount)}</span>
             </li>
-          ))}
+            ),
+          )}
         </ul>
       )}
     </Card>
@@ -938,7 +983,7 @@ function SummaryRows({ t, order, className = '' }) {
  * Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"):
  * reserva no topo, espetáculo, ingressos em caixas claras, valores, divisor e total.
  */
-function MobileOrderCard({ t, order, remaining }) {
+function MobileOrderCard({ t, order, remaining, onRemoveCourtesy }) {
   return (
     <Card as="div" id={`${SUMMARY_ID}-m`} className="flex scroll-mt-24 flex-col gap-4 !p-4">
       <ReserveTimer remaining={remaining} />
@@ -948,7 +993,10 @@ function MobileOrderCard({ t, order, remaining }) {
         <p className="mt-1 font-ui text-xs text-ink-3">{EVENT.venue.name}, {EVENT.venue.city}</p>
       </div>
       <ul className="flex flex-col gap-3">
-        {order.lines.map((l) => (
+        {order.lines.map((l) =>
+          l.kind === 'courtesy' ? (
+            <CourtesyItem key={l.key} line={l} onRemove={onRemoveCourtesy} />
+          ) : (
           <li key={l.key} className="flex flex-col gap-1.5 rounded-3xl bg-body p-4">
             <p className="flex items-center gap-2 text-sm font-semibold leading-5 text-ink-3">
               <Ico name="ticket" className={`size-6 shrink-0 ${l.kind === 'combo' ? 'text-combo' : 'text-brand'}`} />
@@ -965,7 +1013,8 @@ function MobileOrderCard({ t, order, remaining }) {
               <span className="whitespace-nowrap">{brl(l.amount)}</span>
             </p>
           </li>
-        ))}
+          ),
+        )}
       </ul>
       <SummaryRows t={t} order={order} />
       <div className="border-t border-line pt-4">
@@ -1024,6 +1073,8 @@ function Coupons({ c, t, order, dispatch }) {
   const [busy, setBusy] = useState(false)
   const apply = (e) => {
     e.preventDefault()
+    // Cupom e cortesia automática não se somam
+    if (code.trim() && order.courtesy) return setError('Não é possível aplicar cupom em pedidos com cortesia. Remova a cortesia para usar o cupom.')
     const err = checkCoupon(code, order.lines, c.coupons)
     if (err) return setError(err)
     setBusy(true)

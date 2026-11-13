@@ -109,6 +109,7 @@ export function checkoutReducer(c, a) {
 function unitsOf(lines) {
   const units = []
   for (const l of lines) {
+    if (l.kind === 'courtesy') continue // ingresso de cortesia não recebe cupom
     const price = l.kind === 'combo' ? l.amount / l.qty : l.fare.price
     for (let i = 0; i < l.qty; i++) units.push({ key: `${l.key}#${i}`, price })
   }
