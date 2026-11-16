@@ -441,7 +441,7 @@ function PricesCard() {
       </div>
       <ul id="precos-setores" className="mt-4 flex flex-col gap-4" aria-label="Menor valor por setor">
         {shown.map((r) => (
-          <li key={r.id} className="grid gap-3 rounded-2xl bg-body-2 p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
+          <li key={r.id} className="grid gap-3 rounded-2xl bg-body p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
             <div className="flex flex-col gap-2">
               <p className="text-base font-semibold leading-6 text-ink">{r.name}</p>
               <p className="text-sm leading-5 text-ink-2">{r.trait}</p>
