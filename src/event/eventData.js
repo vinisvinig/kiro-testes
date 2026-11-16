@@ -226,6 +226,8 @@ const GUNS = {
    * (o de menor valor). Sem a escolha entre Ingresso e Pacote: os setores já vêm abertos.
    */
   autoCourtesy: { every: 5 },
+  /** Assento marcado: escolhe os lugares no mapa primeiro e depois a tarifa de cada um (Figma 9802:105313). */
+  seatsFirst: true,
   about: {
     eyebrow: 'Sobre o show',
     title: 'Uma noite de rock para cantar do começo ao fim',

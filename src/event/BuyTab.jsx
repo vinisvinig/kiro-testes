@@ -663,10 +663,128 @@ function SeatChips({ ids, onRemove }) {
   )
 }
 
+/**
+ * Assento marcado em 2 passos (Figma 9802:105313, usado no Guns N'Roses): primeiro escolhe os lugares no mapa,
+ * depois define a tarifa de cada um na lista abaixo ("Defina a tarifa · Classificação pendente").
+ */
+function SeatFirstBody({ sector, order, dispatch, session }) {
+  const k = keyOf(order.sessionId, sector.id)
+  const fares = faresFor(sector, session)
+  const mine = order.seats[k] || []
+  const occupied = new Set([...occupiedFor(order.sessionId), ...takenElsewhere(order, sector.id, k)])
+  const toggle = (seat) => dispatch({ type: 'seat', sector: sector.id, seat })
+  const fareOf = (s) => fares.find((f) => f.id === s.fare)
+  const defined = mine.filter((s) => s.fare).length
+  const needsCode = mine.some((s) => fareOf(s)?.validator)
+  return (
+    <div className="flex flex-col gap-3">
+      <InfoBanner>Escolha seus assentos diretamente no mapa. Você poderá definir o tipo de ingresso para cada lugar em seguida.</InfoBanner>
+      <div className="flex flex-col gap-4 rounded-2xl border border-line bg-body-2 p-3 md:p-4">
+        <SeatMap
+          sector={sector}
+          occupied={occupied}
+          selected={new Set(mine.map((s) => s.id))}
+          full={mine.length >= SECTOR_LIMIT}
+          onToggle={toggle}
+          hint={`Selecione até ${SECTOR_LIMIT} assentos`}
+        />
+        {mine.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-base font-semibold text-ink">
+                {mine.length} {mine.length === 1 ? 'assento selecionado' : 'assentos selecionados'}
+              </p>
+              <p className={`font-ui text-xs font-semibold ${defined === mine.length ? 'text-success' : 'text-brand'}`}>
+                {defined} de {mine.length} {mine.length === 1 ? 'definido' : 'definidos'}
+              </p>
+            </div>
+            {/* Lugares escolhidos em pílulas; tocar remove o assento */}
+            <ul className="flex flex-wrap gap-2">
+              {mine.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggle(s.id)}
+                    aria-label={`Remover assento ${s.id}`}
+                    className="flex items-center gap-1.5 rounded-full border border-brand bg-white px-3 py-1.5 font-ui text-xs font-semibold text-ink hover:bg-brand-0"
+                  >
+                    <Ico name="seat" className="size-4" />
+                    {s.id}
+                    <Ico name="close" className="size-3.5 text-ink-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {/* Um bloco por assento: pendente (laranja) até escolher a tarifa */}
+            <ul className="flex flex-col gap-2">
+              {mine.map((s) => {
+                const f = fareOf(s)
+                const open = order.openSeat === s.id
+                return (
+                  <li key={s.id} className={`rounded-xl border-2 bg-white ${f ? 'border-line' : 'border-orange ring-2 ring-orange/20'}`}>
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: 'openSeat', seat: s.id })}
+                      aria-expanded={open}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left"
+                    >
+                      <span className={`flex size-11 shrink-0 items-center justify-center rounded-md font-ui text-sm font-semibold ${f ? 'bg-brand text-white' : 'bg-body-3 text-ink'}`}>{s.id}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold text-ink">{f ? f.name : 'Defina a tarifa'}</span>
+                        <span className="block font-ui text-xs text-ink-3">{f ? `${brl(f.price)} +taxa ${brl(f.price * SERVICE_FEE)}` : 'Classificação pendente'}</span>
+                      </span>
+                      {f ? (
+                        <span className="font-ui text-xs font-semibold text-brand">{open ? 'Fechar' : 'Trocar'}</span>
+                      ) : (
+                        <Ico name="warning" className="size-5 shrink-0 text-orange" />
+                      )}
+                    </button>
+                    {open && (
+                      <div role="radiogroup" aria-label={`Tarifa do assento ${s.id}`} className="flex flex-col gap-2 border-t border-line px-3 py-3">
+                        <p className="font-ui text-xs font-semibold text-ink-2">Selecione a tarifa do assento</p>
+                        {fares.map((x) => {
+                          const on = s.fare === x.id
+                          return (
+                            <button
+                              key={x.id}
+                              type="button"
+                              role="radio"
+                              aria-checked={on}
+                              onClick={() => dispatch({ type: 'seatFare', sector: sector.id, seat: s.id, fare: x.id })}
+                              className={`flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition ${on ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-ink-4'}`}
+                            >
+                              <span className={`size-4 shrink-0 rounded-full ${on ? 'border-[5px] border-brand' : 'border-2 border-ink-4'}`} aria-hidden />
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-ink">{x.name}</span>
+                                <span className="block font-ui text-[11px] text-ink-3">{x.desc}</span>
+                              </span>
+                              <span className="text-right">
+                                <span className="block text-sm font-semibold text-ink">{brl(x.price)}</span>
+                                <span className="block font-ui text-[10px] text-ink-3">+taxa {brl(x.price * SERVICE_FEE)}</span>
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+            {needsCode && <ValidatorHint />}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /* Assento marcado, ingresso individual: a tarifa é escolhida no próprio mapa */
 const SHORT = { inteira: 'Inteira', meia: 'Meia', banrisul: 'Banrisul' }
 
 function SeatBody({ sector, order, dispatch, session }) {
+  // Guns N'Roses: primeiro os lugares, depois a tarifa de cada um
+  if (EVENT.seatsFirst) return <SeatFirstBody sector={sector} order={order} dispatch={dispatch} session={session} />
   const k = keyOf(order.sessionId, sector.id)
   const fares = faresFor(sector, session)
   const mine = order.seats[k] || []
