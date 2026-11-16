@@ -194,18 +194,6 @@ export function VenueMap({ compact = false }) {
   const [open, setOpen] = useState(false)
   // Celular (< 768px): sem pop-up; tocar no mapa mostra "Apenas visualização" no ponto tocado
   const zoom = useIsDesktop()
-  const [tip, setTip] = useState(null) // { x, y, k } em px dentro da imagem
-  useEffect(() => {
-    if (!tip) return
-    const t = setTimeout(() => setTip(null), 1800)
-    return () => clearTimeout(t)
-  }, [tip])
-  const showTip = (e) => {
-    const r = e.currentTarget.getBoundingClientRect()
-    // Mantém o balão dentro da imagem (largura ~140px)
-    const x = Math.min(Math.max(e.clientX - r.left, 70), r.width - 70)
-    setTip({ x, y: e.clientY - r.top, k: Date.now() })
-  }
   const img = (
     <img
       src={MAP_SRC}
@@ -245,20 +233,7 @@ export function VenueMap({ compact = false }) {
             {img}
           </button>
         ) : (
-          <div className="relative" onClick={showTip}>
-            {img}
-            {tip && (
-              <span
-                key={tip.k}
-                role="status"
-                className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+10px)] whitespace-nowrap rounded-lg bg-ink px-3 py-1.5 font-ui text-xs font-semibold text-white shadow-lg"
-                style={{ left: tip.x, top: tip.y }}
-              >
-                Apenas visualização
-                <span className="absolute left-1/2 top-full -translate-x-1/2 border-x-[6px] border-t-[6px] border-x-transparent border-t-ink" aria-hidden />
-              </span>
-            )}
-          </div>
+          <TipMap>{img}</TipMap>
         )}
       </div>
       <MapDialog open={open} onClose={() => setOpen(false)} />
@@ -267,6 +242,38 @@ export function VenueMap({ compact = false }) {
 }
 
 /** Pop-up grande com o mapa, só para visualizar (abre pelo mapa ou pelo "Ver mapa completo"). */
+/** Imagem do mapa que, ao ser tocada/clicada, mostra "Apenas visualização" no ponto (some em ~2s). */
+function TipMap({ children }) {
+  const [tip, setTip] = useState(null) // { x, y, k } em px dentro da imagem
+  useEffect(() => {
+    if (!tip) return
+    const t = setTimeout(() => setTip(null), 1800)
+    return () => clearTimeout(t)
+  }, [tip])
+  const show = (e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    // Mantém o balão dentro da imagem (largura ~140px)
+    const x = Math.min(Math.max(e.clientX - r.left, 70), r.width - 70)
+    setTip({ x, y: e.clientY - r.top, k: Date.now() })
+  }
+  return (
+    <div className="relative cursor-default" onClick={show}>
+      {children}
+      {tip && (
+        <span
+          key={tip.k}
+          role="status"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+10px)] whitespace-nowrap rounded-lg bg-ink px-3 py-1.5 font-ui text-xs font-semibold text-white shadow-lg"
+          style={{ left: tip.x, top: tip.y }}
+        >
+          Apenas visualização
+          <span className="absolute left-1/2 top-full -translate-x-1/2 border-x-[6px] border-t-[6px] border-x-transparent border-t-ink" aria-hidden />
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function MapDialog({ open, onClose }) {
   return (
     <Dialog open={open} onClose={onClose} labelledBy="mapa-t" className="max-w-[1100px] !p-6 md:!p-8">
@@ -278,13 +285,16 @@ export function MapDialog({ open, onClose }) {
           <Ico name="close" className="size-6" />
         </button>
       </div>
-      <div className="mt-6 rounded-3xl border border-line bg-body p-4 md:p-8">
-        <img src={MAP_SRC} alt={MAP_ALT} width={632} height={316} draggable={false} className="h-auto w-full select-none" />
-      </div>
-      <p className="mt-3 flex items-start gap-1 font-ui text-xs text-ink-3">
+      {/* Nota logo abaixo do título, como no card */}
+      <p className="mt-2 flex items-start gap-1 font-ui text-xs text-ink-3">
         <Ico name="info" className="mt-0.5 size-3.5 shrink-0" />
         Este mapa referencial do evento apresenta somente a localização dos setores.
       </p>
+      <div className="mt-6 rounded-3xl border border-line bg-body p-4 md:p-8">
+        <TipMap>
+          <img src={MAP_SRC} alt={MAP_ALT} width={632} height={316} draggable={false} className="h-auto w-full select-none" />
+        </TipMap>
+      </div>
     </Dialog>
   )
 }
