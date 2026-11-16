@@ -208,46 +208,65 @@ export function deriveOrder(o) {
   const bySession = {}
   for (const l of lines) bySession[l.session.id] = (bySession[l.session.id] || 0) + l.tickets
 
-  const gross = lines.reduce((a, l) => a + l.amount, 0)
-  // Cortesia automática (eventos com EVENT.autoCourtesy): a cada N ingressos com tarifa, o de menor valor sai de graça
-  // A pessoa pode remover a cortesia (ex.: para usar um cupom); `progress.off` indica isso.
+  const paid = lines.reduce((a, l) => a + l.amount, 0)
+  // Cortesia automática (eventos com EVENT.autoCourtesy): a cada N ingressos, 1 é cortesia e não tem tarifa.
+  // Vai primeiro para um assento ainda sem tarifa (o último escolhido), para a pessoa não precisar classificá-lo;
+  // se todos já têm tarifa, o de menor valor vira cortesia. A pessoa pode remover a cortesia (ex.: para usar cupom).
   const progress = courtesyProgress(count)
   if (progress && o.noCourtesy) progress.off = true
   let courtesy = null
-  // Linhas exibidas: a cortesia sai da linha de origem e vira uma linha própria, logo abaixo dela
   let shown = lines
   if (progress?.won && !o.noCourtesy) {
+    let left = progress.won
+    const take = new Map() // linha -> quantos viram cortesia
+    for (const l of lines) {
+      if (!left || l.kind !== 'fare' || l.fare) continue
+      const n = Math.min(left, l.qty)
+      take.set(l, n)
+      left -= n
+    }
     const units = []
     for (const l of lines) {
       if (l.kind !== 'fare' || !l.fare) continue
       for (let i = 0; i < l.qty; i++) units.push(l)
     }
     units.sort((a, b) => a.fare.price - b.fare.price)
-    const free = units.slice(0, progress.won)
-    if (free.length) {
-      courtesy = { n: free.length, off: free.reduce((a, l) => a + l.fare.price, 0) }
-      const per = new Map()
-      for (const l of free) per.set(l, (per.get(l) || 0) + 1)
+    for (const l of units.slice(0, left)) take.set(l, (take.get(l) || 0) + 1)
+    if (take.size) {
+      // Valor de referência: a tarifa do ingresso; sem tarifa, o menor valor do setor naquela data
+      const unit = (l) => l.fare?.price ?? Math.min(...faresFor(l.sector, l.session).map((f) => f.price))
+      let n = 0
+      let value = 0
+      let off = 0
       shown = []
       for (const l of lines) {
-        const n = per.get(l) || 0
-        if (!n) {
+        const c = take.get(l) || 0
+        if (!c) {
           shown.push(l)
           continue
         }
-        // Assento marcado: o assento de cortesia é o último escolhido da linha
-        const freeSeats = l.seats.slice(l.seats.length - Math.min(n, l.seats.length))
-        if (l.qty > n) shown.push({ ...l, qty: l.qty - n, tickets: l.tickets - n, amount: l.amount - n * l.fare.price, seats: l.seats.slice(0, l.seats.length - freeSeats.length) })
-        shown.push({ ...l, key: `${l.key}:cortesia`, kind: 'courtesy', qty: n, tickets: n, amount: 0, value: n * l.fare.price, seats: freeSeats })
+        n += c
+        value += c * unit(l)
+        if (l.fare) off += c * l.fare.price
+        // Assento marcado: os assentos de cortesia são os últimos escolhidos da linha
+        const free = l.seats.slice(l.seats.length - Math.min(c, l.seats.length))
+        if (l.qty > c) shown.push({ ...l, qty: l.qty - c, tickets: l.tickets - c, amount: l.amount - (l.fare ? c * l.fare.price : 0), seats: l.seats.slice(0, l.seats.length - free.length) })
+        shown.push({ ...l, key: `${l.key}:cortesia`, kind: 'courtesy', fare: null, qty: c, tickets: c, amount: 0, value: c * unit(l), seats: free })
       }
+      // `off` desconta o que já estava somado; `value` é o que aparece riscado/na linha "Cortesia"
+      courtesy = { n, off: value, paidOff: off }
     }
   }
+  // "Ingressos" mostra também o valor de referência da cortesia sem tarifa, para a conta fechar com a linha "Cortesia"
+  const gross = paid + (courtesy ? courtesy.off - courtesy.paidOff : 0)
   const subtotal = gross - (courtesy?.off || 0)
+  // Assentos de cortesia (para a lista de assentos não pedir tarifa deles)
+  const courtesySeats = new Set(shown.filter((l) => l.kind === 'courtesy').flatMap((l) => l.seats.map((id) => `${l.groupKey}:${id}`)))
   const fee = subtotal * SERVICE_FEE
   const total = subtotal + fee
   const installmentFee = total * INSTALLMENT_FEE
 
-  const pendingFares = lines.filter((l) => l.kind === 'fare' && !l.fare).reduce((a, l) => a + l.qty, 0)
+  const pendingFares = shown.filter((l) => l.kind === 'fare' && !l.fare).reduce((a, l) => a + l.qty, 0)
   const incomplete = lines.filter((l) => l.kind === 'combo' && l.missing > 0)
 
   // Códigos validadores exigidos pelas tarifas escolhidas
@@ -280,6 +299,7 @@ export function deriveOrder(o) {
     sessions: Object.keys(bySession).length,
     gross, // valor dos ingressos antes da cortesia
     courtesy, // { n, off } quando há cortesia automática
+    courtesySeats, // Set de 'sessão|setor:assento' que são cortesia
     progress, // { every, won, missing } nos eventos com cortesia automática
     subtotal,
     fee,

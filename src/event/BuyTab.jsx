@@ -20,7 +20,7 @@ import {
   minFare,
   occupiedFor,
 } from './eventData.js'
-import { keyOf, roomIn, takenElsewhere } from './order.js'
+import { deriveOrder, keyOf, roomIn, takenElsewhere } from './order.js'
 import { Badge, Card, CardTitle, CourtesyHint, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
@@ -673,9 +673,15 @@ function SeatFirstBody({ sector, order, dispatch, session }) {
   const mine = order.seats[k] || []
   const occupied = new Set([...occupiedFor(order.sessionId), ...takenElsewhere(order, sector.id, k)])
   const toggle = (seat) => dispatch({ type: 'seat', sector: sector.id, seat })
-  const fareOf = (s) => fares.find((f) => f.id === s.fare)
-  const defined = mine.filter((s) => s.fare).length
+  // Assentos que viraram cortesia automática: não precisam de tarifa
+  const free = deriveOrder(order).courtesySeats
+  const isFree = (s) => free.has(`${k}:${s.id}`)
+  const fareOf = (s) => (isFree(s) ? null : fares.find((f) => f.id === s.fare))
+  const defined = mine.filter((s) => s.fare || isFree(s)).length
   const needsCode = mine.some((s) => fareOf(s)?.validator)
+  // Assento com as tarifas abertas: o escolhido pela pessoa ou, se ele virou cortesia, o próximo pendente
+  const openSel = mine.find((s) => s.id === order.openSeat)
+  const openId = openSel && !isFree(openSel) ? openSel.id : openSel ? mine.find((s) => !s.fare && !isFree(s))?.id : null
   return (
     <div className="flex flex-col gap-3">
       <InfoBanner>Escolha seus assentos diretamente no mapa. Você poderá definir o tipo de ingresso para cada lugar em seguida.</InfoBanner>
@@ -719,7 +725,23 @@ function SeatFirstBody({ sector, order, dispatch, session }) {
             <ul className="flex flex-col gap-2">
               {mine.map((s) => {
                 const f = fareOf(s)
-                const open = order.openSeat === s.id
+                // Cortesia: bloco verde, "Grátis", sem escolha de tarifa
+                if (isFree(s)) {
+                  const ref = Math.min(...fares.map((x) => x.price))
+                  return (
+                    <li key={s.id} className="flex items-center gap-3 rounded-xl border-2 border-success/40 bg-[#f0fdf4] px-3 py-2.5">
+                      <span className="flex size-11 shrink-0 items-center justify-center rounded-md bg-success font-ui text-sm font-semibold text-white">{s.id}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+                          Cortesia
+                          <span className="rounded bg-success px-1.5 py-px font-ui text-[10px] font-semibold text-white">Grátis</span>
+                        </span>
+                        <span className="block font-ui text-xs text-ink-3">Não precisa definir tarifa · <s>{brl(ref)}</s></span>
+                      </span>
+                    </li>
+                  )
+                }
+                const open = openId === s.id
                 return (
                   <li key={s.id} data-pending-fare={f ? undefined : s.id} className={`scroll-mt-28 rounded-xl border-2 bg-white ${f ? 'border-line' : 'border-orange ring-2 ring-orange/20'}`}>
                     <button

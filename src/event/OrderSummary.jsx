@@ -136,7 +136,7 @@ function SummaryLine({ line: l, codeOk, onRemove }) {
             {l.sector.name}
           </p>
           <p className="font-ui text-[11px] text-ink-3">
-            {l.qty}x {l.fare.name}
+            {l.qty}x Cortesia
             {l.seats.length > 0 && ` · ${l.seats.join(', ')}`}
           </p>
         </div>

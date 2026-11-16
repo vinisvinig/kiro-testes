@@ -26,6 +26,10 @@ const scrollToId = (id) => requestAnimationFrame(() => document.getElementById(i
 export default function Checkout({ order, checkout: c, dispatch, orderDispatch, remaining, user, onBack, onPaid }) {
   // Remover a cortesia automática (ex.: para poder usar um cupom)
   const removeCourtesy = () => orderDispatch?.({ type: 'courtesy', on: false })
+  // Removeu uma cortesia que era um assento sem tarifa: volta para a seleção, onde ele aparece como "Defina a tarifa"
+  useEffect(() => {
+    if (order.pendingFares > 0) onBack()
+  }, [order.pendingFares]) // eslint-disable-line react-hooks/exhaustive-deps
   // Se a cortesia voltar a valer (ex.: reativada na seleção), os cupons saem: os dois não se somam
   useEffect(() => {
     if (order.courtesy && c.coupons.length) c.coupons.forEach((code) => dispatch({ type: 'removeCoupon', code }))
@@ -224,7 +228,7 @@ function CourtesyItem({ line: l, onRemove }) {
           {l.qty} {l.qty === 1 ? 'ingresso' : 'ingressos'} de cortesia, {l.sector.name}
         </span>
         <span className="block text-sm leading-5 text-ink-3">
-          {l.qty}x {l.fare.name}
+          {l.qty}x Cortesia
           {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
         </span>
         {onRemove && (
