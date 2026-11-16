@@ -412,7 +412,7 @@ function ServicesBlock({ children }) {
  * Um serviço: ícone, título, "Opcional/Adicionado · valor", interruptor e o link que mostra os detalhes.
  * Desligado: fundo claro e borda colorida. Ligado: card na cor do serviço com texto branco (Figma 10535:188865).
  */
-function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, value, on, onChange, moreLabel, lessLabel, footer, children }) {
+function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, value, on, onChange, moreLabel, lessLabel, footer, switchColor = color, children }) {
   const [open, setOpen] = useState(false)
   const bodyId = `${id}-detalhes`
   const fg = on ? 'text-white' : 'text-ink'
@@ -431,9 +431,10 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
           </p>
         </div>
         {/* Interruptor (Figma _switch 50x28) */}
-        <label className="relative inline-flex shrink-0 cursor-pointer rounded-2xl bg-white p-2">
+        {/* Figma 10535:188865 (mais contraste): desligado, caixa na cor do serviço e trilho cinza; ligado, caixa branca e trilho na cor */}
+        <label className="relative inline-flex shrink-0 cursor-pointer rounded-2xl p-2 transition-colors" style={{ backgroundColor: on ? '#ffffff' : switchColor }}>
           <input type="checkbox" role="switch" checked={on} onChange={(e) => onChange(e.target.checked)} aria-label={`Adicionar ${title}`} className="peer sr-only" />
-          <span className="h-7 w-[50px] rounded-full bg-body-3 transition peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2" style={on ? { backgroundColor: color } : undefined} />
+          <span className="h-7 w-[50px] rounded-full bg-body-3 transition peer-focus-visible:ring-2 peer-focus-visible:ring-white peer-focus-visible:ring-offset-2" style={on ? { backgroundColor: switchColor } : undefined} />
           <span className="absolute left-[10px] top-[10px] size-6 rounded-full bg-white shadow transition peer-checked:translate-x-[22px]" />
         </label>
       </div>
@@ -470,6 +471,7 @@ function InsuranceStep({ c, t, dispatch }) {
     <ServiceCard
       id="seguro"
       color="#2563eb"
+      switchColor="#3b82f6"
       tint="#fbfdff"
       iconBg="#eff6ff"
       icon="shield"
