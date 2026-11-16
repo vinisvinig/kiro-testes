@@ -192,11 +192,40 @@ const MAP_ALT = `Mapa do local: palco à frente; setores ${MAP_BLOCKS.map((b) =>
  */
 export function VenueMap({ compact = false }) {
   const [open, setOpen] = useState(false)
-  // Celular (< 768px): o mapa é só imagem, sem pop-up
+  // Celular (< 768px): sem pop-up; tocar no mapa mostra "Apenas visualização" no ponto tocado
   const zoom = useIsDesktop()
+  const [tip, setTip] = useState(null) // { x, y, k } em px dentro da imagem
+  useEffect(() => {
+    if (!tip) return
+    const t = setTimeout(() => setTip(null), 1800)
+    return () => clearTimeout(t)
+  }, [tip])
+  const showTip = (e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    // Mantém o balão dentro da imagem (largura ~140px)
+    const x = Math.min(Math.max(e.clientX - r.left, 70), r.width - 70)
+    setTip({ x, y: e.clientY - r.top, k: Date.now() })
+  }
+  const img = (
+    <img
+      src={MAP_SRC}
+      alt={MAP_ALT}
+      loading="lazy"
+      // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
+      width={632}
+      height={316}
+      draggable={false}
+      className="h-auto w-full select-none transition group-hover:opacity-90"
+    />
+  )
   return (
     <Card className={compact ? '!p-8' : ''}>
       <CardTitle>Visão geral do local</CardTitle>
+      {/* Nota fora da caixa da imagem, logo abaixo do título */}
+      <p className="mt-3 flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
+        <Ico name="info" className="mt-px size-3 shrink-0" />
+        Este mapa referencial do evento apresenta somente a localização dos setores.
+      </p>
       {/* Coluna direita (desktop, Figma 10470:207527): botão "Visualizar mapa" entre o título e o mapa, abre o pop-up */}
       {compact && (
         <button
@@ -210,32 +239,27 @@ export function VenueMap({ compact = false }) {
           </svg>
         </button>
       )}
-      <div className={`mt-6 flex flex-col gap-2 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
-        {(() => {
-          const img = (
-            <img
-              src={MAP_SRC}
-              alt={MAP_ALT}
-              loading="lazy"
-              // Tamanho real da imagem: reserva o espaço antes de carregar, senão a página "pula" e os atalhos param fora do bloco
-              width={632}
-              height={316}
-              draggable={false}
-              className="h-auto w-full select-none transition group-hover:opacity-90"
-            />
-          )
-          return zoom ? (
-            <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
-              {img}
-            </button>
-          ) : (
-            img
-          )
-        })()}
-        <p className="flex items-start gap-1 font-ui text-[10px] leading-[14px] text-ink-3">
-          <Ico name="info" className="mt-px size-3 shrink-0" />
-          Este mapa referencial do evento apresenta somente a localização dos setores.
-        </p>
+      <div className={`mt-4 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
+        {zoom ? (
+          <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            {img}
+          </button>
+        ) : (
+          <div className="relative" onClick={showTip}>
+            {img}
+            {tip && (
+              <span
+                key={tip.k}
+                role="status"
+                className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+10px)] whitespace-nowrap rounded-lg bg-ink px-3 py-1.5 font-ui text-xs font-semibold text-white shadow-lg"
+                style={{ left: tip.x, top: tip.y }}
+              >
+                Apenas visualização
+                <span className="absolute left-1/2 top-full -translate-x-1/2 border-x-[6px] border-t-[6px] border-x-transparent border-t-ink" aria-hidden />
+              </span>
+            )}
+          </div>
+        )}
       </div>
       <MapDialog open={open} onClose={() => setOpen(false)} />
     </Card>
