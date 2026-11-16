@@ -309,8 +309,31 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
     setFocusCode(true)
     setOpen(true)
   }
+  // Tarifa de assento pendente: fecha o resumo, abre o setor certo e rola até o assento sem tarifa
+  const goToPendingFare = () => {
+    const l = d.lines.find((x) => x.kind === 'fare' && !x.fare)
+    if (!l) return
+    setOpen(false)
+    if (order.sessionId !== l.session.id) dispatch({ type: 'session', id: l.session.id })
+    if (order.open !== l.sector.id) dispatch({ type: 'open', id: l.sector.id })
+    const seat = l.seats[0]
+    if (seat && order.openSeat !== seat) dispatch({ type: 'openSeat', seat })
+    setTimeout(() => {
+      const el = document.querySelector(`[data-pending-fare="${seat}"]`) || document.getElementById(`item-${l.sector.id}`)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 120)
+  }
+  const showHint = !d.canBuy && d.count > 0 && !d.codePending
   const buy = (
-    <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} className="min-w-0 flex-1" />
+    <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
+      <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} onPendingFare={goToPendingFare} className="w-full" />
+      {/* Pendência logo abaixo do botão */}
+      {showHint && (
+        <p className="text-center font-ui text-[11px] leading-4 text-orange" aria-live="polite">
+          {d.blocker}
+        </p>
+      )}
+    </div>
   )
 
   return (
@@ -344,7 +367,7 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
               }
             />
             <div className="flex flex-col gap-2">
-              <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} className="w-full" />
+              <BuyButton d={d} onBuy={onBuy} onPending={openAtCode} onPendingFare={goToPendingFare} className="w-full" />
               {!d.canBuy && d.count > 0 && !d.codePending && (
                 <p className="text-center font-ui text-xs text-orange" aria-live="polite">
                   {d.blocker}
@@ -373,12 +396,6 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
               </button>
               {buy}
             </div>
-            {/* Outras pendências (assentos do combo, tarifa): toca e abre o resumo para resolver */}
-            {!d.canBuy && d.count > 0 && !d.codePending && (
-              <button type="button" onClick={() => setOpen(true)} className="-mt-2 block px-4 pb-3 text-left font-ui text-[11px] leading-4 text-orange underline">
-                {d.blocker}
-              </button>
-            )}
           </>
         )}
       </div>
@@ -387,12 +404,14 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
 }
 
 /** Comprar; com o código validador pendente vira "Pendente" (amarelo) e leva até o código. */
-function BuyButton({ d, onBuy, onPending, className = '' }) {
-  if (d.codePending) {
+function BuyButton({ d, onBuy, onPending, onPendingFare, className = '' }) {
+  // Celular: em vez de desabilitado, "Pendente" em amarelo leva até o que falta (código validador ou tarifa do assento)
+  const fare = !!onPendingFare && d.pendingFares > 0 && !d.codePending
+  if (d.codePending || fare) {
     return (
       <button
         type="button"
-        onClick={onPending}
+        onClick={fare ? onPendingFare : onPending}
         aria-describedby="comprar-pendente-codigo"
         className={`rounded-full bg-mark px-6 py-[14px] font-ui text-[15px] font-semibold leading-[18px] text-ink transition hover:brightness-95 ${className}`}
       >

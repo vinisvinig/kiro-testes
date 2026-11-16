@@ -721,7 +721,7 @@ function SeatFirstBody({ sector, order, dispatch, session }) {
                 const f = fareOf(s)
                 const open = order.openSeat === s.id
                 return (
-                  <li key={s.id} className={`rounded-xl border-2 bg-white ${f ? 'border-line' : 'border-orange ring-2 ring-orange/20'}`}>
+                  <li key={s.id} data-pending-fare={f ? undefined : s.id} className={`scroll-mt-28 rounded-xl border-2 bg-white ${f ? 'border-line' : 'border-orange ring-2 ring-orange/20'}`}>
                     <button
                       type="button"
                       onClick={() => dispatch({ type: 'openSeat', seat: s.id })}
