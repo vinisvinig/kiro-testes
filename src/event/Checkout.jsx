@@ -455,7 +455,8 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
           {children}
         </div>
       )}
-      {footer && <p className={`mt-3 font-ui text-sm leading-5 ${on ? 'text-white [&_a]:text-white' : 'text-ink-2'}`}>{footer}</p>}
+      {/* Aceite em bloco próprio para facilitar a leitura (Figma 10587:187681): fundo claro, borda cinza, raio 14 */}
+      {footer && <p className="mt-3 rounded-[14px] border border-line bg-body px-3 py-2.5 font-ui text-sm leading-5 text-ink-2 sm:text-base sm:leading-6">{footer}</p>}
     </div>
   )
 }
@@ -482,8 +483,8 @@ function InsuranceStep({ c, t, dispatch }) {
       // Aceite dos termos sempre visível (pedido do PO): a pessoa vê antes de ligar o seguro, sem precisar abrir os detalhes
       footer={
         <>
-          Ao ativar o seguro, declaro que li e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink>, os{' '}
-          <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e as demais disposições do seguro</TermLink>.
+          Ao selecionar Quero contratar o seguro, eu declaro que li e tenho conhecimento e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink> do
+          seguro, e dos <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e Demais Disposições do Seguro</TermLink>.
         </>
       }
     >
