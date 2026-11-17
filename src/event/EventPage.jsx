@@ -331,20 +331,89 @@ function SectionNav() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+  // Celular/tablet: quando a faixa sai da tela (mesmo momento em que o Comprar fica fixo embaixo), ela fica fixa no topo,
+  // logo abaixo do cabeçalho quando ele está visível.
+  const navRef = useRef(null)
+  const [stuck, setStuck] = useState(null) // null | top em px
+  useEffect(() => {
+    const onScroll = () => {
+      const el = navRef.current
+      if (!el || window.innerWidth >= 1024) return setStuck(null)
+      if (el.getBoundingClientRect().bottom >= 0) return setStuck(null)
+      // O cabeçalho some ao rolar para baixo e volta ao subir (com animação): usa o estado final dele, não a posição do meio da animação
+      const header = document.querySelector('header')
+      const hidden = !header || header.classList.contains('-translate-y-full')
+      setStuck(hidden ? 0 : header.offsetHeight)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    const header = document.querySelector('header')
+    const mo = header ? new MutationObserver(onScroll) : null
+    mo?.observe(header, { attributes: true, attributeFilter: ['class'] })
+    return () => (window.removeEventListener('scroll', onScroll), window.removeEventListener('resize', onScroll), mo?.disconnect())
+  }, [])
   const go = (id) => {
     setActive(id)
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
   return (
-    <nav aria-label="Seções da página" className="rounded-2xl border border-line bg-body-2 p-2">
-      <ul className="no-scrollbar flex gap-1 overflow-x-auto">
+    <>
+      <nav ref={navRef} aria-label="Seções da página" className="rounded-2xl border border-line bg-body-2 p-2">
+        <SectionRail active={active} onGo={go} />
+      </nav>
+      {stuck !== null && (
+        <nav aria-label="Seções da página (fixo)" className="fixed inset-x-0 z-30 border-b border-line bg-body-2 px-4 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-[top] duration-300 lg:hidden" style={{ top: stuck }}>
+          <SectionRail active={active} onGo={go} />
+        </nav>
+      )}
+    </>
+  )
+}
+
+/**
+ * Trilho de botões das seções. Quando há botões escondidos para o lado, mostra um degradê com seta na borda
+ * (dica de arrastar), em qualquer largura de tela; o botão ativo é trazido para a vista.
+ */
+function SectionRail({ active, onGo }) {
+  const rail = useRef(null)
+  const [more, setMore] = useState({ left: false, right: false })
+  useEffect(() => {
+    const r = rail.current
+    if (!r) return
+    const check = () => setMore({ left: r.scrollLeft > 2, right: r.scrollLeft + r.clientWidth < r.scrollWidth - 2 })
+    check()
+    r.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check)
+    return () => (r.removeEventListener('scroll', check), window.removeEventListener('resize', check))
+  }, [])
+  useEffect(() => {
+    const r = rail.current
+    const b = r?.querySelector('[aria-current=true]')
+    if (!r || !b) return
+    const left = b.offsetLeft - r.offsetLeft
+    if (left < r.scrollLeft || left + b.offsetWidth > r.scrollLeft + r.clientWidth) r.scrollTo({ left: left - 16, behavior: 'smooth' })
+  }, [active])
+  const fade = (side) => (
+    <span
+      aria-hidden
+      className={`pointer-events-none absolute inset-y-0 flex w-12 items-center ${side === 'right' ? 'right-0 justify-end bg-gradient-to-l' : 'left-0 justify-start bg-gradient-to-r'} from-body-2 via-body-2/80 to-transparent`}
+    >
+      <svg viewBox="0 0 24 24" className={`size-5 fill-ink-2 ${side === 'left' ? 'rotate-180' : ''}`}>
+        <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+      </svg>
+    </span>
+  )
+  return (
+    <div className="relative">
+      <ul ref={rail} className="no-scrollbar flex gap-1 overflow-x-auto">
         {SECTIONS.map(([id, label]) => {
           const on = active === id
           return (
             <li key={id} className="shrink-0">
               <button
                 type="button"
-                onClick={() => go(id)}
+                onClick={() => onGo(id)}
                 aria-current={on ? 'true' : undefined}
                 className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold leading-5 transition ${
                   on ? 'border-brand bg-brand text-white' : 'border-line bg-white text-ink hover:border-brand'
@@ -356,7 +425,9 @@ function SectionNav() {
           )
         })}
       </ul>
-    </nav>
+      {more.left && fade('left')}
+      {more.right && fade('right')}
+    </div>
   )
 }
 
