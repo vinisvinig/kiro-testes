@@ -204,9 +204,10 @@ function Tabs({ tab, onTab, remaining }) {
         <span
           role="timer"
           aria-label={`Reserva garantida por ${mmss(remaining)}`}
-          className={`flex items-center gap-1 rounded-full ${tab === 'buy' ? 'lg:hidden' : ''} px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
+          className={`flex shrink-0 items-center gap-1 rounded-full ${tab === 'buy' ? 'lg:hidden' : ''} px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
         >
-          {mmss(remaining)}
+          {/* Largura fixa e algarismos de mesma largura: o selo não muda de tamanho a cada segundo */}
+          <span className="inline-block w-[34px] text-center tabular-nums">{mmss(remaining)}</span>
           <Ico name="timerRound" className="size-[14px]" />
         </span>
       )}
