@@ -50,7 +50,7 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
         {d.courtesy && (
           <div className="flex items-center justify-between gap-2 text-success">
             <dt>
-              Desconto progressivo ({d.courtesy.n} {d.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})
+              Cortesia ({d.courtesy.n} {d.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})
             </dt>
             <dd>− {brl(d.courtesy.off)}</dd>
           </div>
@@ -132,7 +132,7 @@ function SummaryLine({ line: l, codeOk, onRemove }) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-ink">{sessionTitle(l.session)}</p>
           <p className="flex items-center gap-1.5 font-ui text-xs text-ink-2">
-            <span className="rounded bg-success px-1 font-ui text-[10px] font-semibold text-white">Desconto progressivo</span>
+            <span className="rounded bg-success px-1 font-ui text-[10px] font-semibold text-white">Cortesia</span>
             {l.sector.name}
           </p>
           <p className="font-ui text-[11px] text-ink-3">
@@ -147,7 +147,7 @@ function SummaryLine({ line: l, codeOk, onRemove }) {
         <button
           type="button"
           onClick={onRemove}
-          aria-label="Remover o desconto progressivo do pedido"
+          aria-label="Remover a cortesia do pedido"
           className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-danger text-danger hover:bg-[#fef2f2]"
         >
           <Ico name="trash" className="size-4" />

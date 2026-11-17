@@ -390,11 +390,11 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
       <div role="status" aria-live="polite" className={`flex flex-wrap items-center gap-2 rounded-xl bg-body-2 px-3 py-2.5 font-ui text-sm leading-5 text-ink-2 ${className}`}>
         {gift}
         <span className="flex-1">
-          Desconto progressivo removido. {won === 1 ? '1 dos seus ingressos pode sair de graça.' : `${won} dos seus ingressos podem sair de graça.`}
+          Cortesia removida. {won === 1 ? '1 dos seus ingressos pode sair de graça.' : `${won} dos seus ingressos podem sair de graça.`}
         </span>
         {onRestore && (
           <button type="button" onClick={onRestore} className="font-semibold text-combo underline underline-offset-2 hover:no-underline">
-            Usar desconto
+            Usar cortesia
           </button>
         )}
       </div>
@@ -403,13 +403,13 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
   if (!won && full)
     text = (
       <>
-        <strong>Desconto progressivo:</strong> leve {every}, pague {every - 1}. A cada {every} ingressos, 1 deles sai de graça.
+        <strong>Cortesia:</strong> leve {every}, pague {every - 1}. A cada {every} ingressos, 1 deles sai de graça.
       </>
     )
   else if (won && full)
     text = (
       <>
-        <strong>Desconto progressivo aplicado!</strong> {won === 1 ? '1 dos seus ingressos saiu' : `${won} dos seus ingressos saíram`} de graça. Com mais {every}, outro sai de graça.
+        <strong>Cortesia aplicada!</strong> {won === 1 ? '1 dos seus ingressos saiu' : `${won} dos seus ingressos saíram`} de graça. Com mais {every}, outro sai de graça.
       </>
     )
   else

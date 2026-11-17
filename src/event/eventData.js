@@ -265,8 +265,8 @@ const GUNS = {
     BASE_EVENT.faq[0],
     BASE_EVENT.faq[1],
     {
-      q: 'Desconto progressivo: leve 5, pague 4',
-      a: 'Neste show, a cada 5 ingressos no mesmo pedido, 1 deles sai de graça: o de menor valor, sem taxa de serviço. Não é um ingresso a mais; é um dos 5 que você escolheu. O desconto é aplicado automaticamente no resumo do pedido.',
+      q: 'Cortesia: leve 5, pague 4',
+      a: 'Neste show, a cada 5 ingressos no mesmo pedido, 1 deles sai de graça: o de menor valor, sem taxa de serviço. Não é um ingresso a mais; é um dos 5 que você escolheu. A cortesia é aplicada automaticamente no resumo do pedido.',
     },
     {
       q: 'Acessibilidade física e áreas especiais',

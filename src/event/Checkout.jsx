@@ -222,7 +222,7 @@ function CourtesyItem({ line: l, onRemove }) {
       <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
         <span className="flex items-center gap-2 text-sm font-semibold uppercase leading-5 text-ink-3">
           {sessionTitle(l.session)}
-          <span className="rounded bg-success px-1.5 py-px font-ui text-[10px] font-semibold normal-case text-white">Desconto progressivo</span>
+          <span className="rounded bg-success px-1.5 py-px font-ui text-[10px] font-semibold normal-case text-white">Cortesia</span>
         </span>
         <span className="block text-base font-semibold leading-6 text-ink">
           {l.qty} {l.qty === 1 ? 'ingresso grátis' : 'ingressos grátis'}, {l.sector.name}
@@ -233,7 +233,7 @@ function CourtesyItem({ line: l, onRemove }) {
         </span>
         {onRemove && (
           <button type="button" onClick={onRemove} className="self-start font-ui text-xs font-semibold text-danger underline underline-offset-2 hover:no-underline">
-            Remover desconto
+            Remover cortesia
           </button>
         )}
       </span>
@@ -1024,7 +1024,7 @@ function SummaryRows({ t, order, className = '' }) {
   return (
     <dl className={`flex flex-col gap-2 font-ui text-xs ${className}`}>
       {row('Ingressos', brl(t.subtotal + (order.courtesy?.off || 0)))}
-      {order.courtesy && row(`Desconto progressivo (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
+      {order.courtesy && row(`Cortesia (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
       {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'text-success')}
       {order.validators.length > 0 && row('Código validador', 'Validado', 'text-success')}
       {row('Taxa de serviço', brl(t.fee))}
@@ -1102,7 +1102,7 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
       </p>
       <dl className="mt-5 flex flex-col gap-2 border-t border-line pt-4 font-ui text-xs">
         {row('Ingressos', brl(t.subtotal + (order.courtesy?.off || 0)))}
-      {order.courtesy && row(`Desconto progressivo (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
+      {order.courtesy && row(`Cortesia (${order.courtesy.n} ${order.courtesy.n === 1 ? 'ingresso grátis' : 'ingressos grátis'})`, `− ${brl(order.courtesy.off)}`, 'text-success')}
         {t.couponOff > 0 && row('Cupons de desconto', `− ${brl(t.couponOff)}`, 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {order.validators.length > 0 && row('Código validador', 'Validado', 'rounded-md bg-[#f0fdf4] px-2 py-1.5 text-success')}
         {row('Taxa de serviço', brl(t.fee))}
@@ -1132,7 +1132,7 @@ function Coupons({ c, t, order, dispatch }) {
   const apply = (e) => {
     e.preventDefault()
     // Cupom e cortesia automática não se somam
-    if (code.trim() && order.courtesy) return setError('Não é possível aplicar cupom junto com o desconto progressivo. Remova o desconto para usar o cupom.')
+    if (code.trim() && order.courtesy) return setError('Não é possível aplicar cupom junto com a cortesia. Remova a cortesia para usar o cupom.')
     const err = checkCoupon(code, order.lines, c.coupons)
     if (err) return setError(err)
     setBusy(true)
