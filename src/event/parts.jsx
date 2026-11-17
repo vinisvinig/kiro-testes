@@ -381,19 +381,27 @@ function RuleHint({ rule: r, gift }) {
   const chosen = Object.values(r.filled).reduce((a, n) => a + n, 0)
   const done = r.won > 0 && chosen === 0 // acabou de fechar a regra: mensagem verde, sem barra
   const missing = andList(Object.entries(r.missing).filter(([, n]) => n > 0).map(([f, n]) => fareCount(f, n)))
-  let text
-  if (done) text = r.won === 1 ? `1 ${FARE_WORD[r.free][0]} saiu de graça.` : `${fareCount(r.free, r.won)} saíram de graça.`
-  else if (!chosen) text = r.desc
-  else text = `Selecione mais ${missing} e ${r.won ? 'outra' : '1'} sai de graça.`
+  // Texto curto (pedido do teste): "Selecione mais 5 inteiras e uma delas sai de graça."
+  const onlyFree = Object.keys(r.need).length === 1 // regra só com a tarifa que sai de graça (ex.: 5 inteiras)
+  const prize = onlyFree ? (r.won ? 'outra' : 'uma delas') : `a ${r.free === 'meia' ? 'meia' : FARE_WORD[r.free][0]}`
+  const text = done ? (
+    <>
+      <strong>Cortesia aplicada!</strong> {r.won === 1 ? `1 ${FARE_WORD[r.free][0]} saiu de graça.` : `${fareCount(r.free, r.won)} saíram de graça.`}
+    </>
+  ) : (
+    <>
+      Selecione mais <strong>{missing}</strong>
+      {missing.includes(' e ') ? ', e ' : ' e '}
+      {prize} sai de graça.
+    </>
+  )
   // Trechos da barra na ordem da regra: ex. [inteira, inteira, meia]
   const slots = Object.entries(r.need).flatMap(([f, n]) => Array.from({ length: n }, (_, i) => ({ f, on: i < r.filled[f] })))
   return (
     <div role="status" aria-live="polite" className={`flex flex-col gap-2.5 rounded-xl px-3 py-2.5 font-ui text-sm leading-5 ${done ? 'bg-[#f0fdf4] text-success' : 'bg-combo-0 text-combo'}`}>
       <p className="flex items-start gap-2">
         {gift}
-        <span>
-          <strong>{done ? 'Cortesia aplicada!' : 'Cortesia:'}</strong> {r.title}. <span className="block">{text}</span>
-        </span>
+        <span>{text}</span>
       </p>
       {!done && (
         <div className="flex items-center gap-2" aria-hidden>
@@ -451,7 +459,7 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
   if (!won && full)
     text = (
       <>
-        <strong>Cortesia:</strong> leve {every}, pague {every - 1}. A cada {every} ingressos, 1 deles sai de graça.
+        Selecione mais <strong>{every} ingressos</strong> e um deles sai de graça.
       </>
     )
   else if (won && full)
@@ -463,7 +471,7 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
   else
     text = (
       <>
-        Selecione mais <strong>{missing}</strong> e {won ? 'outro' : '1'} dos seus ingressos sai de graça.
+        Selecione mais <strong>{missing === 1 ? '1 ingresso' : `${missing} ingressos`}</strong> e {won ? 'outro' : 'um deles'} sai de graça.
       </>
     )
   const done = won && full // acabou de completar: só a mensagem verde, sem barra

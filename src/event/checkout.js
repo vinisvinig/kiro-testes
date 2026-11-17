@@ -125,7 +125,7 @@ export function applyCoupons(lines, codes) {
     const free = units.filter((u) => !used.has(u.key)).slice(0, cp.max)
     free.forEach((u) => used.add(u.key))
     const off = free.reduce((s, u) => s + Math.min(u.price, cp.kind === 'pct' ? u.price * cp.value : cp.value), 0)
-    return { code, tickets: free.length, off }
+    return { code, tickets: free.length, max: cp.max, off }
   })
   return { applied, freeUnits: units.length - used.size }
 }

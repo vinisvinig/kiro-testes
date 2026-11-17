@@ -1153,9 +1153,15 @@ function Coupons({ c, t, order, dispatch }) {
             <li key={a.code} className="flex items-center gap-3 rounded-xl border border-line bg-body-2 px-3 py-2.5">
               <span className="min-w-0 flex-1">
                 <span className="block font-ui text-sm font-semibold text-ink">{a.code}</span>
-                <span className="block font-ui text-[11px] text-ink-3">
-                  {a.tickets}x {a.tickets === 1 ? 'ingresso' : 'ingressos'}
+                {/* Em quantos ingressos o cupom entrou e, se o pedido tiver menos, até quantos ele vale */}
+                <span className="block font-ui text-xs text-ink-3">
+                  {a.tickets === 0 ? 'Sem ingressos disponíveis' : `Aplicado em ${a.tickets} ${a.tickets === 1 ? 'ingresso' : 'ingressos'}`}
                 </span>
+                {a.tickets < a.max && (
+                  <span className="block font-ui text-xs text-ink-3">
+                    Válido para até {a.max} {a.max === 1 ? 'ingresso' : 'ingressos'}
+                  </span>
+                )}
               </span>
               <span className="font-ui text-sm font-semibold text-success">− {brl(a.off)}</span>
               <button
