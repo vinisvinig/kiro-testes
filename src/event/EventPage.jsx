@@ -432,14 +432,15 @@ function PricesCard() {
       </ul>
       <hr className="mt-6 border-line" /> */}
       {/* Espaços do Figma: 24 após o título, 8 entre subtítulo e texto, 16 entre os itens da tabela, 32 antes do Ver mais */}
+      {/* Ocultos a pedido (para voltar, descomente):
       <h3 className="mt-6 text-xl font-bold leading-6 text-ink">Compare os setores</h3>
-      <p className="mt-2 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p>
+      <p className="mt-2 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p> */}
       {/* Desktop: cabeçalho Setor | Valor; no celular cada setor vira um bloco com o valor embaixo */}
-      <div className="mt-4 hidden gap-4 px-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
+      <div className="mt-6 hidden gap-4 px-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
         <span>Setor</span>
         <span>Valor</span>
       </div>
-      <ul id="precos-setores" className="mt-4 flex flex-col gap-4" aria-label="Menor valor por setor">
+      <ul id="precos-setores" className="mt-6 flex flex-col gap-4 sm:mt-4" aria-label="Menor valor por setor">
         {shown.map((r) => (
           <li key={r.id} className="grid gap-3 rounded-2xl bg-body p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
             <div className="flex flex-col gap-2">
