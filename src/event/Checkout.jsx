@@ -1154,14 +1154,10 @@ function Coupons({ c, t, order, dispatch }) {
               <span className="min-w-0 flex-1">
                 <span className="block font-ui text-sm font-semibold text-ink">{a.code}</span>
                 {/* Em quantos ingressos o cupom entrou e, se o pedido tiver menos, até quantos ele vale */}
+                {/* Regra do cupom em uma linha (pedido do teste): "Aplica em 2 ingressos" */}
                 <span className="block font-ui text-xs text-ink-3">
-                  {a.tickets === 0 ? 'Sem ingressos disponíveis' : `Aplicado em ${a.tickets} ${a.tickets === 1 ? 'ingresso' : 'ingressos'}`}
+                  Aplica em {a.max} {a.max === 1 ? 'ingresso' : 'ingressos'}
                 </span>
-                {a.tickets < a.max && (
-                  <span className="block font-ui text-xs text-ink-3">
-                    Válido para até {a.max} {a.max === 1 ? 'ingresso' : 'ingressos'}
-                  </span>
-                )}
               </span>
               <span className="font-ui text-sm font-semibold text-success">− {brl(a.off)}</span>
               <button
