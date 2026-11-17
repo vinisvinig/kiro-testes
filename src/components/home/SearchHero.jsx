@@ -160,7 +160,7 @@ function MobileBanner({ slides }) {
             onClick={onClick}
             className="relative flex aspect-[358/477] w-full shrink-0 flex-col justify-end overflow-hidden rounded-3xl"
           >
-            <img src={s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
+            <img src={s.mobileImage || s.image} alt="" draggable={false} className="absolute inset-0 size-full object-cover" />
             <div className="relative flex flex-col items-start gap-3 bg-black/50 p-4 pb-6">
               <span className="rounded-md bg-brand px-[14px] py-[11px] text-xs font-medium leading-4 text-white">{s.period}</span>
               <p className="text-3xl font-bold leading-none text-white">{s.title}</p>
