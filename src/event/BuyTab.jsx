@@ -66,12 +66,9 @@ export default function BuyTab({ order, dispatch, derived, session, onFees, onBu
   //   if (order.open !== target) dispatch({ type: 'open', id: target })
   //   requestAnimationFrame(() => document.getElementById(`item-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
   // }
-  // "Ver mapa completo": no desktop abre o pop-up grande do mapa; no celular rola até o mapa (sem pop-up)
+  // "Visualizar mapa": abre o pop-up grande do mapa (no celular também; antes rolava até o mapa no fim da página)
   const [mapOpen, setMapOpen] = useState(false)
-  const toMap = () =>
-    window.matchMedia('(min-width: 768px)').matches
-      ? setMapOpen(true)
-      : document.getElementById(MAP_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const toMap = () => setMapOpen(true)
   // Desktop, depois de escolher data e modalidade: o mapa vai para a coluna direita, abaixo do resumo (Figma 10470:207527)
   const mapAside = !!showList
   // A coluna direita fica fixa enquanto rola; se for mais alta que a tela, rola junto até o fim e só então para
@@ -318,7 +315,7 @@ function ModalityPicker({ session, selected, onPick }) {
   )
 }
 
-/** "Ver mapa completo": rola até o Mapa referencial do evento (estático) no fim da página. */
+/** "Visualizar mapa" (celular e tablet): abre o pop-up com o mapa referencial do evento. */
 // Oculto no desktop (lá o mapa e o botão "Visualizar mapa" ficam na coluna direita); no celular e no tablet continua
 const MapButton = ({ onClick }) => (
   <button
@@ -326,7 +323,7 @@ const MapButton = ({ onClick }) => (
     onClick={onClick}
     className="flex items-center gap-2 rounded-full lg:hidden border border-brand px-4 py-[10px] font-ui text-[15px] font-semibold leading-none text-brand hover:border-brand-700 hover:text-brand-700"
   >
-    Ver mapa completo
+    Visualizar mapa
     {/* Ícone "map" do Figma 9961:42076 (mapa dobrado), no lugar do pin: é um mapa de setores, não a localização */}
     <svg viewBox="0 0 14 14" aria-hidden className="size-[14px] fill-current">
       <path d="M8.548 2.905 5.631 1.884a1.18 1.18 0 0 0-.758-.006l-2.328.782a1.17 1.17 0 0 0-.793 1.108v6.913c0 .822.822 1.382 1.587 1.085l1.709-.665a.6.6 0 0 1 .402-.006l2.917 1.021c.245.087.513.087.758.006l2.328-.782a1.17 1.17 0 0 0 .793-1.108V3.319c0-.823-.822-1.383-1.587-1.085l-1.709.665a.6.6 0 0 1-.403.006ZM8.752 11.019l-3.5-1.231V2.98l3.5 1.231v6.808Z" />
