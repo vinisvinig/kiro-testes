@@ -227,7 +227,7 @@ const GUNS = {
    */
   autoCourtesy: { every: 5 },
   /** Assento marcado: escolhe os lugares no mapa primeiro e depois a tarifa de cada um (Figma 9802:105313). */
-  seatsFirst: true,
+  seatsFirst: false, // teste com usuários: escolher assento e tarifa juntos no mapa foi mais fácil (igual ao Jack)
   about: {
     eyebrow: 'Sobre o show',
     title: 'Uma noite de rock para cantar do começo ao fim',
@@ -265,8 +265,8 @@ const GUNS = {
     BASE_EVENT.faq[0],
     BASE_EVENT.faq[1],
     {
-      q: 'Cortesia a cada 5 ingressos',
-      a: 'Neste show, a cada 5 ingressos no mesmo pedido, 1 sai como cortesia: o de menor valor fica de graça, sem taxa de serviço. A cortesia é aplicada automaticamente no resumo do pedido.',
+      q: 'Desconto progressivo: leve 5, pague 4',
+      a: 'Neste show, a cada 5 ingressos no mesmo pedido, 1 deles sai de graça: o de menor valor, sem taxa de serviço. Não é um ingresso a mais; é um dos 5 que você escolheu. O desconto é aplicado automaticamente no resumo do pedido.',
     },
     {
       q: 'Acessibilidade física e áreas especiais',

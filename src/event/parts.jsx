@@ -387,27 +387,32 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
       <div role="status" aria-live="polite" className={`flex flex-wrap items-center gap-2 rounded-xl bg-body-2 px-3 py-2.5 font-ui text-sm leading-5 text-ink-2 ${className}`}>
         {gift}
         <span className="flex-1">
-          Cortesia removida do pedido. {won === 1 ? 'Você tem direito a 1 ingresso' : `Você tem direito a ${won} ingressos`} de cortesia.
+          Desconto progressivo removido. {won === 1 ? '1 dos seus ingressos pode sair de graça.' : `${won} dos seus ingressos podem sair de graça.`}
         </span>
         {onRestore && (
           <button type="button" onClick={onRestore} className="font-semibold text-combo underline underline-offset-2 hover:no-underline">
-            Usar cortesia
+            Usar desconto
           </button>
         )}
       </div>
     )
   let text
-  if (!won && full) text = <>A cada {every} ingressos, <strong>1 é cortesia</strong>. Selecione {every} para ganhar.</>
+  if (!won && full)
+    text = (
+      <>
+        <strong>Desconto progressivo:</strong> leve {every}, pague {every - 1}. A cada {every} ingressos, 1 deles sai de graça.
+      </>
+    )
   else if (won && full)
     text = (
       <>
-        <strong>Você ganhou {won} {won === 1 ? 'ingresso' : 'ingressos'} de cortesia!</strong> Selecione mais {every} para ganhar outro.
+        <strong>Desconto progressivo aplicado!</strong> {won === 1 ? '1 dos seus ingressos saiu' : `${won} dos seus ingressos saíram`} de graça. Com mais {every}, outro sai de graça.
       </>
     )
   else
     text = (
       <>
-        Selecione mais <strong>{missing}</strong> para ganhar {won ? 'outro' : '1'} ingresso de cortesia.
+        Selecione mais <strong>{missing}</strong> e {won ? 'outro' : '1'} dos seus ingressos sai de graça.
       </>
     )
   const done = won && full // acabou de completar: só a mensagem verde, sem barra
