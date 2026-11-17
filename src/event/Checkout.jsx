@@ -431,12 +431,17 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
             {on ? 'Adicionado' : 'Opcional'} · {brl(value)}<span className="max-[379px]:hidden"> no pedido</span>
           </p>
         </div>
-        {/* Interruptor (Figma _switch 50x28) */}
-        {/* Figma 10535:188865 (mais contraste): desligado, caixa na cor do serviço e trilho cinza; ligado, caixa branca e trilho na cor */}
-        <label className="relative inline-flex shrink-0 cursor-pointer rounded-2xl p-2 transition-colors" style={{ backgroundColor: on ? '#ffffff' : switchColor }}>
-          <input type="checkbox" role="switch" checked={on} onChange={(e) => onChange(e.target.checked)} aria-label={`Adicionar ${title}`} className="peer sr-only" />
-          <span className="h-7 w-[50px] rounded-full bg-body-3 transition peer-focus-visible:ring-2 peer-focus-visible:ring-white peer-focus-visible:ring-offset-2" style={on ? { backgroundColor: switchColor } : undefined} />
-          <span className="absolute left-[10px] top-[10px] size-6 rounded-full bg-white shadow transition peer-checked:translate-x-[22px]" />
+        {/* Checkbox (antes era interruptor): desmarcado, quadrado branco com borda na cor do serviço;
+            marcado, quadrado branco com o check na cor do serviço sobre o card colorido. Área de toque de 44px. */}
+        <label className="relative inline-flex size-11 shrink-0 cursor-pointer items-center justify-center">
+          <input type="checkbox" checked={on} onChange={(e) => onChange(e.target.checked)} aria-label={`Adicionar ${title}`} className="peer sr-only" />
+          <span
+            className="flex size-7 items-center justify-center rounded-md border-2 bg-white transition peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2"
+            style={{ borderColor: on ? '#ffffff' : switchColor, color: switchColor, '--tw-ring-color': on ? '#ffffff' : switchColor }}
+            aria-hidden="true"
+          >
+            {on && <Ico name="check" className="size-5" />}
+          </span>
         </label>
       </div>
       <button
@@ -1043,7 +1048,7 @@ function MobileOrderCard({ t, order, remaining, onRemoveCourtesy }) {
   )
 }
 
-function Totals({ t, order, remaining, title = 'Total à vista', showTimer = true }) {
+function Totals({ t, order, remaining, title = 'Total à vista', showTimer = true, showInstallments = true }) {
   const low = remaining <= 120
   const row = (label, value, cls = 'text-ink-2') => (
     <div className={`flex items-center justify-between gap-2 ${cls}`}>
@@ -1075,7 +1080,8 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
           <span className="text-base font-bold text-ink">{title}</span>
           <span className="text-[28px] font-bold leading-none text-ink">{brl(t.total)}</span>
         </div>
-        <p className="mt-2 font-ui text-xs text-ink-3">Ou parcelado no cartão até 3x de {brl(t.maxInstallment)}</p>
+        {/* Na tela do Pix o pagamento já foi escolhido: sem a chamada do parcelamento no cartão */}
+        {showInstallments && <p className="mt-2 font-ui text-xs text-ink-3">Ou parcelado no cartão até 3x de {brl(t.maxInstallment)}</p>}
       </div>
     </Card>
   )
@@ -1275,7 +1281,7 @@ function PixScreen({ pix, t, order, remaining, onBack, onPaid, onExpired, status
           </Card>
           <aside className="lg:sticky lg:top-24 lg:self-start">
             {/* Tela do Pix: só o "Pague dentro de" do bloco principal; o resumo fica sem o contador da reserva */}
-            <Totals t={t} order={order} title="Total a pagar" showTimer={false} />
+            <Totals t={t} order={order} title="Total a pagar" showTimer={false} showInstallments={false} />
           </aside>
         </div>
       </div>
