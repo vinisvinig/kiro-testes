@@ -456,7 +456,9 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
         <Ico name="expand" className={`size-4 no-underline transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div id={bodyId} className={`mt-4 flex flex-col gap-3 font-ui text-sm leading-5 ${on ? 'text-white [&_a]:text-white' : 'text-ink-2'}`}>
+        // Detalhes sempre em painel branco com texto escuro (Figma 10535:188904): a cor do card muda ao marcar/desmarcar
+        // sem afetar a leitura do conteúdo.
+        <div id={bodyId} className={`mt-4 flex flex-col gap-4 rounded-2xl bg-white p-4 font-ui text-sm leading-5 text-ink-2 ${on ? '' : 'border border-line'}`}>
           {children}
         </div>
       )}
@@ -465,6 +467,27 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
     </div>
   )
 }
+
+/** Item de benefício: check na cor do serviço; com `no`, X vermelho (o que não está incluído). */
+function Perk({ color, no = false, children }) {
+  return (
+    <li className="flex items-start gap-2 text-sm leading-5 text-ink">
+      <span
+        className={`mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full text-white ${no ? 'bg-danger' : ''}`}
+        style={no ? undefined : { backgroundColor: color }}
+        aria-hidden="true"
+      >
+        <Ico name={no ? 'close' : 'check'} className="size-3" />
+      </span>
+      <span>
+        <span className="sr-only">{no ? 'Não cobre: ' : 'Inclui: '}</span>
+        {children}
+      </span>
+    </li>
+  )
+}
+
+const INSURANCE_COVERS = ['Doença grave', 'Internação hospitalar', 'Morte acidental', 'Fratura óssea', 'Desemprego involuntário']
 
 /* ---------------- Seguro ---------------- */
 function InsuranceStep({ c, t, dispatch }) {
@@ -493,16 +516,30 @@ function InsuranceStep({ c, t, dispatch }) {
         </>
       }
     >
-      {/* Textos do Figma 10535:188877 */}
-      <p className={`font-sans text-base leading-6 ${on ? '' : 'text-ink'}`}>Reembolso em situações previstas na apólice, sujeito à análise da MetLife.</p>
-      <ul className="flex flex-col gap-1">
-        <li>• Pode cobrir doença grave, internação, morte acidental, fratura óssea e desemprego involuntário, conforme a apólice.</li>
-        <li>• Não cobre simples desistência ou mudança de planos.</li>
-        <li>• Solicitação diretamente com a MetLife.</li>
-      </ul>
-      <button type="button" onClick={() => setInfo(true)} className="self-start text-base font-semibold underline underline-offset-2" style={on ? undefined : { color: '#2563eb' }}>
-        Saiba mais
-      </button>
+      {/* Destaque comercial: o que cobre (check) e o único "não cobre" (X); regras da MetLife ficam nas letras miúdas */}
+      <p className="font-sans text-base font-semibold leading-6 text-ink">Se um imprevisto te impedir de ir, você pode receber de volta o valor do ingresso e da taxa de serviço.</p>
+      <div>
+        <p className="text-xs font-semibold uppercase leading-4 tracking-wide text-ink-3">O que cobre</p>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          {INSURANCE_COVERS.map((item) => (
+            <Perk key={item} color="#2563eb">{item}</Perk>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <p className="text-xs font-semibold uppercase leading-4 tracking-wide text-ink-3">O que não cobre</p>
+        <ul className="mt-2">
+          <Perk no>Simples desistência ou mudança de planos</Perk>
+        </ul>
+      </div>
+      {/* Letras miúdas: é o que o suporte mais ouve ("não sabia que era com a MetLife", "achei que cobria desistência") */}
+      <p className="border-t border-line pt-3 text-xs leading-4 text-ink-3">
+        Seguro oferecido pela MetLife. O pedido de reembolso é feito diretamente com a MetLife, não com a Uhuu, e depende de análise e aprovação. Coberturas conforme a apólice; aplicam-se
+        carências, limites e exclusões.{' '}
+        <button type="button" onClick={() => setInfo(true)} className="font-semibold underline underline-offset-2 hover:no-underline" style={{ color: '#2563eb' }}>
+          Saiba mais
+        </button>
+      </p>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o seguro MetLife">
         {/* Texto do Figma 9640:241163 */}
         <div className="flex flex-col gap-6 font-sans text-base leading-6">
@@ -543,19 +580,19 @@ function ClubStep({ c, t, order, dispatch }) {
       moreLabel="Ver benefícios"
       lessLabel="Ocultar benefícios"
     >
-      {/* Textos do Figma 10535 (Clube · Detalhes=Expandidos) */}
-      <p className={`font-sans text-base leading-6 ${on ? '' : 'text-ink'}`}>Benefícios e descontos exclusivos em eventos participantes.</p>
-      <ul className="flex flex-col gap-1">
-        <li>• Descontos exclusivos em ingressos parceiros</li>
-        <li>• Prioridade na compra de eventos selecionados</li>
-        <li>• Vantagens administradas pela Uhuu</li>
+      {/* Mesmo formato do seguro: chamada, benefícios com check e letras miúdas */}
+      <p className="font-sans text-base font-semibold leading-6 text-ink">Benefícios e descontos exclusivos em eventos participantes.</p>
+      <ul className="grid gap-2">
+        <Perk color="#ee3680">Descontos exclusivos em ingressos parceiros</Perk>
+        <Perk color="#ee3680">Prioridade na compra de eventos selecionados</Perk>
+        <Perk color="#ee3680">Vantagens administradas pela Uhuu</Perk>
       </ul>
-      <p>
-        {brl(per)} por ingresso · {order.count} {order.count === 1 ? 'ingresso' : 'ingressos'} no pedido.
+      <p className="border-t border-line pt-3 text-xs leading-4 text-ink-3">
+        {brl(per)} por ingresso · {order.count} {order.count === 1 ? 'ingresso' : 'ingressos'} no pedido.{' '}
+        <button type="button" onClick={() => setInfo(true)} className="font-semibold text-brand underline underline-offset-2 hover:no-underline">
+          Saiba mais
+        </button>
       </p>
-      <button type="button" onClick={() => setInfo(true)} className={`self-start text-base font-semibold underline underline-offset-2 ${on ? '' : 'text-brand'}`}>
-        Saiba mais
-      </button>
       <InfoDialog open={info} onClose={() => setInfo(false)} title="Sobre o Clube Planeta">
         <p>Benefícios e descontos exclusivos em eventos e ingressos participantes.</p>
         <p>Descontos em ingressos parceiros, prioridade na compra de eventos selecionados e vantagens administradas pela Uhuu.</p>
