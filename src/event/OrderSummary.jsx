@@ -169,7 +169,7 @@ function SummaryLine({ line: l, codeOk, onRemove }) {
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-ink">{sessionTitle(l.session)}</p>
         <p className="flex items-center gap-1.5 font-ui text-xs text-ink-2">
-          {isCombo && <span className="rounded bg-combo-0 px-1 font-ui text-[10px] font-semibold text-combo">Combo</span>}
+          {isCombo && <span className="rounded bg-combo-0 px-1 font-ui text-[10px] font-semibold text-combo">Pacote</span>}
           {l.sector.name}
         </p>
         <p className="font-ui text-[11px] text-ink-3">

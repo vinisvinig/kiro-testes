@@ -89,11 +89,11 @@ export const minFare = (sector, session) => Math.min(...faresFor(sector, session
 export const COMBO_FARES = { inteira: 'Inteira', meia: 'Meia-entrada', cortesia: 'Cortesia' }
 const combo = (id, name, desc, sector, price, items) => ({ id, name, desc, sector, price, items, size: items.reduce((a, [, n]) => a + n, 0) })
 export const COMBOS = [
-  combo('conexoes-pista', 'Combo de Conexões', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
-  combo('amizade-especial', 'Combo de Amizade Especial', '5 ingressos, com 30% de desconto.', 'pista-premium', 391, [['inteira', 5]]),
-  combo('amizade-premium', 'Combo de Amizade Premium', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 4], ['cortesia', 1]]),
-  combo('conexoes-coberta', 'Combo de Conexões', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
-  combo('amigos-coberta', 'Combo Amigos', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 4], ['cortesia', 1]]),
+  combo('conexoes-pista', 'Pacote Conexões', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
+  combo('amizade-especial', 'Pacote Amizade Especial', '5 ingressos, com 30% de desconto.', 'pista-premium', 391, [['inteira', 5]]),
+  combo('amizade-premium', 'Pacote Amizade Premium', '5 ingressos, sendo 1 cortesia.', 'pista-premium', 391, [['inteira', 4], ['cortesia', 1]]),
+  combo('conexoes-coberta', 'Pacote Conexões', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 3], ['meia', 1], ['cortesia', 1]]),
+  combo('amigos-coberta', 'Pacote Amigos', '5 ingressos, sendo 1 cortesia.', 'cadeira-coberta', 391, [['inteira', 4], ['cortesia', 1]]),
 ]
 export const comboPrice = (c, session) => c.price * (session?.mult ?? 1)
 /** Mesmo texto da lista de combos, sem o ponto final (ex.: "5 ingressos, sendo 1 cortesia"). */

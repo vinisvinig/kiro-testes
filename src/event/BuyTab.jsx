@@ -879,8 +879,8 @@ function Combos({ order, dispatch, session, onMap }) {
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Eyebrow>Combo</Eyebrow>
-          <CardTitle className="mt-1">Combos disponíveis</CardTitle>
+          <Eyebrow>Pacote</Eyebrow>
+          <CardTitle className="mt-1">Pacotes disponíveis</CardTitle>
         </div>
         <MapButton onClick={onMap} />
       </div>
@@ -911,7 +911,7 @@ function Combos({ order, dispatch, session, onMap }) {
           )
         })}
       </ul>
-      <Note className="mt-4">As tarifas de cada combo já estão incluídas. Nos combos com assento marcado, escolha no mapa o assento de cada ingresso para liberar a compra.</Note>
+      <Note className="mt-4">As tarifas de cada pacote já estão incluídas. Nos pacotes com assento marcado, escolha no mapa o assento de cada ingresso para liberar a compra.</Note>
     </Card>
   )
 }
@@ -932,7 +932,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           {selected && (
             <span className="mb-1 flex flex-wrap gap-2">
               <span className="rounded-full bg-combo-0 px-2 py-0.5 font-ui text-[10px] font-semibold text-combo">
-                {seated ? 'No pedido' : `${state.n} ${state.n === 1 ? 'combo' : 'combos'} no pedido`}
+                {seated ? 'No pedido' : `${state.n} ${state.n === 1 ? 'pacote' : 'pacotes'} no pedido`}
               </span>
               {missing > 0 && (
                 <span className="rounded-full bg-[#fffbeb] px-2 py-0.5 font-ui text-[10px] font-semibold text-orange">
@@ -995,7 +995,7 @@ function ComboSeats({ combo, sector, order, state, dispatch }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-line bg-body-2 p-3 md:p-4">
       <InfoBanner>
-        Escolha no mapa os assentos dos {combo.size} ingressos deste combo: {comboItemsLabel(combo)}. As tarifas já estão incluídas.
+        Escolha no mapa os assentos dos {combo.size} ingressos deste pacote: {comboItemsLabel(combo)}. As tarifas já estão incluídas.
       </InfoBanner>
       <div className="rounded-2xl border border-line bg-white p-4">
         <div className="flex items-center justify-between gap-2">
@@ -1009,7 +1009,7 @@ function ComboSeats({ combo, sector, order, state, dispatch }) {
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-body-3" role="progressbar" aria-valuemin={0} aria-valuemax={needed} aria-valuenow={chosen} aria-label={`Ingressos com assento escolhido no ${combo.name}`}>
           <div className={`h-full rounded-full transition-all ${done ? 'bg-success' : 'bg-combo'}`} style={{ width: `${(chosen / needed) * 100}%` }} />
         </div>
-        {chosen > 0 && !done && <p className="mt-2 font-ui text-xs text-ink-3">O botão Comprar fica disponível quando todos os ingressos deste combo tiverem assento escolhido.</p>}
+        {chosen > 0 && !done && <p className="mt-2 font-ui text-xs text-ink-3">O botão Comprar fica disponível quando todos os ingressos deste pacote tiverem assento escolhido.</p>}
       </div>
 
       <SeatMap

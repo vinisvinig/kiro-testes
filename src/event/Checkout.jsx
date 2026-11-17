@@ -483,7 +483,7 @@ function InsuranceStep({ c, t, dispatch }) {
       // Aceite dos termos sempre visível (pedido do PO): a pessoa vê antes de ligar o seguro, sem precisar abrir os detalhes
       footer={
         <>
-          Ao selecionar Quero contratar o seguro, eu declaro que li e tenho conhecimento e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink> do
+          Ao ativar o seguro, eu declaro que li e tenho conhecimento e concordo com os <TermLink href={INSURANCE_TERMS}>Termos e Condições</TermLink> do
           seguro, e dos <TermLink href={INSURANCE_PRIVACY}>Termos de Privacidade de Dados e Demais Disposições do Seguro</TermLink>.
         </>
       }
