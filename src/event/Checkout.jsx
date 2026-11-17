@@ -43,12 +43,19 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' })
   const [cardTouched, setCardTouched] = useState({})
   const [alertStep, setAlertStep] = useState(null) // etapa obrigatória sinalizada em vermelho
+  // Tocou no "Escolha como pagar" ainda bloqueado: a entrega ganha contorno amarelo (alerta) e o texto do pagamento também
+  const [warnDelivery, setWarnDelivery] = useState(false)
+  const lockedPayment = () => {
+    setWarnDelivery(true)
+    scrollToId('etapa-entrega')
+  }
   const cardValid = Object.keys(cardErrors(card)).length === 0
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
   // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
   const showBar = c.step === 'pagamento' && !!c.method
   // Respondeu a etapa sinalizada (ou mudou o que faltava): tira o vermelho.
   useEffect(() => setAlertStep(null), [c.step, c.method, cardValid])
+  useEffect(() => setWarnDelivery(false), [c.step, c.deliveryDone])
 
   /** Comprar (barra do celular): finaliza se estiver tudo pronto; senão sinaliza e rola até a pendência. */
   const buyMobile = () => {
@@ -150,7 +157,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               <InsuranceStep c={c} t={t} dispatch={dispatch} />
               <ClubStep c={c} t={t} order={order} dispatch={dispatch} />
             </ServicesBlock>
-            <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} />
+            <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} warn={warnDelivery} />
             {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"), logo antes de escolher como pagar */}
             <div className="lg:hidden">
               <MobileOrderCard t={t} order={order} onRemoveCourtesy={removeCourtesy} />
@@ -167,6 +174,8 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               onPix={genPix}
               card={{ value: card, set: setCard, touched: cardTouched, setTouched: setCardTouched }}
               onCard={() => pay('cartao', card)}
+              onLocked={lockedPayment}
+              warn={warnDelivery}
             />
           </div>
 
@@ -294,17 +303,27 @@ function EventSummary({ order, onRemoveCourtesy }) {
 /* ------------------------------------------------------------------ */
 /* Blocos de etapa: aberta, concluída, bloqueada                       */
 /* ------------------------------------------------------------------ */
-function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, alert = false, lockedText = 'Disponível após a etapa anterior', children }) {
+function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, alert = false, warn = false, onLocked, lockedText = 'Disponível após a etapa anterior', children }) {
   if (state === 'locked') {
+    // Com onLocked, tocar no bloco bloqueado leva até a etapa que falta (ex.: pagamento → entrega)
+    const go = onLocked
+      ? {
+          role: 'button',
+          tabIndex: 0,
+          onClick: onLocked,
+          onKeyDown: (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onLocked()),
+        }
+      : {}
     return (
-      <section id={`etapa-${id}`} aria-disabled="true" className="scroll-mt-24 rounded-3xl border border-line bg-white p-6 opacity-80">
+      <section id={`etapa-${id}`} aria-disabled="true" {...go} className={`scroll-mt-24 rounded-3xl border border-line bg-white p-6 opacity-80 ${onLocked ? 'cursor-pointer' : ''}`}>
         <div className="flex items-center gap-4">
           <span className="flex size-8 items-center justify-center rounded-full bg-body-3 text-ink-2">
             <Ico name={icon} className="size-4" />
           </span>
           <div>
             <h2 className="text-xl font-bold leading-tight text-ink-2">{title}</h2>
-            <p className="mt-1 font-ui text-xs text-ink-3">{lockedText}</p>
+            {/* Depois do toque no bloco bloqueado, o texto de apoio fica na cor de alerta do Design System */}
+            <p className={`mt-1 font-ui text-xs ${warn ? 'font-semibold text-alert' : 'text-ink-3'}`}>{lockedText}</p>
           </div>
         </div>
       </section>
@@ -333,7 +352,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
     <section
       id={`etapa-${id}`}
       aria-labelledby={`etapa-${id}-t`}
-      className={`scroll-mt-24 rounded-3xl border bg-white p-6 transition-colors ${alert ? 'border-danger ring-1 ring-danger' : 'border-line'}`}
+      className={`scroll-mt-24 rounded-3xl border bg-white p-6 transition-colors ${alert ? 'border-danger ring-1 ring-danger' : warn ? 'border-alert ring-1 ring-alert' : 'border-line'}`}
     >
       {alert && (
         <p role="alert" className="mb-4 flex items-center gap-2 rounded-xl bg-[#fef2f2] px-3 py-2 font-ui text-xs font-semibold text-danger">
@@ -608,7 +627,7 @@ function ClubStep({ c, t, order, dispatch }) {
 }
 
 /* ---------------- 04 · Entrega ---------------- */
-function DeliveryStep({ c, dispatch, alert }) {
+function DeliveryStep({ c, dispatch, alert, warn = false }) {
   const [adding, setAdding] = useState(false)
   const [duplicate, setDuplicate] = useState(false) // pop-up "Endereço já cadastrado"
   const chosen = DELIVERY.find((d) => d.id === c.delivery)
@@ -625,6 +644,7 @@ function DeliveryStep({ c, dispatch, alert }) {
     <StepShell
       id="entrega"
       alert={alert}
+      warn={warn}
       state={stateOf(c, 'entrega', c.deliveryDone)}
       icon="truck"
       title={c.step === 'entrega' ? (express ? 'Para onde enviamos?' : 'Escolha a modalidade de entrega') : 'Entrega'}
@@ -817,7 +837,7 @@ function AddressForm({ onSave, onCancel }) {
 }
 
 /* ---------------- 05/06 · Pagamento ---------------- */
-function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert }) {
+function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, warn }) {
   const open = c.step === 'pagamento'
   const [coinsInfo, setCoinsInfo] = useState(false)
   const coinsId = useId()
@@ -825,6 +845,8 @@ function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert }) {
     <StepShell
       id="pagamento"
       alert={alert}
+      warn={warn}
+      onLocked={onLocked}
       state={open ? 'open' : 'locked'}
       icon="card"
       title="Escolha como pagar"
