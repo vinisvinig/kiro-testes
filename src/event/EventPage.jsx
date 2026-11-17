@@ -435,34 +435,81 @@ function PricesCard() {
       {/* Ocultos a pedido (para voltar, descomente):
       <h3 className="mt-6 text-xl font-bold leading-6 text-ink">Compare os setores</h3>
       <p className="mt-2 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p> */}
-      {/* Desktop: cabeçalho Setor | Valor; no celular cada setor vira um bloco com o valor embaixo */}
-      <div className="mt-6 hidden gap-4 px-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]" aria-hidden>
-        <span>Setor</span>
-        <span>Valor</span>
-      </div>
-      <ul id="precos-setores" className="mt-6 flex flex-col gap-4 sm:mt-4" aria-label="Menor valor por setor">
-        {shown.map((r) => (
-          <li key={r.id} className="grid gap-3 rounded-2xl bg-body p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4">
-            <div className="flex flex-col gap-2">
+      {/* Figma 10596:46607: tabela com borda; cabeçalho cinza, linhas alternando branco e #fafbfb, divisória no topo de cada linha */}
+      {more && <h3 className="mt-6 text-xl font-bold leading-6 text-ink-2">Setores</h3>}
+      <div id="precos-setores" className={`${more ? 'mt-4' : 'mt-6'} overflow-hidden rounded-2xl border border-line bg-white`} role="table" aria-label="Menor valor por setor">
+        <div role="row" className="hidden gap-4 bg-body-2 p-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]">
+          <span role="columnheader">Setor</span>
+          <span role="columnheader">Valor</span>
+        </div>
+        {shown.map((r, i) => (
+          <div
+            key={r.id}
+            role="row"
+            className={`grid gap-3 border-line p-4 sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)] sm:gap-4 sm:border-t ${i ? 'border-t' : ''} ${i % 2 ? 'bg-body' : 'bg-white'}`}
+          >
+            <div role="cell" className="flex flex-col gap-2">
               <p className="text-base font-semibold leading-6 text-ink">{r.name}</p>
               <p className="text-sm leading-5 text-ink-2">{r.trait}</p>
             </div>
-            <div className="flex flex-col gap-2">
+            <div role="cell" className="flex flex-col gap-2">
               <p className="text-lg font-bold leading-[22px] text-brand">A partir de {brl(r.price)}</p>
               <p className="text-sm leading-5 text-ink-2">Taxa a partir de {brl(r.fee)}</p>
               <p className="text-sm font-semibold leading-5 text-ink">Total a partir de {brl(r.price + r.fee)}</p>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       <p className="mt-4 text-xs leading-4 text-ink-2">
         Obs.: Valores e taxas a partir de, sujeitos à disponibilidade. Setores e tipos de ingresso podem esgotar até a seleção.
       </p>
-      {rows.length > 3 && (
-        <div className="mt-8 flex">
-          <MoreButton open={more} onClick={() => setMore(!more)} controls="precos-setores" />
+      {/* "Ver mais": tipos de ingresso e condições (Figma 10596:46607, Estado=Expandido) */}
+      {more && (
+        <div id="precos-tipos" className="mt-8 flex flex-col gap-8">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-bold leading-6 text-ink">Inteira</h3>
+            <p className="text-base leading-6 text-ink-2">Disponível para qualquer pessoa. Não exige comprovação de benefício.</p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-xl font-bold leading-6 text-ink">Meia-entrada</h3>
+            <p className="text-base leading-6 text-ink-2">50% sobre o valor do ingresso, mediante comprovação do benefício. Confira os critérios:</p>
+            <ul className="flex flex-col gap-4 pl-4">
+              {[
+                ['Estudantes', 'Carteira de Identificação Estudantil (CIE) válida + documento com foto.'],
+                ['Pessoas com 60 anos ou mais', 'Documento oficial com foto que comprove a idade.'],
+                [
+                  'Pessoas com deficiência e acompanhante necessário',
+                  'Documento com foto + comprovante aceito (ex.: cartão BPC ou documento do INSS). Acompanhante: declaração de necessidade.',
+                ],
+                ['Jovens de baixa renda · 15 a 29 anos', 'ID Jovem válida + documento com foto. Renda familiar de até 2 salários mínimos e CadÚnico atualizado.'],
+              ].map(([who, doc]) => (
+                <li key={who} className="flex flex-col gap-2">
+                  <p className="text-base font-semibold leading-6 text-ink">{who}</p>
+                  <p className="text-sm leading-5 text-ink-2">{doc}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-sm leading-5 text-ink-2">Apresente a documentação na compra e na entrada. Outros públicos e comprovantes seguem as condições específicas do evento.</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-base font-semibold leading-6 text-ink-2">Setores com benefícios ou serviços inclusos</p>
+              <p className="text-sm leading-5 text-ink-2">
+                Os tipos de ingresso disponíveis variam por setor. O desconto incide sobre o ingresso; benefícios e serviços adicionais podem ter cobrança própria. Confira as
+                opções e a composição do preço ao comprar.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-bold leading-6 text-ink">Outros descontos</h3>
+            <ul className="text-base leading-6 text-ink-2">
+              <li>• Cartões parceiros e promoções têm critérios próprios.</li>
+              <li>• Os descontos não são cumulativos.</li>
+            </ul>
+          </div>
         </div>
       )}
+      <div className="mt-8 flex">
+        <MoreButton open={more} onClick={() => setMore(!more)} controls="precos-setores" />
+      </div>
     </Card>
   )
 }
