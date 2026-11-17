@@ -48,9 +48,10 @@ export default function EventPage({ slug, search }) {
   const [fees, setFees] = useState(false)
   const { user } = useAuth()
   const remaining = useCountdown(deadline)
-  // A reserva vale na aba Comprar ingressos e na finalização
+  // A reserva começa na aba Comprar ingressos e segue na finalização
   const reserving = view === 'buy' || view === 'checkout'
-  const expired = deadline && remaining === 0 && reserving
+  // Depois de começar, a reserva continua mesmo nas informações do evento (só a tela de sucesso não conta)
+  const expired = deadline && remaining === 0 && view !== 'done'
 
   const session = SESSIONS.find((s) => s.id === order.sessionId) || null
   const derived = useMemo(() => deriveOrder(order), [order])
@@ -58,23 +59,23 @@ export default function EventPage({ slug, search }) {
   const base = `/evento/${slug}`
   const go = (aba, opts) => navigate(aba ? `${base}?aba=${aba}` : base, opts)
 
-  // O tempo de reserva começa ao abrir a aba Comprar ingressos (Figma 9941:50644), segue na finalização
-  // e para quando o usuário volta para as informações do evento.
+  // O tempo de reserva começa ao abrir a aba Comprar ingressos (Figma 9941:50644) e segue na finalização.
+  // Voltar para as informações do evento não zera nada: o tempo continua e o pedido fica guardado.
+  // Só termina ao pagar, ao recomeçar depois de expirar ou ao sair da página do evento.
   useEffect(() => {
     if (reserving && !deadline) {
       setDeadline(Date.now() + RESERVE_SECONDS * 1000)
       setExtended(false)
     }
-    if (!reserving && deadline) setDeadline(null)
   }, [reserving, deadline])
 
   // Quando faltam 5 minutos, a reserva ganha +5 minutos uma única vez (Figma 9945:124592).
   useEffect(() => {
-    if (!reserving || !deadline || extended || remaining > EXTEND_AT) return
+    if (!deadline || view === 'done' || extended || remaining > EXTEND_AT) return
     setExtended(true)
     setDeadline((d) => d + EXTEND_SECONDS * 1000)
     setBonus(true)
-  }, [reserving, deadline, extended, remaining])
+  }, [view, deadline, extended, remaining])
 
   // Sem ingressos válidos (ou sem login), a finalização volta para a seleção; sem pedido, o resultado também.
   useEffect(() => {
@@ -197,12 +198,13 @@ function Tabs({ tab, onTab, remaining }) {
         <Ico name={icon} className="size-4" />
         {label}
       </span>
-      {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644); oculto no desktop a pedido (Figma 9941:50449) */}
-      {id === 'buy' && tab === 'buy' && remaining !== null && (
+      {/* Cronômetro da reserva na aba Comprar ingressos (Figma 9941:50644). No desktop só aparece nas informações do evento
+          (na compra o resumo já mostra o tempo, Figma 9941:50449); no celular, nas duas abas. */}
+      {id === 'buy' && remaining !== null && (
         <span
           role="timer"
           aria-label={`Reserva garantida por ${mmss(remaining)}`}
-          className={`flex items-center gap-1 rounded-full lg:hidden px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
+          className={`flex items-center gap-1 rounded-full ${tab === 'buy' ? 'lg:hidden' : ''} px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
         >
           {mmss(remaining)}
           <Ico name="timerRound" className="size-[14px]" />
