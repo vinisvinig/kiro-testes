@@ -437,10 +437,10 @@ function ServiceCard({ id, color, tint, iconBg, icon, title, titleOn = title, va
           <input type="checkbox" checked={on} onChange={(e) => onChange(e.target.checked)} aria-label={`Adicionar ${title}`} className="peer sr-only" />
           <span
             className="flex size-7 items-center justify-center rounded-md border-2 bg-white transition peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2"
-            style={{ borderColor: on ? '#ffffff' : switchColor, color: switchColor, '--tw-ring-color': on ? '#ffffff' : switchColor }}
+            style={{ borderColor: on ? '#ffffff' : switchColor, color, '--tw-ring-color': on ? '#ffffff' : switchColor }}
             aria-hidden="true"
           >
-            {on && <Ico name="check" className="size-5" />}
+            {on && <Ico name="checkRound" className="size-5" />}
           </span>
         </label>
       </div>
@@ -477,7 +477,7 @@ function Perk({ color, no = false, children }) {
         style={no ? undefined : { backgroundColor: color }}
         aria-hidden="true"
       >
-        <Ico name={no ? 'close' : 'check'} className="size-3" />
+        <Ico name={no ? 'closeRound' : 'checkRound'} className="size-3" />
       </span>
       <span>
         <span className="sr-only">{no ? 'Não cobre: ' : 'Inclui: '}</span>

@@ -200,7 +200,7 @@ function Tabs({ tab, onTab, remaining }) {
           className={`flex items-center gap-1 rounded-full lg:hidden px-2 py-0.5 text-xs font-normal leading-4 text-white ${remaining <= 120 ? 'bg-danger' : 'bg-ink'}`}
         >
           {mmss(remaining)}
-          <Ico name="timer" className="size-[14px]" />
+          <Ico name="timerRound" className="size-[14px]" />
         </span>
       )}
     </button>
