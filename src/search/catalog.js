@@ -123,6 +123,8 @@ export const venueFaq = (v) => [
 
 /** Página do evento interna (src/event): por enquanto todos os cards abrem o evento modelo. */
 const EVENT_URL = '/evento/o-estranho-mundo-de-jack'
+/** Eventos com página própria (mesma página do evento, outro conteúdo). */
+const OWN_PAGES = { 'Guns N’Roses': '/evento/guns-n-roses', 'Kim Walker-Smith — Worship Nights': '/evento/kim-walker-smith' }
 
 /** Data de hoje (ISO, fuso local). Os eventos "É hoje" usam esta data, então o filtro "Hoje" da Agenda funciona em qualquer dia de teste. */
 const isoDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -137,7 +139,8 @@ const FEATURED = [
   // Página própria (/evento/guns-n-roses): mesmas datas e preços do evento modelo, com cortesia automática
   ['Guns N’Roses', 'Show', 'Mineirão', '2026-11-14', 89, 450, ['corre', 'maisVendidos'], 'ev-6.png', '2026-11-27'],
   ['Curitiba Country Festival', 'Show', 'Pedreira Paulo Leminski', '2027-05-24', 120, 890, ['acabando'], 'ev-4.png', '2027-05-25', 'object-left'],
-  ['Kim Walker-Smith — Worship Nights', 'Show', 'Auditório Araújo Vianna', '2026-12-05', 150, 520, ['popular'], 'hero-1.png', null, 'object-left'],
+  // Página própria (/evento/kim-walker-smith): mesmas datas e preços do evento modelo, com duas cortesias por tarifa
+  ['Kim Walker-Smith — Worship Nights', 'Show', 'Auditório Araújo Vianna', '2026-11-14', 89, 450, ['popular'], 'hero-1.png', '2026-11-27', 'object-left'],
   ['Human Bodies — Exposição Internacional', 'Exposição', 'Centro de Eventos FIERGS', '2026-11-03', 50, 120, ['ultimos'], 'ev-3.png'],
   ['Calado — Turnê', 'Musical', 'Teatro Via Sul', '2026-12-12', 80, 300, ['sessaoExtra'], 'ev-5.png'],
   ['Trio Aurora — Acústico', 'Musical', 'Teatro Bradesco', '2026-11-21', 70, 260, [], 'ev-1.png'],
@@ -204,7 +207,7 @@ export const EVENTS = [...FEATURED, ...RAW].map(([title, category, venueName, da
     // Sem arte própria: imagem genérica gerada por IA (Figma, aba "Imagens para. o Kiro"), public/figma/gen-<slug>.jpg
     image: asset(image || `gen-${slugify(title)}.jpg`),
     imageClass: imageClass || '',
-    href: title === 'Guns N’Roses' ? '/evento/guns-n-roses' : EVENT_URL,
+    href: OWN_PAGES[title] || EVENT_URL,
     tags: tags.map((t) => TAG[t]),
     dates: end ? [cardDate(date), cardDate(end)] : [cardDate(date)],
     priceFrom: brl(min),

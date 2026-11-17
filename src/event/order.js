@@ -3,7 +3,7 @@
 //
 // O pedido pode ter ingressos de várias datas: a seleção é guardada por "sessão|setor"
 // (ou "sessão|combo"), e trocar de data só muda o que está sendo exibido.
-import { COMBOS, COMBO_LIMIT, INSTALLMENT_FEE, SECTOR_LIMIT, SECTORS, SERVICE_FEE, SESSIONS, VALIDATORS, comboPrice, courtesyProgress, faresFor } from './eventData.js'
+import { COMBOS, COMBO_LIMIT, EVENT, INSTALLMENT_FEE, SECTOR_LIMIT, SECTORS, SERVICE_FEE, SESSIONS, VALIDATORS, comboPrice, courtesyProgress, courtesyRulesProgress, faresFor } from './eventData.js'
 
 export const initialOrder = {
   sessionId: null, // data exibida agora
@@ -212,26 +212,40 @@ export function deriveOrder(o) {
   // Cortesia automática (eventos com EVENT.autoCourtesy): a cada N ingressos, 1 é cortesia e não tem tarifa.
   // Vai primeiro para um assento ainda sem tarifa (o último escolhido), para a pessoa não precisar classificá-lo;
   // se todos já têm tarifa, o de menor valor vira cortesia. A pessoa pode remover a cortesia (ex.: para usar cupom).
-  const progress = courtesyProgress(count)
+  // Com regras por tarifa (Kim Walker-Smith), só contam os ingressos com a tarifa da regra.
+  const byRules = !!EVENT.autoCourtesy?.rules
+  const fareCounts = {}
+  if (byRules) for (const l of lines) if (l.kind === 'fare' && l.fare) fareCounts[l.fare.id] = (fareCounts[l.fare.id] || 0) + l.qty
+  const progress = byRules ? courtesyRulesProgress(fareCounts) : courtesyProgress(count)
   if (progress && o.noCourtesy) progress.off = true
   let courtesy = null
   let shown = lines
-  if (progress?.won && !o.noCourtesy) {
-    let left = progress.won
-    const take = new Map() // linha -> quantos viram cortesia
-    for (const l of lines) {
-      if (!left || l.kind !== 'fare' || l.fare) continue
-      const n = Math.min(left, l.qty)
-      take.set(l, n)
-      left -= n
-    }
+  // Ingressos de uma tarifa (ou todos com tarifa), do mais barato para o mais caro
+  const unitsOf = (fareId) => {
     const units = []
     for (const l of lines) {
-      if (l.kind !== 'fare' || !l.fare) continue
+      if (l.kind !== 'fare' || !l.fare || (fareId && l.fare.id !== fareId)) continue
       for (let i = 0; i < l.qty; i++) units.push(l)
     }
-    units.sort((a, b) => a.fare.price - b.fare.price)
-    for (const l of units.slice(0, left)) take.set(l, (take.get(l) || 0) + 1)
+    return units.sort((a, b) => a.fare.price - b.fare.price)
+  }
+  if (progress?.won && !o.noCourtesy) {
+    const take = new Map() // linha -> quantos viram cortesia
+    if (byRules) {
+      // Cada regra fechada deixa grátis 1 ingresso da tarifa `free` (o de menor valor)
+      const freeBy = {}
+      for (const r of progress.rules) if (r.won) freeBy[r.free] = (freeBy[r.free] || 0) + r.won
+      for (const [fareId, n] of Object.entries(freeBy)) for (const l of unitsOf(fareId).slice(0, n)) take.set(l, (take.get(l) || 0) + 1)
+    } else {
+      let left = progress.won
+      for (const l of lines) {
+        if (!left || l.kind !== 'fare' || l.fare) continue
+        const n = Math.min(left, l.qty)
+        take.set(l, n)
+        left -= n
+      }
+      for (const l of unitsOf(null).slice(0, left)) take.set(l, (take.get(l) || 0) + 1)
+    }
     if (take.size) {
       // Valor de referência: a tarifa do ingresso; sem tarifa, o menor valor do setor naquela data
       const unit = (l) => l.fare?.price ?? Math.min(...faresFor(l.sector, l.session).map((f) => f.price))

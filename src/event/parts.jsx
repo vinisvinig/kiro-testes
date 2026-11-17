@@ -372,6 +372,45 @@ export function FeesDialog({ open, onClose }) {
     </Dialog>
   )
 }
+const FARE_WORD = { inteira: ['inteira', 'inteiras'], meia: ['meia-entrada', 'meias-entradas'] }
+const fareCount = (f, n) => `${n} ${FARE_WORD[f][n === 1 ? 0 : 1]}`
+const andList = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} e ${xs.at(-1)}` : xs[0])
+
+/** Uma regra da cortesia por tarifa: título, situação e barra com um trecho por ingresso exigido (inteiras primeiro). */
+function RuleHint({ rule: r, gift }) {
+  const chosen = Object.values(r.filled).reduce((a, n) => a + n, 0)
+  const done = r.won > 0 && chosen === 0 // acabou de fechar a regra: mensagem verde, sem barra
+  const missing = andList(Object.entries(r.missing).filter(([, n]) => n > 0).map(([f, n]) => fareCount(f, n)))
+  let text
+  if (done) text = r.won === 1 ? `1 ${FARE_WORD[r.free][0]} saiu de graça.` : `${fareCount(r.free, r.won)} saíram de graça.`
+  else if (!chosen) text = r.desc
+  else text = `Selecione mais ${missing} e ${r.won ? 'outra' : '1'} sai de graça.`
+  // Trechos da barra na ordem da regra: ex. [inteira, inteira, meia]
+  const slots = Object.entries(r.need).flatMap(([f, n]) => Array.from({ length: n }, (_, i) => ({ f, on: i < r.filled[f] })))
+  return (
+    <div role="status" aria-live="polite" className={`flex flex-col gap-2.5 rounded-xl px-3 py-2.5 font-ui text-sm leading-5 ${done ? 'bg-[#f0fdf4] text-success' : 'bg-combo-0 text-combo'}`}>
+      <p className="flex items-start gap-2">
+        {gift}
+        <span>
+          <strong>{done ? 'Cortesia aplicada!' : 'Cortesia:'}</strong> {r.title}. <span className="block">{text}</span>
+        </span>
+      </p>
+      {!done && (
+        <div className="flex items-center gap-2" aria-hidden>
+          <div className="flex flex-1 gap-1">
+            {slots.map((s, i) => (
+              <span key={i} title={FARE_WORD[s.f][0]} className={`h-2 flex-1 rounded-full transition-colors duration-300 ${s.on ? 'bg-combo' : 'bg-white'}`} />
+            ))}
+          </div>
+          <span className="shrink-0 text-xs font-semibold leading-4">
+            {chosen}/{r.size}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /**
  * Cortesia automática: "Selecione mais N para ganhar 1 ingresso de cortesia", atualizado a cada ingresso.
  * Ao completar o grupo, confirma a cortesia e já mostra quanto falta para a próxima.
@@ -397,6 +436,15 @@ export function CourtesyHint({ progress, onRestore, className = "" }) {
             Usar cortesia
           </button>
         )}
+      </div>
+    )
+  // Cortesia com regras por tarifa (Kim Walker-Smith): uma barra por regra
+  if (progress.rules)
+    return (
+      <div className={`flex flex-col gap-2 ${className}`}>
+        {progress.rules.map((r) => (
+          <RuleHint key={r.id} rule={r} gift={gift} />
+        ))}
       </div>
     )
   let text

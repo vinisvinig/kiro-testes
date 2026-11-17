@@ -165,10 +165,15 @@ function Hero() {
     // Altura proporcional à largura: celular 390×520 (Figma 10227:101972), desktop 1440×468.
     // Celular: sem cantos arredondados, imagem enquadrada nos personagens e legenda à esquerda numa faixa escura (50%).
     <section className="relative aspect-[390/520] w-full overflow-hidden bg-ink-dark md:aspect-[1440/468] md:rounded-bl-[80px]">
-      <img src={EVENT.hero} alt="" className={`absolute inset-0 size-full object-cover ${EVENT.heroPos || 'object-[30.5%_50%]'} md:object-center`} />
+      {/* heroMobile: recorte próprio para o celular (abaixo de 768px), quando o evento tiver */}
+      <picture>
+        {EVENT.heroMobile && <source media="(max-width: 767px)" srcSet={EVENT.heroMobile} />}
+        <img src={EVENT.hero} alt="" className={`absolute inset-0 size-full object-cover ${EVENT.heroPos || 'object-[30.5%_50%]'} md:object-center`} />
+      </picture>
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 bg-black/50 p-4 md:items-center md:bg-transparent md:bg-gradient-to-t md:from-black/70 md:via-black/40 md:to-transparent md:px-4 md:pb-[2.8vw] md:pt-20">
         <span className="rounded-md bg-brand px-[14px] py-[11px] font-ui text-xs font-medium leading-4 text-white md:py-[9px]">{EVENT.period}</span>
-        <h1 className="text-3xl font-bold leading-none text-white md:text-center md:text-[clamp(30px,3.4vw,48px)]">{EVENT.title}</h1>
+        {/* heroTitleInArt: a arte do desktop já traz o nome; o título fica só para leitores de tela a partir de 768px */}
+        <h1 className={`text-3xl font-bold leading-none text-white md:text-center md:text-[clamp(30px,3.4vw,48px)] ${EVENT.heroTitleInArt ? 'md:sr-only' : ''}`}>{EVENT.title}</h1>
         <div className="h-1.5 md:hidden" />
       </div>
     </section>

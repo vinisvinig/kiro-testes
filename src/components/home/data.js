@@ -17,7 +17,7 @@ export const TAG = {
 
 export const heroSlides = [
   // mobileImage: recorte próprio para o banner do celular (358×477), mais bonito que cortar o banner largo
-  { image: asset('hero-1.png'), mobileImage: asset('hero-1-mobile.png'), period: '16/06/25 a 03/08/25', title: 'Kim Walker-Smith', href: EVENT_URL },
+  { image: asset('hero-1.png'), mobileImage: asset('hero-1-mobile.png'), period: '14/11/26 a 27/11/26', title: 'Kim Walker-Smith', href: '/evento/kim-walker-smith' },
   { image: asset('hero-2.png'), mobileImage: asset('hero-2-mobile.png'), period: '14/11/26 a 27/11/26', title: 'O estranho mundo de Jack de Tim Burton', href: EVENT_URL },
   { image: asset('hero-3.png'), period: '14/11/26 a 27/11/26', title: 'Guns N’Roses', href: '/evento/guns-n-roses' },
 ]

@@ -279,7 +279,84 @@ const GUNS = {
   ],
 }
 
-const EXTRA_EVENTS = { [GUNS_SLUG]: GUNS }
+export const KIM_SLUG = 'kim-walker-smith'
+const KIM = {
+  slug: KIM_SLUG,
+  title: 'Kim Walker-Smith',
+  hero: asset('hero-1.png'),
+  heroMobile: asset('hero-1-mobile.png'), // celular: recorte próprio (o mesmo do banner da home)
+  heroTitleInArt: true, // desktop: a arte já escreve "Kim Walker-Smith"; sem o título por cima
+  /**
+   * Desconto progressivo com duas regras (internamente; para o usuário é "Cortesia").
+   * Só contam ingressos com a tarifa da regra. Cada ingresso entra em uma regra só; a divisão
+   * entre as regras é a que dá mais cortesias (no empate, vale a primeira regra).
+   * `free`: tarifa que sai de graça quando a regra fecha.
+   */
+  autoCourtesy: {
+    rules: [
+      { id: 'inteiras', need: { inteira: 5 }, free: 'inteira', title: 'Leve 5 inteiras, pague 4', desc: 'A cada 5 inteiras, 1 delas sai de graça.' },
+      {
+        id: 'inteiras-meia',
+        need: { inteira: 2, meia: 1 },
+        free: 'meia',
+        title: 'Leve 2 inteiras e 1 meia, pague só as inteiras',
+        desc: 'A cada 2 inteiras e 1 meia-entrada, a meia-entrada sai de graça.',
+      },
+    ],
+  },
+  seatsFirst: false,
+  about: {
+    eyebrow: 'Sobre o show',
+    title: 'Uma noite de adoração para cantar junto',
+    paragraphs: [
+      'Kim Walker-Smith, uma das vozes mais conhecidas da música de adoração, chega ao Brasil com a turnê Worship Nights. No repertório estão as músicas que marcaram sua carreira com o Jesus Culture e os sucessos da carreira solo, como How He Loves, Show Me Your Glory e Fire Fall Down.',
+      'Banda completa, coral convidado e momentos acústicos fazem da noite um grande encontro para cantar junto do começo ao fim. Os portões abrem às 18h e o show começa às 20h30.',
+    ],
+    more: [
+      'Parte do repertório será cantada em português, em versões preparadas especialmente para a turnê. A abertura fica por conta de um ministério de louvor convidado, anunciado na semana do show.',
+      'Não é permitida a entrada com alimentos, bebidas, câmeras profissionais ou guarda-chuvas. Recomendamos chegar com antecedência para passar pela revista e encontrar seu setor com tranquilidade.',
+    ],
+    credits: [
+      ['Local', 'Auditório Araújo Vianna', 'Parque Farroupilha · Porto Alegre/RS'],
+      ['Data e horário', '14 a 27 de novembro às 20h30', 'Abertura dos portões às 18h'],
+      ['Estacionamento', 'Estacionamentos no entorno', 'Pagos à parte e sujeitos à lotação'],
+      ['Classificação etária', 'Livre', 'Menores de 12 anos acompanhados dos responsáveis'],
+      ['Acessibilidade', 'Espaços e acessos adaptados', ''],
+      ['Duração', 'Aproximadamente 2 horas', 'Com abertura'],
+    ],
+  },
+  salesPoints: [
+    ['Compra on-line · Uhuu.com', ['Compre pelo site oficial. A taxa de serviço e o total da compra são apresentados antes do pagamento. Confira os valores antes de concluir seu pedido.']],
+    ['Bilheteria física · Auditório Araújo Vianna', ['Av. Osvaldo Aranha, 685 · Bom Fim · Porto Alegre/RS.', 'Nos dias de show, a partir das 14h. Compra na bilheteria sem taxa de serviço.']],
+    ['Formas de pagamento', ['Consulte as opções disponíveis no pagamento on-line.'], ['Para a compra presencial, confirme os meios aceitos diretamente com a bilheteria.']],
+  ],
+  thankYou:
+    'Obrigado por comprar com a gente! 🙌\nAgora é só se preparar para uma noite de muito louvor. Nos vemos no Araújo Vianna para o show da Kim Walker-Smith!\n\nAté lá! 🎶',
+  venue: {
+    name: 'Auditório Araújo Vianna',
+    city: 'Porto Alegre',
+    address: 'Av. Osvaldo Aranha, 685, Bom Fim, Porto Alegre, RS, CEP 90035-191',
+    tip: 'O auditório fica dentro do Parque Farroupilha (Redenção). Várias linhas de ônibus passam pela Av. Osvaldo Aranha; programe a chegada considerando o trânsito e a abertura dos portões.',
+  },
+  faq: [
+    BASE_EVENT.faq[0],
+    BASE_EVENT.faq[1],
+    {
+      q: 'Cortesia: inteiras e meia-entrada',
+      a: 'Neste show há duas cortesias, aplicadas automaticamente no resumo do pedido: a cada 5 inteiras, 1 delas sai de graça; e a cada 2 inteiras e 1 meia-entrada, a meia-entrada sai de graça. Cada ingresso conta para uma cortesia só, e o pedido sempre recebe a combinação com mais ingressos grátis. Não é um ingresso a mais; é um dos que você escolheu.',
+    },
+    {
+      q: 'Acessibilidade física e áreas especiais',
+      a: 'O Auditório Araújo Vianna conta com rampas e espaços reservados para pessoas com deficiência e mobilidade reduzida. Solicite atendimento na central de ajuda com antecedência.',
+    },
+    {
+      q: 'Pontos de venda físicos e taxa de conveniência',
+      a: 'A bilheteria do auditório abre nos dias de show a partir das 14h, sem taxa de serviço. Na compra on-line é cobrada a taxa de serviço Uhuu de 15%.',
+    },
+  ],
+}
+
+const EXTRA_EVENTS = { [GUNS_SLUG]: GUNS, [KIM_SLUG]: KIM }
 
 /** Troca o conteúdo do evento exibido (chamado pela página do evento ao abrir pelo endereço). */
 export function setActiveEvent(slug) {
@@ -287,6 +364,41 @@ export function setActiveEvent(slug) {
   if ((EVENT.slug === (next ? next.slug : BASE_EVENT.slug))) return
   for (const k of Object.keys(EVENT)) delete EVENT[k]
   Object.assign(EVENT, JSON.parse(JSON.stringify(BASE_EVENT)), next ? JSON.parse(JSON.stringify(next)) : {})
+}
+
+/**
+ * Cortesia com regras por tarifa (Kim Walker-Smith). `counts`: ingressos por tarifa, ex. { inteira: 6, meia: 1 }.
+ * Distribui os ingressos entre as regras para dar o máximo de cortesias; no empate, prefere a primeira regra.
+ * Cada regra mostra o próprio progresso com os ingressos que sobraram (a mesma sobra aparece nas duas barras).
+ */
+export function courtesyRulesProgress(counts) {
+  const rules = EVENT.autoCourtesy?.rules
+  if (!rules) return null
+  const times = (r, rem) => Math.min(...Object.entries(r.need).map(([f, n]) => Math.floor((rem[f] || 0) / n)))
+  const use = (r, rem, k) => {
+    const next = { ...rem }
+    for (const [f, n] of Object.entries(r.need)) next[f] = (next[f] || 0) - n * k
+    return next
+  }
+  // Busca exaustiva (poucas regras e poucos ingressos): melhor total de cortesias a partir da regra i
+  const best = (i, rem) => {
+    if (i === rules.length) return { total: 0, wins: [], rem }
+    let pick = null
+    for (let k = times(rules[i], rem); k >= 0; k--) {
+      const r = best(i + 1, use(rules[i], rem, k))
+      if (!pick || r.total + k > pick.total) pick = { total: r.total + k, wins: [k, ...r.wins], rem: r.rem }
+    }
+    return pick
+  }
+  const { total, wins, rem } = best(0, counts)
+  return {
+    won: total,
+    rules: rules.map((r, i) => {
+      const filled = Object.fromEntries(Object.entries(r.need).map(([f, n]) => [f, Math.min(rem[f] || 0, n)]))
+      const missing = Object.fromEntries(Object.entries(r.need).map(([f, n]) => [f, n - filled[f]]))
+      return { ...r, won: wins[i], filled, missing, size: Object.values(r.need).reduce((a, n) => a + n, 0) }
+    }),
+  }
 }
 
 /** Cortesia automática: quantos ingressos faltam para a próxima e quantas já foram ganhas. */

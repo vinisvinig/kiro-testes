@@ -78,10 +78,11 @@ const countLabel = (n) => (n === 0 ? 'Nenhum ingresso selecionado' : `${n} ${n =
 export function ReserveTimer({ remaining, className = '' }) {
   const low = remaining <= 120
   return (
-    <div className={`flex items-center gap-2 rounded-full border px-4 py-2.5 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-brand-0'} ${className}`} role="timer" aria-live="off">
+    // Design System "Tempo de reserva" (Figma 9616:41464): fundo #FFFBFD, borda rosa, 12/16 de respiro, textos SM 14/20
+    <div className={`flex items-center gap-2 rounded-full border px-4 py-3 ${low ? 'border-danger bg-[#fef2f2]' : 'border-brand bg-[#fffbfd]'} ${className}`} role="timer" aria-live="off">
       <Ico name="timerRound" className="size-4 text-ink" />
-      <span className="flex-1 font-ui text-xs text-ink-2">Reserva garantida por</span>
-      <span className={`font-ui text-sm font-bold ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
+      <span className="flex-1 font-ui text-sm leading-5 tracking-[0.005em] text-ink">Reserva garantida por</span>
+      <span className={`font-ui text-sm font-bold leading-5 tracking-[0.005em] ${low ? 'text-danger' : 'text-ink'}`}>{mmss(remaining)}</span>
     </div>
   )
 }
