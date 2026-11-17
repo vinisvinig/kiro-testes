@@ -507,8 +507,8 @@ function PricesCard() {
       <h3 className="mt-6 text-xl font-bold leading-6 text-ink">Compare os setores</h3>
       <p className="mt-2 text-sm leading-5 text-ink-2">Menor valor por setor, conforme o tipo de ingresso e suas condições.</p> */}
       {/* Figma 10596:46607: tabela com borda; cabeçalho cinza, linhas alternando branco e #fafbfb, divisória no topo de cada linha */}
-      {more && <h3 className="mt-6 text-xl font-bold leading-6 text-ink-2">Setores</h3>}
-      <div id="precos-setores" className={`${more ? 'mt-4' : 'mt-6'} overflow-hidden rounded-2xl border border-line bg-white`} role="table" aria-label="Menor valor por setor">
+      {/* Sem o título "Setores" no Ver mais: a tabela já tem a coluna "Setor" */}
+      <div id="precos-setores" className="mt-6 overflow-hidden rounded-2xl border border-line bg-white" role="table" aria-label="Menor valor por setor">
         <div role="row" className="hidden gap-4 bg-body-2 p-4 text-base font-semibold leading-6 text-ink sm:grid sm:grid-cols-[minmax(0,300fr)_minmax(0,332fr)]">
           <span role="columnheader">Setor</span>
           <span role="columnheader">Valor</span>
