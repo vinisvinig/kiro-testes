@@ -143,11 +143,9 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
             <div className="hidden lg:block">
               <EventSummary order={order} onRemoveCourtesy={removeCourtesy} />
             </div>
-            {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos") */}
-            <div className="lg:hidden">
-              <MobileOrderCard t={t} order={order} remaining={remaining} onRemoveCourtesy={removeCourtesy} />
-            </div>
-            {/* Celular: cupom (opcional) logo abaixo dos ingressos e antes do seguro; no desktop fica na coluna da direita */}
+            {/* Celular/tablet: o tempo da reserva fica no topo, fora do card do pedido (que desceu para antes do pagamento) */}
+            <ReserveTimer remaining={remaining} className="lg:hidden" />
+            {/* Celular: cupom (opcional) antes do seguro; no desktop fica na coluna da direita */}
             <div className="lg:hidden">
               <Coupons c={c} t={t} order={order} dispatch={dispatch} />
             </div>
@@ -157,6 +155,10 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               <ClubStep c={c} t={t} order={order} dispatch={dispatch} />
             </ServicesBlock>
             <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} />
+            {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"), logo antes de escolher como pagar */}
+            <div className="lg:hidden">
+              <MobileOrderCard t={t} order={order} onRemoveCourtesy={removeCourtesy} />
+            </div>
             <PaymentStep
               c={c}
               t={t}
@@ -1040,10 +1042,9 @@ function SummaryRows({ t, order, className = '' }) {
  * Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"):
  * reserva no topo, espetáculo, ingressos em caixas claras, valores, divisor e total.
  */
-function MobileOrderCard({ t, order, remaining, onRemoveCourtesy }) {
+function MobileOrderCard({ t, order, onRemoveCourtesy }) {
   return (
     <Card as="div" id={`${SUMMARY_ID}-m`} className="flex scroll-mt-24 flex-col gap-4 !p-4">
-      <ReserveTimer remaining={remaining} />
       <div>
         <p className="font-ui text-xs uppercase leading-4 text-brand">Espetáculo</p>
         <p className="mt-1 text-2xl font-bold leading-tight text-ink">{EVENT.title}</p>
