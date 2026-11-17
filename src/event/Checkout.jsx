@@ -145,10 +145,6 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
             </div>
             {/* Celular/tablet: o tempo da reserva fica no topo, fora do card do pedido (que desceu para antes do pagamento) */}
             <ReserveTimer remaining={remaining} className="lg:hidden" />
-            {/* Celular: cupom (opcional) antes do seguro; no desktop fica na coluna da direita */}
-            <div className="lg:hidden">
-              <Coupons c={c} t={t} order={order} dispatch={dispatch} />
-            </div>
             {/* Seguro e Clube Planeta num bloco só, com interruptor (Figma 10493:209144) */}
             <ServicesBlock>
               <InsuranceStep c={c} t={t} dispatch={dispatch} />
@@ -158,6 +154,10 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
             {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"), logo antes de escolher como pagar */}
             <div className="lg:hidden">
               <MobileOrderCard t={t} order={order} onRemoveCourtesy={removeCourtesy} />
+            </div>
+            {/* Celular: cupom (opcional) logo abaixo do card do pedido, antes do pagamento; no desktop fica na coluna da direita */}
+            <div className="lg:hidden">
+              <Coupons c={c} t={t} order={order} dispatch={dispatch} />
             </div>
             <PaymentStep
               c={c}
