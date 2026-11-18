@@ -146,10 +146,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
 
         <div className="mt-4 evento-grid">
           <div className="flex min-w-0 flex-col gap-6">
-            {/* Desktop: evento e ingressos num card; o resumo fica na coluna da direita */}
-            <div className="hidden lg:block">
-              <EventSummary order={order} onRemoveCourtesy={removeCourtesy} />
-            </div>
+            {/* Desktop: evento, ingressos e resumo ficam mesclados num card só na coluna da direita (Figma 10635:226072) */}
             {/* Celular/tablet: o tempo da reserva fica no topo, fora do card do pedido (que desceu para antes do pagamento) */}
             <ReserveTimer remaining={remaining} className="lg:hidden" />
             {/* Seguro e Clube Planeta num bloco só, com interruptor (Figma 10493:209144) */}
@@ -180,8 +177,9 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
           </div>
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
+            {/* Mesmo card mesclado do celular, com o tempo da reserva no topo (Figma 10635:226072 "Seus ingressos") */}
             <div className="hidden lg:block">
-              <Totals t={t} order={order} remaining={remaining} />
+              <MobileOrderCard id={SUMMARY_ID} t={t} order={order} remaining={remaining} onRemoveCourtesy={removeCourtesy} />
             </div>
             <div className="hidden lg:block">
               <Coupons c={c} t={t} order={order} dispatch={dispatch} />
@@ -1064,9 +1062,11 @@ function SummaryRows({ t, order, className = '' }) {
  * Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"):
  * reserva no topo, espetáculo, ingressos em caixas claras, valores, divisor e total.
  */
-function MobileOrderCard({ t, order, onRemoveCourtesy }) {
+function MobileOrderCard({ t, order, onRemoveCourtesy, remaining = null, id = `${SUMMARY_ID}-m` }) {
   return (
-    <Card as="div" id={`${SUMMARY_ID}-m`} className="flex scroll-mt-24 flex-col gap-4 !p-4">
+    <Card as="div" id={id} className="flex scroll-mt-24 flex-col gap-4 !p-4">
+      {/* Desktop: tempo da reserva dentro do card, no topo; no celular ele fica fora, no topo da página */}
+      {remaining !== null && <ReserveTimer remaining={remaining} />}
       <div>
         <p className="font-ui text-xs uppercase leading-4 text-brand">Espetáculo</p>
         <p className="mt-1 text-2xl font-bold leading-tight text-ink">{EVENT.title}</p>
