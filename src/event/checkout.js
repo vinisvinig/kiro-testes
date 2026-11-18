@@ -37,10 +37,10 @@ export const COUPONS = {
 
 export const initialCheckout = {
   // Seguro e Clube Planeta viraram opcionais em destaque (Figma 10337:54950): não são mais etapas,
-  // a jornada já abre na entrega. O seguro já vem marcado; o Clube Planeta começa desmarcado.
+  // a jornada já abre na entrega. Os dois começam desmarcados: seguro pré-marcado é arriscado (CDC art. 39, I e III)
   step: 'entrega', // etapa aberta agora
-  insurance: true, // contratado ou não (marcar/desmarcar não muda a etapa)
-  insuranceDraft: true,
+  insurance: false, // contratado ou não (marcar/desmarcar não muda a etapa)
+  insuranceDraft: false,
   club: false,
   clubDraft: false,
   delivery: null, // 'bilheteria' | 'expressa'
