@@ -59,6 +59,55 @@ export function Collapse({ open, children, className = '' }) {
   )
 }
 
+/**
+ * Anima a altura de um elemento quando `key` muda (o conteúdo troca e a altura vai da antiga para a nova em ~300ms).
+ * Usado no resumo expansível da barra do celular, que cresce/encolhe como uma gaveta.
+ */
+export function useHeightTween(key) {
+  const ref = useRef(null)
+  const last = useRef(null)
+  const busy = useRef(false)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const from = last.current
+    if (!el || from === null || busy.current) return
+    const to = el.getBoundingClientRect().height
+    if (Math.abs(from - to) < 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    busy.current = true
+    el.style.overflow = 'hidden'
+    el.style.height = `${from}px`
+    const t0 = performance.now()
+    let raf
+    const end = () => {
+      el.style.height = ''
+      el.style.overflow = ''
+      busy.current = false
+    }
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / 300)
+      el.style.height = `${from + (to - from) * (1 - Math.pow(1 - k, 3))}px`
+      if (k < 1) raf = requestAnimationFrame(step)
+      else {
+        end()
+        last.current = el.getBoundingClientRect().height
+      }
+    }
+    raf = requestAnimationFrame(step)
+    // Na limpeza (troca de estado no meio) não mede: o DOM já mudou e a próxima animação precisa da altura anterior
+    return () => {
+      cancelAnimationFrame(raf)
+      if (busy.current) {
+        last.current = parseFloat(el.style.height) || last.current
+        end()
+      }
+    }
+  }, [key])
+  useLayoutEffect(() => {
+    if (!busy.current && ref.current) last.current = ref.current.getBoundingClientRect().height
+  })
+  return ref
+}
+
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 /* ------------------------------------------------------------------ */

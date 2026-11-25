@@ -2,7 +2,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useModalBehavior } from '../components/home/ui.jsx'
 import { SERVICE_FEE, comboDetail, sessionTitle } from './eventData.js'
-import { Card, CourtesyHint, Eyebrow, Ico, brl } from './parts.jsx'
+import { Card, CourtesyHint, Eyebrow, Ico, brl, useHeightTween } from './parts.jsx'
 
 export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
@@ -294,6 +294,8 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
   const [focusCode, setFocusCode] = useState(false)
   const panelId = useId()
   const panel = useRef(null)
+  // A barra cresce e encolhe como uma gaveta (antes trocava de tamanho de uma vez)
+  const sheet = useHeightTween(open)
   useModalBehavior(open, () => setOpen(false))
   useEffect(() => {
     if (!open) return
@@ -342,8 +344,13 @@ export function MobileBuyBar({ order, derived: d, dispatch, onFees, onBuy }) {
 
   return (
     <div className="lg:hidden">
-      {open && <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setOpen(false)} aria-hidden />}
-      <div className="fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col border-t border-line bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+      {/* Fundo escuro com transição de opacidade */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 motion-reduce:transition-none ${open ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        onClick={() => setOpen(false)}
+        aria-hidden
+      />
+      <div ref={sheet} className="fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col border-t border-line bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
         {open ? (
           <div ref={panel} id={panelId} role="region" aria-label="Resumo do pedido" tabIndex={-1} className="flex min-h-0 flex-col gap-6 overflow-y-auto px-4 pb-6 pt-4 outline-none">
             <button
