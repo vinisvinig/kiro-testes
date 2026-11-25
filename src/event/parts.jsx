@@ -1,6 +1,25 @@
 // Peças compartilhadas pela Página do evento e pela seleção de ingressos.
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { asset, useIsDesktop, useModalBehavior } from '../components/home/ui.jsx'
+
+/**
+ * Leva a página para o topo ao abrir uma tela nova (Pix, pedido concluído).
+ * No iPhone (Safari) a rolagem suave é cancelada quando a tela troca de altura, então rola na hora
+ * e repete depois que o layout assenta (próximo quadro e ~120ms).
+ */
+export function useScrollTopOnMount(key = '') {
+  useLayoutEffect(() => {
+    // O CSS do site tem scroll-behavior: smooth; aqui a rolagem precisa ser instantânea ('instant' ignora o CSS)
+    const top = () => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    top()
+    const raf = requestAnimationFrame(top)
+    const t = setTimeout(top, 120)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(t)
+    }
+  }, [key])
+}
 
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 

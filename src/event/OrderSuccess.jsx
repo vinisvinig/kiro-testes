@@ -2,9 +2,10 @@
 import { useState } from 'react'
 import { maskEmail } from '../auth.js'
 import { EVENT } from './eventData.js'
-import { Card, Ico, brl } from './parts.jsx'
+import { Card, Ico, brl, useScrollTopOnMount } from './parts.jsx'
 
 export default function OrderSuccess({ result, onHome }) {
+  useScrollTopOnMount(result?.number)
   const [copied, setCopied] = useState(false)
   const [notice, setNotice] = useState('')
   const soon = (what) => setNotice(`${what} estará disponível na próxima fase do projeto.`)

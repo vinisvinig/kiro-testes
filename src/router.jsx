@@ -17,7 +17,8 @@ export function navigate(to, { scroll = true } = {}) {
     window.history.pushState({}, '', href(to))
     window.dispatchEvent(new PopStateEvent('popstate'))
   }
-  if (scroll) window.scrollTo({ top: 0 })
+  // 'instant': o CSS tem scroll-behavior: smooth, e no iPhone a rolagem suave para no meio quando a tela troca
+  if (scroll) window.scrollTo({ top: 0, behavior: 'instant' })
 }
 
 export function useLocation() {

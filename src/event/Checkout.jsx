@@ -17,7 +17,7 @@ import {
   onlyDigits,
 } from './checkout.js'
 import { ReserveTimer, mmss } from './OrderSummary.jsx'
-import { Card, Dialog, Eyebrow, Ico, brl } from './parts.jsx'
+import { Card, Dialog, Eyebrow, Ico, brl, useScrollTopOnMount } from './parts.jsx'
 
 const SUMMARY_ID = 'resumo-checkout'
 const AUTO_SCROLL_STEPS = false // rolar sozinho até a próxima etapa (desligado para o teste de rolagem manual)
@@ -111,12 +111,10 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   const showReasons = () => {
     setStatus(null)
     setDeclinedScreen(true)
-    window.scrollTo({ top: 0 })
   }
 
   const genPix = () => {
-    setPix('generating')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setPix('generating') // a tela do Pix rola para o topo ao abrir (useScrollTopOnMount)
     setTimeout(() => setPix({ code: pixCode(t.total), deadline: Date.now() + PIX_SECONDS * 1000 }), 1400)
   }
 
@@ -1261,6 +1259,7 @@ function PixScreen({ pix, t, order, remaining, onBack, onPaid, onExpired, status
   const [now, setNow] = useState(Date.now())
   const [copied, setCopied] = useState(false)
   const ready = typeof pix === 'object'
+  useScrollTopOnMount(ready ? 'pix' : 'gerando')
   const left = ready ? Math.min(PIX_SECONDS, Math.max(0, Math.ceil((pix.deadline - now) / 1000))) : PIX_SECONDS
 
   useEffect(() => {
@@ -1532,6 +1531,7 @@ const DECLINE_REASONS = [
 
 /** Página "Pagamento recusado" (Figma 10260:109029 desktop / 10260:108565 celular). */
 function DeclinedScreen({ number, onChange }) {
+  useScrollTopOnMount(number)
   const [copied, setCopied] = useState(false)
   const [open, setOpen] = useState(null)
   const id = useId()
