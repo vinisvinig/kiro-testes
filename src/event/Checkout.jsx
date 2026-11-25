@@ -375,7 +375,8 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
           <Ico name="error" className="size-4" /> {id === 'pagamento' ? 'Escolha a forma de pagamento e preencha os dados para comprar.' : 'Responda esta etapa para continuar.'}
         </p>
       )}
-      <div className="flex items-start gap-4">
+      {/* Ícone centralizado com o título (e o subtítulo, quando houver), também quando o título quebra em 2 linhas */}
+      <div className="flex items-center gap-4">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <Ico name={icon} className="size-4" />
         </span>
