@@ -20,6 +20,7 @@ export const SAVED_ADDRESSES = [
 ]
 
 /** Parcelas do cartão: juros a partir de 2x. */
+export const PROCESSING_FEE = 0 // Taxa de processamento do pagamento (sem cobrança no protótipo)
 export const INSTALLMENTS = [
   { n: 1, rate: 0 },
   { n: 2, rate: 0.02 },
@@ -160,7 +161,17 @@ export function deriveCheckout(c, order) {
   const total = round(before - coins)
   const inst = INSTALLMENTS.find((i) => i.n === c.installments) || INSTALLMENTS[0]
   const cardTotal = round(total * (1 + inst.rate))
+  // Decreto 7.962/2013 (e-commerce): o resumo mostra separados os juros do parcelamento e a taxa de processamento.
+  // No protótipo não há taxa de processamento (fica R$ 0,00); os juros só existem no cartão parcelado.
+  const card = c.method === 'cartao'
+  const interest = card ? round(cardTotal - total) : 0
+  const processing = PROCESSING_FEE
   return {
+    method: c.method,
+    installments: card ? inst.n : 1,
+    interest,
+    processing,
+    payTotal: round((card ? cardTotal : total) + processing),
     applied,
     couponOff,
     subtotal,

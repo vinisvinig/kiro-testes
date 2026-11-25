@@ -50,6 +50,14 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
     scrollToId('etapa-entrega')
   }
   const cardValid = Object.keys(cardErrors(card)).length === 0
+  // Celular: "Confirmar" no pagamento leva até o Resumo (no fim da página), onde ficam os termos e o botão final
+  const [confirmed, setConfirmed] = useState(false)
+  useEffect(() => setConfirmed(false), [c.method, c.installments, card])
+  const confirm = () => {
+    if (c.method === 'cartao' && !cardValid) return setCardTouched({ number: true, name: true, expiry: true, cvv: true })
+    setConfirmed(true)
+    scrollToId(`${SUMMARY_ID}-m`)
+  }
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
   // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
   const showBar = c.step === 'pagamento' && !!c.method
@@ -59,7 +67,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
 
   /** Comprar (barra do celular): finaliza se estiver tudo pronto; senão sinaliza e rola até a pendência. */
   const buyMobile = () => {
-    if (ready) return c.method === 'pix' ? genPix() : pay('cartao', card)
+    if (ready) return confirm() // termos e botão final ficam no Resumo, no fim da página
     const step = c.step || 'pagamento'
     if (step === 'pagamento' && c.method === 'cartao') setCardTouched({ number: true, name: true, expiry: true, cvv: true })
     setAlertStep(step)
@@ -153,14 +161,6 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               <ClubStep c={c} t={t} order={order} dispatch={dispatch} />
             </ServicesBlock>
             <DeliveryStep c={c} dispatch={dispatch} alert={alertStep === 'entrega'} warn={warnDelivery} />
-            {/* Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"), logo antes de escolher como pagar */}
-            <div className="lg:hidden">
-              <MobileOrderCard t={t} order={order} onRemoveCourtesy={removeCourtesy} />
-            </div>
-            {/* Celular: cupom (opcional) logo abaixo do card do pedido, antes do pagamento; no desktop fica na coluna da direita */}
-            <div className="lg:hidden">
-              <Coupons c={c} t={t} order={order} dispatch={dispatch} />
-            </div>
             <PaymentStep
               c={c}
               t={t}
@@ -171,7 +171,27 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               onCard={() => pay('cartao', card)}
               onLocked={lockedPayment}
               warn={warnDelivery}
+              onConfirm={confirm}
             />
+            {/* Celular/tablet: Resumo no fim da página, com o cupom dentro e, depois do "Confirmar", os termos e o botão final */}
+            <div className="lg:hidden">
+              <MobileOrderCard
+                t={t}
+                order={order}
+                onRemoveCourtesy={removeCourtesy}
+                coupon={<Coupons c={c} t={t} order={order} dispatch={dispatch} embedded />}
+                footer={
+                  confirmed && ready ? (
+                    <div>
+                      <PurchaseTerms action={c.method === 'pix' ? 'Gerar Pix' : 'Finalizar compra'} />
+                      <PrimaryButton className="mt-4 w-full" onClick={() => (c.method === 'pix' ? genPix() : pay('cartao', card))}>
+                        {c.method === 'pix' ? 'Gerar Pix' : 'Finalizar compra'}
+                      </PrimaryButton>
+                    </div>
+                  ) : null
+                }
+              />
+            </div>
           </div>
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
@@ -186,7 +206,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
         </div>
       </div>
 
-      {showBar && <MobileTotal total={t.total} remaining={remaining} ready={ready} onBuy={buyMobile} />}
+      {showBar && !confirmed && <MobileTotal total={t.payTotal} remaining={remaining} ready={ready} onBuy={buyMobile} />}
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
       <DeclinedDialog open={status === 'declined'} onClose={() => setStatus(null)} onChange={changeMethod} onReasons={showReasons} />
@@ -833,7 +853,7 @@ function AddressForm({ onSave, onCancel }) {
 }
 
 /* ---------------- 05/06 · Pagamento ---------------- */
-function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, warn }) {
+function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, warn, onConfirm }) {
   const open = c.step === 'pagamento'
   const [coinsInfo, setCoinsInfo] = useState(false)
   const coinsId = useId()
@@ -927,19 +947,25 @@ function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, war
             Ao gerar o Pix, você terá <strong className="text-ink">10 minutos</strong> para pagar <strong className="text-ink">{brl(t.total)}</strong> pelo app do seu banco. A
             confirmação costuma ser imediata.
           </div>
-          <PurchaseTerms action="Gerar Pix" />
-          <div className="mt-5 flex justify-end">
-            <PrimaryButton onClick={onPix}>Gerar Pix</PrimaryButton>
+          {/* Desktop: termos e Gerar Pix aqui. Celular: Confirmar leva até o Resumo, onde ficam os termos e o botão */}
+          <div className="hidden lg:block">
+            <PurchaseTerms action="Gerar Pix" />
+            <div className="mt-5 flex justify-end">
+              <PrimaryButton onClick={onPix}>Gerar Pix</PrimaryButton>
+            </div>
           </div>
+          <PrimaryButton className="mt-5 w-full lg:hidden" onClick={onConfirm}>
+            Confirmar
+          </PrimaryButton>
         </div>
       )}
-      {c.method === 'cartao' && <CardForm c={c} t={t} dispatch={dispatch} card={card} onSubmit={onCard} />}
+      {c.method === 'cartao' && <CardForm c={c} t={t} dispatch={dispatch} card={card} onSubmit={onCard} onConfirm={onConfirm} />}
       {!c.method && <p className="mt-4 font-ui text-xs text-ink-3">Escolha Pix ou Cartão de crédito para continuar.</p>}
     </StepShell>
   )
 }
 
-function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
+function CardForm({ c, t, dispatch, card: cs, onSubmit, onConfirm }) {
   const id = useId()
   const { value: card, set: setCard, touched, setTouched } = cs
   const errors = cardErrors(card)
@@ -1015,14 +1041,18 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit }) {
       <p className="col-span-2 font-ui text-xs text-ink-3">
         {valid ? `Total no cartão: ${brl(t.cardTotal)}.` : 'Preencha os dados do cartão para finalizar a compra.'}
       </p>
-      <div className="col-span-2">
+      {/* Desktop: termos e Finalizar compra aqui. Celular: Confirmar leva até o Resumo, onde ficam os termos e o botão */}
+      <div className="col-span-2 hidden lg:block">
         <PurchaseTerms action="Finalizar compra" />
       </div>
-      <div className="col-span-2 flex justify-end">
+      <div className="col-span-2 hidden justify-end lg:flex">
         <PrimaryButton type="submit" disabled={!valid}>
           Finalizar compra
         </PrimaryButton>
       </div>
+      <PrimaryButton className="col-span-2 w-full lg:hidden" onClick={onConfirm}>
+        Confirmar
+      </PrimaryButton>
     </form>
   )
 }
@@ -1052,6 +1082,9 @@ function SummaryRows({ t, order, className = '' }) {
       {t.club > 0 && row('Clube Planeta', brl(t.club))}
       {row('Entrega', t.shipping === null ? 'A definir' : t.shipping ? brl(t.shipping) : 'Grátis')}
       {t.coins > 0 && row('Moedas Uhuu', `− ${brl(t.coins)}`, 'text-success')}
+      {/* Decreto 7.962/2013: juros e taxa de processamento sempre discriminados no resumo */}
+      {row(t.installments > 1 ? `Juros do parcelamento (${t.installments}x)` : 'Juros do parcelamento', brl(t.interest))}
+      {row('Taxa de processamento', brl(t.processing))}
     </dl>
   )
 }
@@ -1060,13 +1093,13 @@ function SummaryRows({ t, order, className = '' }) {
  * Celular/tablet: evento, ingressos e resumo num card só (Figma 10195:63007 "Seus ingressos"):
  * reserva no topo, espetáculo, ingressos em caixas claras, valores, divisor e total.
  */
-function MobileOrderCard({ t, order, onRemoveCourtesy, remaining = null, id = `${SUMMARY_ID}-m` }) {
+function MobileOrderCard({ t, order, onRemoveCourtesy, remaining = null, id = `${SUMMARY_ID}-m`, coupon = null, footer = null }) {
   return (
     <Card as="div" id={id} className="flex scroll-mt-24 flex-col gap-4 !p-4">
       {/* Desktop: tempo da reserva dentro do card, no topo; no celular ele fica fora, no topo da página */}
       {remaining !== null && <ReserveTimer remaining={remaining} />}
       <div>
-        <p className="font-ui text-xs uppercase leading-4 text-brand">Espetáculo</p>
+        <p className="font-ui text-xs uppercase leading-4 text-brand">Resumo</p>
         <p className="mt-1 text-2xl font-bold leading-tight text-ink">{EVENT.title}</p>
         <p className="mt-1 font-ui text-xs text-ink-3">{EVENT.venue.name}, {EVENT.venue.city}</p>
       </div>
@@ -1094,14 +1127,23 @@ function MobileOrderCard({ t, order, onRemoveCourtesy, remaining = null, id = `$
           ),
         )}
       </ul>
+      {coupon}
       <SummaryRows t={t} order={order} />
       <div className="border-t border-line pt-4">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-2xl font-bold leading-tight text-ink">Total à vista</span>
-          <span className="text-2xl font-bold leading-tight text-ink">{brl(t.total)}</span>
+          <span className="text-2xl font-bold leading-tight text-ink">{t.method === 'cartao' ? 'Total no cartão' : 'Total à vista'}</span>
+          <span className="text-2xl font-bold leading-tight text-ink">{brl(t.payTotal)}</span>
         </div>
-        <p className="mt-2 font-ui text-xs text-ink-3">Ou parcelado no cartão até 3x de {brl(t.maxInstallment)}</p>
+        {t.method === 'cartao' ? (
+          <p className="mt-2 font-ui text-xs text-ink-3">
+            {t.installments}x de {brl(t.payTotal / t.installments)}
+            {t.installments > 1 ? ' com juros' : ' sem juros'}
+          </p>
+        ) : (
+          t.method !== 'pix' && <p className="mt-2 font-ui text-xs text-ink-3">Ou parcelado no cartão até 3x de {brl(t.maxInstallment)}</p>
+        )}
       </div>
+      {footer}
     </Card>
   )
 }
@@ -1145,7 +1187,9 @@ function Totals({ t, order, remaining, title = 'Total à vista', showTimer = tru
   )
 }
 
-function Coupons({ c, t, order, dispatch }) {
+function Coupons({ c, t, order, dispatch, embedded = false }) {
+  // embedded: dentro do Resumo (celular), numa caixa clara em vez de um card próprio
+  const Box = embedded ? EmbeddedBox : Card
   const id = useId()
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -1166,7 +1210,7 @@ function Coupons({ c, t, order, dispatch }) {
     }, 700)
   }
   return (
-    <Card as="div">
+    <Box as="div">
       <p className="text-base font-bold text-ink">{c.coupons.length > 1 ? 'Cupons de desconto' : 'Cupom de desconto'}</p>
       {t.applied.length > 0 && (
         <ul className="mt-4 flex flex-col gap-2">
@@ -1215,9 +1259,10 @@ function Coupons({ c, t, order, dispatch }) {
           {busy ? 'Validando…' : 'Aplicar cupom'}
         </button>
       </form>
-    </Card>
+    </Box>
   )
 }
+const EmbeddedBox = ({ children }) => <div className="rounded-3xl border border-line bg-body p-4">{children}</div>
 
 /** Barra fixa no celular com o total; leva até o resumo. */
 /**
