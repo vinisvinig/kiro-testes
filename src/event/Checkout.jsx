@@ -56,7 +56,11 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   const confirm = () => {
     if (c.method === 'cartao' && !cardValid) return setCardTouched({ number: true, name: true, expiry: true, cvv: true })
     setConfirmed(true)
-    scrollToId(`${SUMMARY_ID}-m`)
+    // Rolagem suave até o Resumo, igual às outras etapas: espera a etapa minimizar e, no celular,
+    // o teclado fechar (se um campo do cartão estava em foco); senão o Safari corta a animação no meio.
+    const typing = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'SELECT'
+    document.activeElement?.blur?.()
+    setTimeout(() => document.getElementById(`${SUMMARY_ID}-m`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), typing ? 350 : 60)
   }
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
   // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
@@ -145,7 +149,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   }
 
   return (
-    <div className={`page-x pt-6 md:pt-8 lg:pb-16 ${showBar ? 'pb-28' : 'pb-12'}`}>
+    <div className="page-x pb-12 pt-6 md:pt-8 lg:pb-16">
       <div className="evento-box">
         <BackButton onClick={onBack}>Voltar à seleção de ingressos</BackButton>
         <h1 className="sr-only">Finalizar compra</h1>
@@ -211,7 +215,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
         </div>
       </div>
 
-      {showBar && !confirmed && <MobileTotal total={t.payTotal} remaining={remaining} ready={ready} onBuy={buyMobile} />}
+      {/* Barra fixa "Total à vista + Comprar" removida: a compra termina no Resumo, depois do Confirmar */}
       <ProcessingDialog open={status === 'processing'} />
       <FailedDialog open={status === 'failed'} onClose={() => setStatus(null)} />
       <DeclinedDialog open={status === 'declined'} onClose={() => setStatus(null)} onChange={changeMethod} onReasons={showReasons} />
