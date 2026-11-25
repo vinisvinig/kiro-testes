@@ -172,6 +172,11 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               onLocked={lockedPayment}
               warn={warnDelivery}
               onConfirm={confirm}
+              confirmed={confirmed}
+              onEdit={() => {
+                setConfirmed(false)
+                scrollToId('etapa-pagamento')
+              }}
             />
             {/* Celular/tablet: Resumo no fim da página, com o cupom dentro e, depois do "Confirmar", os termos e o botão final */}
             <div className="lg:hidden">
@@ -854,7 +859,15 @@ function AddressForm({ onSave, onCancel }) {
 }
 
 /* ---------------- 05/06 · Pagamento ---------------- */
-function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, warn, onConfirm }) {
+/** Resumo da etapa minimizada: "Pix · R$ 224,83" ou "Cartão final 1111 · 3x de R$ 77,19 (com juros)". */
+const paymentSummary = (c, t, card) => {
+  if (c.method === 'pix') return `Pix · ${brl(t.payTotal)}`
+  if (c.method !== 'cartao') return ''
+  const last = onlyDigits(card?.number || '').slice(-4)
+  const parc = t.installments > 1 ? `${t.installments}x de ${brl(t.payTotal / t.installments)} (com juros)` : `1x de ${brl(t.payTotal)}`
+  return `Cartão${last ? ` final ${last}` : ''} · ${parc}`
+}
+function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, warn, onConfirm, confirmed = false, onEdit }) {
   const open = c.step === 'pagamento'
   const [coinsInfo, setCoinsInfo] = useState(false)
   const coinsId = useId()
@@ -864,9 +877,12 @@ function PaymentStep({ c, t, dispatch, onPix, onCard, card, alert, onLocked, war
       alert={alert}
       warn={warn}
       onLocked={onLocked}
-      state={open ? 'open' : 'locked'}
+      // Celular: depois do "Confirmar" a etapa minimiza (igual à entrega) e mostra o resumo com "Editar"
+      state={open ? (confirmed ? 'done' : 'open') : 'locked'}
+      summary={paymentSummary(c, t, card?.value)}
+      onEdit={onEdit}
       icon="card"
-      title="Escolha como pagar"
+      title={confirmed ? 'Pagamento' : 'Escolha como pagar'}
       subtitle="Selecione uma forma de pagamento para continuar"
       lockedText="Disponível após escolher a entrega"
     >
