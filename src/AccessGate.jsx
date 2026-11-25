@@ -20,8 +20,13 @@ const allowed = () => {
   }
 }
 
+// Desligada a pedido: o site abre direto, sem pedir a senha. Para voltar a pedir, troque para true.
+// (O noindex do index.html continua: o site segue fora do Google.)
+const GATE_ON = false
+
 export default function AccessGate({ children }) {
   const [ok, setOk] = useState(allowed)
+  if (!GATE_ON) return children
   if (ok) return children
   return <Gate onOk={() => setOk(true)} />
 }
