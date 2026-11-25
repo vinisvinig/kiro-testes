@@ -1,7 +1,7 @@
 // Finalização de compra com descoberta progressiva (Figma "Desktop - Pagamento", 9566:234294 a 9926:95446).
 // Etapas: Seguro → Clube Planeta → Entrega → Pagamento. Cada uma só abre quando a anterior é respondida;
 // as já respondidas viram um resumo com "Editar".
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { EVENT, comboDetail, sessionTitle } from './eventData.js'
 import {
   DELIVERY,
@@ -53,8 +53,21 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   // Celular: "Confirmar" no pagamento leva até o Resumo (no fim da página), onde ficam os termos e o botão final
   const [confirmed, setConfirmed] = useState(false)
   useEffect(() => setConfirmed(false), [c.method, c.installments, card])
-  const confirm = () => {
+  // Ao minimizar, a etapa encolhe e o que vem abaixo (o Resumo) subiria para o lugar do botão, parecendo que a página rolou.
+  // Por isso o bloco "Pagamento" minimizado fica na mesma altura da tela em que estava o botão Confirmar.
+  const confirmAnchor = useRef(null)
+  useLayoutEffect(() => {
+    const y = confirmAnchor.current
+    if (!confirmed || y === null) return
+    confirmAnchor.current = null
+    const el = document.getElementById('etapa-pagamento')
+    if (!el) return
+    const bottom = el.getBoundingClientRect().bottom
+    window.scrollTo({ top: Math.max(0, window.scrollY + bottom - y), behavior: 'instant' })
+  }, [confirmed])
+  const confirm = (e) => {
     if (c.method === 'cartao' && !cardValid) return setCardTouched({ number: true, name: true, expiry: true, cvv: true })
+    confirmAnchor.current = e?.currentTarget?.getBoundingClientRect?.().bottom ?? null
     // A etapa só minimiza, sem rolar sozinha (pedido do teste: rolagem automática deixava as pessoas perdidas)
     setConfirmed(true)
   }
