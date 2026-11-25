@@ -53,21 +53,8 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   // Celular: "Confirmar" no pagamento leva até o Resumo (no fim da página), onde ficam os termos e o botão final
   const [confirmed, setConfirmed] = useState(false)
   useEffect(() => setConfirmed(false), [c.method, c.installments, card])
-  // Ao minimizar, a etapa encolhe e o que vem abaixo (o Resumo) subiria para o lugar do botão, parecendo que a página rolou.
-  // Por isso o bloco "Pagamento" minimizado fica na mesma altura da tela em que estava o botão Confirmar.
-  const confirmAnchor = useRef(null)
-  useLayoutEffect(() => {
-    const y = confirmAnchor.current
-    if (!confirmed || y === null) return
-    confirmAnchor.current = null
-    const el = document.getElementById('etapa-pagamento')
-    if (!el) return
-    const bottom = el.getBoundingClientRect().bottom
-    window.scrollTo({ top: Math.max(0, window.scrollY + bottom - y), behavior: 'instant' })
-  }, [confirmed])
   const confirm = (e) => {
     if (c.method === 'cartao' && !cardValid) return setCardTouched({ number: true, name: true, expiry: true, cvv: true })
-    confirmAnchor.current = e?.currentTarget?.getBoundingClientRect?.().bottom ?? null
     // A etapa só minimiza, sem rolar sozinha (pedido do teste: rolagem automática deixava as pessoas perdidas)
     setConfirmed(true)
   }
@@ -339,7 +326,64 @@ function EventSummary({ order, onRemoveCourtesy }) {
 /* ------------------------------------------------------------------ */
 /* Blocos de etapa: aberta, concluída, bloqueada                       */
 /* ------------------------------------------------------------------ */
+/**
+ * Etapa que minimiza ou abre com animação (≈320ms), em vez de trocar de altura de uma vez.
+ * Ao minimizar uma etapa cujo topo já saiu da tela (ex.: cartão preenchido), a página acompanha a animação
+ * para o bloco minimizado terminar onde a etapa terminava; assim o Resumo não "sobe" para o lugar do botão.
+ */
+function useStepMotion(state) {
+  const ref = useRef(null)
+  const last = useRef(null) // { h, top, bottom } em coordenadas da página, medidos no último render
+  const busy = useRef(false)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const prev = last.current
+    if (!el || !prev || busy.current) return
+    const to = el.getBoundingClientRect().height
+    const from = prev.h
+    if (Math.abs(from - to) < 4 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const root = document.documentElement
+    const topVp = prev.top - window.scrollY
+    const keepBottom = to < from && topVp < 80 // minimizando com o topo fora da tela (ou sob o cabeçalho)
+    const anchor = Math.min(prev.bottom - window.scrollY, window.innerHeight - 16)
+    busy.current = true
+    root.style.overflowAnchor = 'none' // o navegador não "compensa" a rolagem por conta própria
+    el.style.overflow = 'hidden'
+    el.style.height = `${from}px`
+    const t0 = performance.now()
+    const D = 320
+    let raf
+    const done = () => {
+      el.style.height = ''
+      el.style.overflow = ''
+      root.style.overflowAnchor = ''
+      busy.current = false
+    }
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / D)
+      const e = 1 - Math.pow(1 - k, 3)
+      el.style.height = `${from + (to - from) * e}px`
+      if (keepBottom) window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().bottom - anchor, behavior: 'instant' })
+      if (k < 1) raf = requestAnimationFrame(step)
+      else done()
+    }
+    raf = requestAnimationFrame(step)
+    return () => {
+      cancelAnimationFrame(raf)
+      done()
+    }
+  }, [state])
+  // Guarda a medida atual a cada render (menos durante a animação), para a próxima troca de estado saber de onde partir
+  useLayoutEffect(() => {
+    if (busy.current || !ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    last.current = { h: r.height, top: r.top + window.scrollY, bottom: r.bottom + window.scrollY }
+  })
+  return ref
+}
+
 function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined = false, alert = false, warn = false, onLocked, lockedText = 'Disponível após a etapa anterior', children }) {
+  const motion = useStepMotion(state)
   if (state === 'locked') {
     // Com onLocked, tocar no bloco bloqueado leva até a etapa que falta (ex.: pagamento → entrega)
     const go = onLocked
@@ -351,7 +395,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
         }
       : {}
     return (
-      <section id={`etapa-${id}`} aria-disabled="true" {...go} className={`scroll-mt-24 rounded-3xl border border-line bg-white p-6 opacity-80 ${onLocked ? 'cursor-pointer' : ''}`}>
+      <section ref={motion} id={`etapa-${id}`} aria-disabled="true" {...go} className={`scroll-mt-24 rounded-3xl border border-line bg-white p-6 opacity-80 ${onLocked ? 'cursor-pointer' : ''}`}>
         <div className="flex items-center gap-4">
           <span className="flex size-8 items-center justify-center rounded-full bg-body-3 text-ink-2">
             <Ico name={icon} className="size-4" />
@@ -367,7 +411,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
   }
   if (state === 'done') {
     return (
-      <section id={`etapa-${id}`} className="scroll-mt-24 rounded-3xl border border-line bg-white p-6">
+      <section ref={motion} id={`etapa-${id}`} className="scroll-mt-24 rounded-3xl border border-line bg-white p-6">
         <div className="flex items-center gap-4">
           {/* Verde quando o adicional foi contratado; cinza (como etapa não preenchida) quando a pessoa continuou sem */}
           <span className={`flex size-8 shrink-0 items-center justify-center rounded-full ${declined ? 'bg-body-3 text-ink-2' : 'bg-[#22c55e] text-white'}`}>
@@ -386,6 +430,7 @@ function StepShell({ id, state, icon, title, subtitle, summary, onEdit, declined
   }
   return (
     <section
+      ref={motion}
       id={`etapa-${id}`}
       aria-labelledby={`etapa-${id}-t`}
       className={`scroll-mt-24 rounded-3xl border bg-white p-6 transition-colors ${alert ? 'border-danger ring-1 ring-danger' : warn ? 'border-alert ring-1 ring-alert' : 'border-line'}`}
