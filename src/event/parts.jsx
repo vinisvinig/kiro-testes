@@ -338,7 +338,8 @@ export function VenueMap({ compact = false }) {
       )}
       <div className={`mt-4 rounded-3xl border border-line bg-body ${compact ? 'p-6' : 'p-4 md:p-6'}`}>
         {zoom ? (
-          <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          // mx-auto: o botão encolhe para o tamanho da imagem, então precisa ser centralizado no card
+          <button type="button" onClick={() => setOpen(true)} aria-label="Ampliar mapa do local" className="group relative mx-auto block cursor-zoom-in rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-brand">
             {img}
           </button>
         ) : (
