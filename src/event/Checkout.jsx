@@ -242,37 +242,42 @@ const pixCode = (total) =>
 /* ------------------------------------------------------------------ */
 /* Evento e ingressos (cabeçalho com lista recolhível)                 */
 /* ------------------------------------------------------------------ */
-/** Ingresso de cortesia na finalização: destaque verde, "Grátis" com o valor riscado e opção de remover. */
+/** Ingresso de cortesia na finalização (Figma 11061:132097): card verde, selo "Cortesia", Grátis com o valor riscado e "Remover cortesia". */
 function CourtesyItem({ line: l, onRemove }) {
   return (
-    <li className="flex items-center gap-3 rounded-3xl border border-success/40 bg-[#f0fdf4] p-4">
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white text-success">
-        <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-current">
-          <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" />
-        </svg>
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <span className="flex items-center gap-2 text-sm font-semibold uppercase leading-5 text-ink-3">
-          {sessionTitle(l.session)}
-          <span className="rounded bg-success px-1.5 py-px font-ui text-[10px] font-semibold normal-case text-white">Cortesia</span>
+    <li className="flex flex-col gap-3 rounded-2xl border border-[#22c55e] bg-[#f0fdf4] p-4">
+      <div className="flex items-start gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#22c55e] text-white">
+          <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-current">
+            <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" />
+          </svg>
         </span>
-        <span className="block text-base font-semibold leading-6 text-ink">
-          {l.qty} {l.qty === 1 ? 'ingresso grátis' : 'ingressos grátis'}, {l.sector.name}
-        </span>
-        <span className="block text-sm leading-5 text-ink-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="flex flex-wrap items-center gap-2 text-sm font-semibold uppercase leading-5 text-ink-3">
+            {sessionTitle(l.session)}
+            <span className="rounded-md bg-[#22c55e] px-[5px] py-px text-[10px] font-medium normal-case leading-4 text-white">Cortesia</span>
+          </p>
+          <p className="text-base font-bold leading-6 text-ink">
+            {l.qty} {l.qty === 1 ? 'ingresso grátis' : 'ingressos grátis'}, {l.sector.name}
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="whitespace-nowrap text-base font-bold leading-6 text-success">Grátis</span>
+          <span className="whitespace-nowrap text-xs leading-4 text-ink-3 line-through">{brl(l.value)}</span>
+        </div>
+      </div>
+      <div className="flex flex-col items-start gap-1">
+        <p className="text-xs leading-4 text-ink-2">
           {l.qty === 1 ? 'Um dos ingressos escolhidos' : `${l.qty} dos ingressos escolhidos`} sai de graça
           {l.seats.length > 0 && ` · ${l.seats.length === 1 ? 'assento' : 'assentos'} ${l.seats.join(', ')}`}
-        </span>
+        </p>
+        {/* Remover existe porque cortesia e cupom não se somam: para usar um cupom, a pessoa remove a cortesia */}
         {onRemove && (
-          <button type="button" onClick={onRemove} className="self-start font-ui text-xs font-semibold text-danger underline underline-offset-2 hover:no-underline">
+          <button type="button" onClick={onRemove} className="text-xs font-semibold leading-4 text-danger underline underline-offset-2 hover:no-underline">
             Remover cortesia
           </button>
         )}
-      </span>
-      <span className="flex flex-col items-end">
-        <span className="whitespace-nowrap text-base font-semibold leading-6 text-success">Grátis</span>
-        <span className="whitespace-nowrap text-xs text-ink-3 line-through">{brl(l.value)}</span>
-      </span>
+      </div>
     </li>
   )
 }

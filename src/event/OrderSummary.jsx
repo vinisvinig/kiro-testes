@@ -127,29 +127,32 @@ export function OrderSummary({ order, derived, dispatch, onFees, onBuy, remainin
 
 function SummaryLine({ line: l, codeOk, onRemove }) {
   // Ingresso de cortesia: linha própria em verde, valor "Grátis" e lixeira que remove só a cortesia
+  // Ingresso de cortesia (Figma 11061:138879): verde, "Cortesia · setor", Grátis com o valor riscado e lixeira
   if (l.kind === 'courtesy') {
     return (
-      <li className="flex items-start gap-3 rounded-xl border border-success/40 bg-[#f0fdf4] p-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-ink">{sessionTitle(l.session)}</p>
-          <p className="flex items-center gap-1.5 font-ui text-xs text-ink-2">
-            <span className="rounded bg-success px-1 font-ui text-[10px] font-semibold text-white">Cortesia</span>
-            {l.sector.name}
-          </p>
-          <p className="font-ui text-[11px] text-ink-3">
-            {l.qty}x {l.qty === 1 ? 'ingresso grátis' : 'ingressos grátis'}
-            {l.seats.length > 0 && ` · ${l.seats.join(', ')}`}
-          </p>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-ui text-xs font-bold text-success">Grátis</span>
-          <span className="font-ui text-[11px] text-ink-3 line-through">{brl(l.value)}</span>
+      <li className="flex items-center gap-4 rounded-xl border border-[#22c55e] bg-[#f0fdf4] px-3 py-2">
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <p className="text-xs font-bold leading-4 text-black">{sessionTitle(l.session)}</p>
+            <p className="text-xs leading-4">
+              <span className="font-bold text-success">Cortesia</span>
+              <span className="text-ink-3"> · {l.sector.name}</span>
+            </p>
+            <p className="text-[10px] font-medium leading-4 text-ink-3">
+              {l.qty}x {l.qty === 1 ? 'ingresso grátis' : 'ingressos grátis'}
+              {l.seats.length > 0 && ` · ${l.seats.join(', ')}`}
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-xs font-bold leading-4 text-success">Grátis</span>
+            <span className="text-[10px] font-medium leading-4 text-ink-3 line-through">{brl(l.value)}</span>
+          </div>
         </div>
         <button
           type="button"
           onClick={onRemove}
           aria-label="Remover a cortesia do pedido"
-          className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-danger text-danger hover:bg-[#fef2f2]"
+          className="flex size-[38px] shrink-0 items-center justify-center rounded-lg border border-danger bg-[#fef2f2] text-danger hover:brightness-95"
         >
           <Ico name="trash" className="size-4" />
         </button>

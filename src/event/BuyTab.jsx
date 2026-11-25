@@ -920,10 +920,13 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
   const selected = state.n > 0
   const body = (
     <>
+      {/* Celular (Figma 11061:132029): ícone + nome numa linha; setor e preço embaixo, sem recuo; quantidade por último.
+          Desktop: tudo numa linha (md:contents põe os blocos na mesma grade). */}
+      <span className="flex min-w-0 flex-1 flex-col gap-4 md:grid md:grid-cols-[auto_minmax(0,1.1fr)_minmax(0,1fr)_auto] md:items-center">
+        <span className="flex items-start gap-4 md:contents">
       <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-combo text-white">
         <Ico name="ticket" className="size-6" />
       </span>
-      <span className="grid min-w-0 flex-1 gap-2 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] md:items-center md:gap-4">
         <span className="min-w-0">
           {/* Etiquetas no topo, 4px acima do nome (mesmo espaço do "N selecionados" nos setores) */}
           {selected && (
@@ -941,6 +944,8 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           <span className="block text-base font-semibold leading-6 text-ink">{combo.name}</span>
           <span className="block font-ui text-xs leading-4 text-combo">{combo.desc}</span>
         </span>
+        </span>
+        <span className="flex flex-col gap-2 md:contents">
         <span className="min-w-0">
           {sector.badge && <Badge>{sector.badge}</Badge>}
           <span className={`block text-lg font-bold leading-tight text-ink ${sector.badge ? 'mt-1' : ''}`}>{sector.name}</span>
@@ -949,10 +954,11 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
           <span className="text-sm font-semibold leading-5 text-ink">{brl(price)}</span>
           <Fee value={price} />
         </span>
+        </span>
       </span>
     </>
   )
-  const frame = `flex w-full items-center gap-4 rounded-[14px] border bg-body p-4 text-left transition ${
+  const frame = `flex w-full flex-col gap-4 md:flex-row md:items-center rounded-[14px] border bg-body p-4 text-left transition ${
     open || selected ? 'border-combo ring-1 ring-combo' : 'border-line hover:border-ink-4'
   }`
 
@@ -962,7 +968,7 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
       <button type="button" onClick={onToggle} aria-expanded={open} className={frame}>
         {body}
         {/* Mesma largura do Stepper (104px) no desktop, para nome, setor e preço ficarem alinhados entre combos livres e com assento */}
-        <span className="flex shrink-0 justify-end md:w-[104px]">
+        <span className="flex shrink-0 justify-start md:w-[104px] md:justify-end">
           <span className="flex size-9 items-center justify-center rounded-full bg-body-3 text-ink">
             <Ico name="expand" className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} />
           </span>
@@ -972,9 +978,9 @@ function ComboRow({ combo, sector, session, state, open, onToggle, onQty }) {
   }
   // Setor livre: basta a quantidade, não há mapa nem tarifa para escolher.
   return (
-    <div className={`${frame} max-md:flex-wrap`}>
+    <div className={frame}>
       {body}
-      <div className="shrink-0 max-md:flex max-md:basis-full max-md:justify-end md:w-[104px]">
+      <div className="flex shrink-0 justify-start md:w-[104px]">
         <Stepper label={combo.name} value={state.n} canAdd={state.n < COMBO_LIMIT} onChange={onQty} />
       </div>
     </div>
