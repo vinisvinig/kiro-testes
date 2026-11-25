@@ -21,7 +21,7 @@ import {
   occupiedFor,
 } from './eventData.js'
 import { deriveOrder, keyOf, roomIn, takenElsewhere } from './order.js'
-import { Badge, Card, CardTitle, CourtesyHint, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
+import { Badge, Card, CardTitle, Collapse, CourtesyHint, Eyebrow, Ico, InfoBanner, MapDialog, Note, Stepper, VenueMap, brl } from './parts.jsx'
 import { OrderSummary, MobileBuyBar } from './OrderSummary.jsx'
 import { useDragScroll } from '../components/home/ui.jsx'
 
@@ -356,17 +356,16 @@ function Sectors({ order, dispatch, session, onMap, progress = null }) {
           return (
             <li key={s.id} id={`item-${s.id}`} className="scroll-mt-28">
               <SectorRow sector={s} session={session} open={open} onToggle={() => dispatch({ type: 'open', id: s.id })} count={count} />
-              {open && (
-                <div className="mt-2 flex flex-col gap-2">
-                  {s.kind === 'assento' ? (
-                    <SeatBody sector={s} order={order} dispatch={dispatch} session={session} />
-                  ) : (
-                    <FreeBody sector={s} order={order} dispatch={dispatch} session={session} />
-                  )}
-                  {/* Cortesia automática: o aviso acompanha quem está escolhendo dentro do setor */}
-                  {progress && <CourtesyHint progress={progress} onRestore={() => dispatch({ type: "courtesy", on: true })} />}
-                </div>
-              )}
+              {/* Abre e recolhe com animação (Collapse) */}
+              <Collapse open={open} className="flex flex-col gap-2 pt-2">
+                {s.kind === 'assento' ? (
+                  <SeatBody sector={s} order={order} dispatch={dispatch} session={session} />
+                ) : (
+                  <FreeBody sector={s} order={order} dispatch={dispatch} session={session} />
+                )}
+                {/* Cortesia automática: o aviso acompanha quem está escolhendo dentro do setor */}
+                {progress && <CourtesyHint progress={progress} onRestore={() => dispatch({ type: "courtesy", on: true })} />}
+              </Collapse>
             </li>
           )
         })}
@@ -899,11 +898,9 @@ function Combos({ order, dispatch, session, onMap }) {
                 onToggle={() => dispatch({ type: 'open', id: c.id })}
                 onQty={(n) => dispatch({ type: 'comboQty', combo: c.id, n })}
               />
-              {open && (
-                <div className="mt-2">
-                  <ComboSeats combo={c} sector={sector} order={order} state={state} dispatch={dispatch} />
-                </div>
-              )}
+              <Collapse open={open} className="pt-2">
+                <ComboSeats combo={c} sector={sector} order={order} state={state} dispatch={dispatch} />
+              </Collapse>
             </li>
           )
         })}

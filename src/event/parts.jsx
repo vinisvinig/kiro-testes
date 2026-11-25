@@ -21,6 +21,44 @@ export function useScrollTopOnMount(key = '') {
   }, [key])
 }
 
+/**
+ * Conteúdo que expande e recolhe com animação de altura (~300ms), em vez de aparecer/sumir de uma vez.
+ * Fica montado durante o recolher; depois de aberto, libera o overflow para balões (ex.: tarifa no mapa) não serem cortados.
+ */
+export function Collapse({ open, children, className = '' }) {
+  const [mounted, setMounted] = useState(open)
+  const [shown, setShown] = useState(open)
+  const [settled, setSettled] = useState(open)
+  useEffect(() => {
+    if (open) {
+      setMounted(true)
+      let r2
+      const r1 = requestAnimationFrame(() => (r2 = requestAnimationFrame(() => setShown(true))))
+      const t = setTimeout(() => setSettled(true), 340)
+      return () => {
+        cancelAnimationFrame(r1)
+        cancelAnimationFrame(r2)
+        clearTimeout(t)
+      }
+    }
+    setSettled(false)
+    setShown(false)
+    const t = setTimeout(() => setMounted(false), 320)
+    return () => clearTimeout(t)
+  }, [open])
+  if (!mounted) return null
+  return (
+    <div
+      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${shown ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      {...(shown ? {} : { inert: '' })}
+    >
+      <div className={`min-h-0 ${settled ? 'overflow-visible' : 'overflow-hidden'}`}>
+        <div className={className}>{children}</div>
+      </div>
+    </div>
+  )
+}
+
 export const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 /* ------------------------------------------------------------------ */
