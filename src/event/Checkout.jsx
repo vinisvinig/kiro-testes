@@ -55,12 +55,8 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   useEffect(() => setConfirmed(false), [c.method, c.installments, card])
   const confirm = () => {
     if (c.method === 'cartao' && !cardValid) return setCardTouched({ number: true, name: true, expiry: true, cvv: true })
+    // A etapa só minimiza, sem rolar sozinha (pedido do teste: rolagem automática deixava as pessoas perdidas)
     setConfirmed(true)
-    // Rolagem suave até o Resumo, igual às outras etapas: espera a etapa minimizar e, no celular,
-    // o teclado fechar (se um campo do cartão estava em foco); senão o Safari corta a animação no meio.
-    const typing = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'SELECT'
-    document.activeElement?.blur?.()
-    setTimeout(() => document.getElementById(`${SUMMARY_ID}-m`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), typing ? 350 : 60)
   }
   const ready = c.step === 'pagamento' && (c.method === 'pix' || (c.method === 'cartao' && cardValid))
   // Barra fixa do celular (total, cronômetro e Comprar) só depois de escolher Pix ou cartão
@@ -177,10 +173,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               warn={warnDelivery}
               onConfirm={confirm}
               confirmed={confirmed}
-              onEdit={() => {
-                setConfirmed(false)
-                scrollToId('etapa-pagamento')
-              }}
+              onEdit={() => setConfirmed(false)}
             />
             {/* Celular/tablet: Resumo no fim da página, com o cupom dentro e, depois do "Confirmar", os termos e o botão final */}
             <div className="lg:hidden">
