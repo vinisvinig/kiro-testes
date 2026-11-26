@@ -1175,7 +1175,7 @@ function SummaryRows({ t, order, className = '' }) {
  */
 function MobileOrderCard({ t, order, onRemoveCourtesy, remaining = null, id = `${SUMMARY_ID}-m`, coupon = null, footer = null }) {
   return (
-    <Card as="div" id={id} className="flex scroll-mt-24 flex-col gap-4 !p-4">
+    <Card as="div" id={id} className="flex scroll-mt-24 flex-col gap-4 lg:!p-4">
       {/* Desktop: tempo da reserva dentro do card, no topo; no celular ele fica fora, no topo da página */}
       {remaining !== null && <ReserveTimer remaining={remaining} />}
       <div>
