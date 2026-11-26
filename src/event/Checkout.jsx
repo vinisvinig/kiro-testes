@@ -50,6 +50,8 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
     setWarnDelivery(true)
     scrollToId('etapa-entrega')
   }
+  // Mesmo alerta amarelo para o pagamento: tocou em "Pagar" no Resumo sem escolher Pix/cartão (ou com o cartão incompleto)
+  const [warnPayment, setWarnPayment] = useState(false)
   const cardValid = Object.keys(cardErrors(card)).length === 0
   // Celular: "Confirmar" no pagamento leva até o Resumo (no fim da página), onde ficam os termos e o botão final
   const [confirmed, setConfirmed] = useState(false)
@@ -65,6 +67,24 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
   // Respondeu a etapa sinalizada (ou mudou o que faltava): tira o vermelho.
   useEffect(() => setAlertStep(null), [c.step, c.method, cardValid])
   useEffect(() => setWarnDelivery(false), [c.step, c.deliveryDone])
+  useEffect(() => setWarnPayment(false), [c.method, cardValid])
+
+  /** "Pagar" no fim do Resumo (celular): se falta algo, sinaliza em amarelo a etapa pendente e rola até ela. */
+  const payFromSummary = () => {
+    if (!c.deliveryDone) return lockedPayment()
+    if (c.method === 'cartao') setCardTouched({ number: true, name: true, expiry: true, cvv: true })
+    setConfirmed(false)
+    setWarnPayment(true)
+    scrollToId('etapa-pagamento')
+  }
+  // Mensagem amarela abaixo do botão, enquanto a pendência sinalizada não for resolvida
+  const summaryWarn = warnDelivery
+    ? 'Selecione uma modalidade de entrega para continuar.'
+    : warnPayment
+      ? c.method === 'cartao'
+        ? 'Preencha os dados do cartão para continuar.'
+        : 'Selecione uma forma de pagamento para continuar.'
+      : null
 
   /** Comprar (barra do celular): finaliza se estiver tudo pronto; senão sinaliza e rola até a pendência. */
   const buyMobile = () => {
@@ -171,7 +191,7 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
               card={{ value: card, set: setCard, touched: cardTouched, setTouched: setCardTouched }}
               onCard={() => pay('cartao', card)}
               onLocked={lockedPayment}
-              warn={warnDelivery}
+              warn={warnDelivery || warnPayment}
               onConfirm={confirm}
               confirmed={confirmed}
               onEdit={() => setConfirmed(false)}
@@ -184,14 +204,27 @@ export default function Checkout({ order, checkout: c, dispatch, orderDispatch, 
                 onRemoveCourtesy={removeCourtesy}
                 coupon={<Coupons c={c} t={t} order={order} dispatch={dispatch} embedded />}
                 footer={
-                  confirmed && ready ? (
+                  // Botão de pagar sempre no fim do Resumo. Pronto (entrega + Pix ou cartão válido): termos e ação final.
+                  // Faltando algo: o toque destaca em amarelo a etapa pendente (entrega ou pagamento), como no bloco bloqueado.
+                  ready ? (
                     <div>
                       <PurchaseTerms action={c.method === 'pix' ? 'Gerar Pix' : 'Finalizar compra'} />
                       <PrimaryButton className="mt-4 w-full" onClick={() => (c.method === 'pix' ? genPix() : pay('cartao', card))}>
                         {c.method === 'pix' ? 'Gerar Pix' : 'Finalizar compra'}
                       </PrimaryButton>
                     </div>
-                  ) : null
+                  ) : (
+                    <div>
+                      <PrimaryButton className="w-full" onClick={payFromSummary}>
+                        Pagar
+                      </PrimaryButton>
+                      {summaryWarn && (
+                        <p role="alert" className="mt-3 flex items-start gap-2 font-ui text-xs font-semibold leading-4 text-alert">
+                          <Ico name="error" className="size-4 shrink-0" /> {summaryWarn}
+                        </p>
+                      )}
+                    </div>
+                  )
                 }
               />
             </div>
