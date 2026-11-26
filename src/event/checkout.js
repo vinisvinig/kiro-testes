@@ -19,8 +19,9 @@ export const SAVED_ADDRESSES = [
   { id: 'a2', street: 'Avenida Arlindo Pasqualini, 210', detail: 'Jardim Isabel · Porto Alegre/RS · CEP 91760-140 · Apto. 601' },
 ]
 
+/** Taxa de processamento da operadora: só no cartão (centavos); Pix não tem. */
+export const CARD_PROCESSING_FEE = 0.49
 /** Parcelas do cartão: juros a partir de 2x. */
-export const PROCESSING_FEE = 0 // Taxa de processamento do pagamento (sem cobrança no protótipo)
 export const INSTALLMENTS = [
   { n: 1, rate: 0 },
   { n: 2, rate: 0.02 },
@@ -161,11 +162,11 @@ export function deriveCheckout(c, order) {
   const total = round(before - coins)
   const inst = INSTALLMENTS.find((i) => i.n === c.installments) || INSTALLMENTS[0]
   const cardTotal = round(total * (1 + inst.rate))
-  // Decreto 7.962/2013 (e-commerce): o resumo mostra separados os juros do parcelamento e a taxa de processamento.
-  // No protótipo não há taxa de processamento (fica R$ 0,00); os juros só existem no cartão parcelado.
+  // Decreto 7.962/2013 (e-commerce): juros do parcelamento e taxa de processamento aparecem separados no resumo
+  // quando existem. Taxa de processamento só no cartão; juros só no cartão parcelado (2x ou mais).
   const card = c.method === 'cartao'
   const interest = card ? round(cardTotal - total) : 0
-  const processing = PROCESSING_FEE
+  const processing = card ? CARD_PROCESSING_FEE : 0
   return {
     method: c.method,
     installments: card ? inst.n : 1,
@@ -185,7 +186,7 @@ export function deriveCheckout(c, order) {
     total,
     cardTotal,
     installment: cardTotal / inst.n,
-    maxInstallment: round((total * (1 + INSTALLMENTS.at(-1).rate)) / INSTALLMENTS.at(-1).n),
+    maxInstallment: round((total * (1 + INSTALLMENTS.at(-1).rate) + CARD_PROCESSING_FEE) / INSTALLMENTS.at(-1).n),
   }
 }
 

@@ -1,5 +1,6 @@
 // Peças compartilhadas pela Página do evento e pela seleção de ingressos.
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { asset, useIsDesktop, useModalBehavior } from '../components/home/ui.jsx'
 
 /**
@@ -49,10 +50,12 @@ export function Collapse({ open, children, className = '' }) {
   if (!mounted) return null
   return (
     <div
-      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${shown ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      // grid-cols-[minmax(0,1fr)] + min-w-0: sem isso a coluna do grid cresce até a largura do conteúdo
+      // (ex.: o mapa de assentos, w-max) e o setor aberto vaza para fora da tela no celular.
+      className={`grid grid-cols-[minmax(0,1fr)] transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${shown ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       {...(shown ? {} : { inert: '' })}
     >
-      <div className={`min-h-0 ${settled ? 'overflow-visible' : 'overflow-hidden'}`}>
+      <div className={`min-h-0 min-w-0 ${settled ? 'overflow-visible' : 'overflow-hidden'}`}>
         <div className={className}>{children}</div>
       </div>
     </div>
@@ -430,7 +433,9 @@ export function Dialog({ open, onClose, labelledBy, children, className = 'max-w
     if (open) requestAnimationFrame(() => ref.current?.focus())
   }, [open])
   if (!open) return null
-  return (
+  // Portal no <body>: dentro da página, o pop-up herdava o contexto de empilhamento da coluna (sticky/relative)
+  // e o rodapé (ícones sociais, selos Reclame Aqui) e o header passavam por cima dele ao rolar.
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-3" onMouseDown={onClose}>
       <div
         ref={ref}
@@ -443,7 +448,8 @@ export function Dialog({ open, onClose, labelledBy, children, className = 'max-w
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

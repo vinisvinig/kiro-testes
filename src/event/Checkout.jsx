@@ -5,6 +5,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 're
 import { EVENT, comboDetail, sessionTitle } from './eventData.js'
 import {
   DELIVERY,
+  CARD_PROCESSING_FEE,
   INSTALLMENTS,
   PIX_SECONDS,
   UHUU_COINS,
@@ -1102,7 +1103,8 @@ function CardForm({ c, t, dispatch, card: cs, onSubmit, onConfirm }) {
           className="h-11 w-full cursor-pointer appearance-none rounded-lg border border-line bg-white pl-4 pr-12 font-ui text-sm text-ink outline-none focus:border-brand"
         >
           {INSTALLMENTS.map((i) => {
-            const total = t.total * (1 + i.rate)
+            // Mesmo cálculo do resumo: juros da parcela + taxa de processamento do cartão
+            const total = t.total * (1 + i.rate) + CARD_PROCESSING_FEE
             return (
               <option key={i.n} value={i.n}>
                 {i.n}x de {brl(total / i.n)} {i.rate ? `(total ${brl(total)}, com juros)` : 'sem juros'}
@@ -1159,9 +1161,10 @@ function SummaryRows({ t, order, className = '' }) {
       {t.club > 0 && row('Clube Planeta', brl(t.club))}
       {row('Entrega', t.shipping === null ? 'A definir' : t.shipping ? brl(t.shipping) : 'Grátis')}
       {t.coins > 0 && row('Moedas Uhuu', `− ${brl(t.coins)}`, 'text-success')}
-      {/* Decreto 7.962/2013: juros e taxa de processamento sempre discriminados no resumo */}
-      {row(t.installments > 1 ? `Juros do parcelamento (${t.installments}x)` : 'Juros do parcelamento', brl(t.interest))}
-      {row('Taxa de processamento', brl(t.processing))}
+      {/* Decreto 7.962/2013: juros e taxa de processamento discriminados, mas só quando existem (R$ 0,00 não aparece).
+          Taxa de processamento: só no cartão. Juros: só no cartão parcelado. */}
+      {t.interest > 0 && row(`Juros do parcelamento (${t.installments}x)`, brl(t.interest))}
+      {t.processing > 0 && row('Taxa de processamento', brl(t.processing))}
     </dl>
   )
 }

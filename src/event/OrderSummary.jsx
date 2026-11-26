@@ -1,7 +1,7 @@
 // Resumo do pedido (coluna direita, Figma 9401:52957) e barra fixa de compra no celular.
 import { useEffect, useId, useRef, useState } from 'react'
 import { useModalBehavior } from '../components/home/ui.jsx'
-import { SERVICE_FEE, comboDetail, sessionTitle } from './eventData.js'
+import { comboDetail, sessionTitle } from './eventData.js'
 import { Card, CourtesyHint, Eyebrow, Ico, brl, useHeightTween } from './parts.jsx'
 
 export const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
@@ -55,7 +55,7 @@ function SummaryDetails({ order, derived: d, dispatch, feesLink }) {
             <dd>− {brl(d.courtesy.off)}</dd>
           </div>
         )}
-        <Row label={`Taxa de serviço, ${SERVICE_FEE * 100}%`} value={empty ? 'R$ -' : brl(d.fee)} />
+        <Row label="Taxa de serviço" value={empty ? 'R$ -' : brl(d.fee)} />
       </dl>
       {d.progress && !empty && <CourtesyHint progress={d.progress} onRestore={() => dispatch({ type: "courtesy", on: true })} />}
       {feesLink}

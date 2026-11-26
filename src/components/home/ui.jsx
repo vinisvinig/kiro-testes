@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from '../../router.jsx'
 
 /** Caminho de um asset baixado do Figma (public/figma). */
@@ -370,7 +371,8 @@ export function Sheet({ open, onClose, title, children, footer, labelledBy }) {
     if (open) requestAnimationFrame(() => ref.current?.focus())
   }, [open])
   if (!open) return null
-  return (
+  // Portal no <body> para ficar sempre acima do header e do rodapé
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/80 p-2 pt-4" onMouseDown={onClose}>
       <div
         ref={ref}
@@ -391,7 +393,8 @@ export function Sheet({ open, onClose, title, children, footer, labelledBy }) {
         <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
         {footer}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
