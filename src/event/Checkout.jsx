@@ -496,7 +496,7 @@ const PurchaseTerms = ({ action }) => (
 /** Bloco "Serviços adicionais" com os dois opcionais, ligados por interruptor (desligados por padrão). */
 function ServicesBlock({ children }) {
   return (
-    <section aria-labelledby="servicos-t" className="rounded-3xl border border-line bg-white p-4 sm:p-6 md:p-8">
+    <section aria-labelledby="servicos-t" className="rounded-3xl border border-line bg-white p-6 md:p-8">
       <div className="flex items-center gap-3">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <svg viewBox="0 0 24 24" aria-hidden className="size-5 fill-current">
